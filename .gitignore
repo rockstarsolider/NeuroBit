@@ -9,3 +9,5 @@ migrations/
 
 .env
 db.sqlite3
+
+se.py
