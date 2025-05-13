@@ -1,0 +1,11 @@
+{
+    "django": {
+      "pythonVersion": "3.12"
+    },
+    "disks": [
+      {
+        "name": "neurobit",
+        "mountTo": "media"
+      }
+    ]
+  }

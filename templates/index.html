@@ -1,0 +1,336 @@
+{% extends "_base.html" %}
+{% load static %}
+
+{% block title %}
+NEUROBIT
+{% endblock title %}
+
+{% block content %}
+  <!-- ============ HEADER ============ -->
+  <header>
+    <a href="#hero" class="logo-square" aria-label="Home"><img src='{% static "images/neurobit_main_logo.webp" %}' alt=""><span data-i18n="logo_text" class="logo-text">neurobit</span></a>
+    <nav class="desktop-nav">
+      <a href="#manifesto" data-i18n="nav_manifesto">What Neurobit do?</a>
+      <a href="#process" data-i18n="nav_process">Process</a>
+      <button class="btn-apply" data-i18n="nav_apply" onclick="document.getElementById('apply').scrollIntoView({behavior:'smooth'})">Apply</button>
+      <button id="langToggle" class="lang-toggle">FA</button>
+    </nav>
+    <button class="menu-icon" id="openMenu" aria-label="Open menu"><span></span><span></span></button>
+    
+  </header>
+
+  <!-- ============ MOBILE MENU ============ -->
+  <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+    <button class="close-btn" id="closeMenu" aria-label="Close menu">&times;</button>
+    <div class="mobile-menu-inner">
+      <div style="text-align: center;">
+        <button  class="lang-toggle lang-btn-mobile" style="margin-left: 0;">FA</button>
+      </div>
+      <a href="#manifesto" class="mobile-link" data-i18n="nav_manifesto">Manifesto</a>
+      <a href="#process" class="mobile-link" data-i18n="nav_process">Process</a>
+      <button class="btn-apply mobile-apply" data-i18n="nav_apply"
+        onclick="document.getElementById('apply').scrollIntoView({behavior:'smooth'});document.getElementById('mobileMenu').classList.remove('open');">Apply</button>
+    </div>
+  </div>
+
+  <!-- ============ HERO ============ -->
+  <main id="hero" class="hero">
+    <h1 data-i18n="hero_section_title" class="title glitch">NEUROBIT</h1>
+    <p class="lead" data-i18n="hero_ready">Ready for the future?</p>
+    <p class="lead lead-text"></p>
+    <img src='{% static "images/neurobit_hero.webp" %}' class="glitch hero_img" alt="">
+  </main>
+
+
+  <!-- ============ ETHICS / SAFE ENVIRONMENT ============ -->
+  <section id="ethics">
+    <h2 class="title_with_line" data-i18n="ethics_title">Our Code of Ethics</h2>
+
+    <p class="ethics-intro" data-i18n="ethics_intro">
+      We believe every learner deserves a safe, inclusive, and inspiring space to
+      grow. Here’s how we keep Neurobit a worry‑free environment for teens and
+      young adults.
+    </p>
+
+    <ul class="ethics-list">
+      <li data-i18n="ethics_point1">
+        🛡️ Certified mentors: All instructors pass background checks and complete
+        youth‑protection training.
+      </li>
+      <li data-i18n="ethics_point2">
+        🤝 Zero‑tolerance policy toward bullying, harassment, or discrimination of
+        any kind.
+      </li>
+      <li data-i18n="ethics_point3">
+        ⏱️ Live sessions are always recorded and available for parents on demand.
+      </li>
+      <li data-i18n="ethics_point4">
+        🔒 Private data stays private — we never share student information with
+        third parties.
+      </li>
+      <li data-i18n="ethics_point5">
+        📞 Dedicated parent hotline and monthly progress reports.
+      </li>
+    </ul>
+  </section>
+
+
+  <!-- ============ MANIFESTO ============ -->
+  <section id="manifesto">
+    <h2 class="title_with_line" data-i18n="manifesto_title">Manifesto</h2>
+    <div class="p_container">
+      <p data-i18n="manifesto_p1">
+        The “Neurobit” training program is an ultra-learning educational initiative and a focused, comprehensive pathway for cultivating and empowering future specialists in computer science and software engineering, designed to fully prepare learners for a successful entry into the real-world job market.
+      </p>
+    </div>
+    <div class="p_container">
+      <p data-i18n="manifesto_p2">
+        This program not only provides trainees with advanced, practical technical skills, but also equips them with valuable business and communication abilities so they can maintain a creative, dynamic, and impactful presence in professional environments.
+      </p>
+    </div>
+    <div class="p_container">
+      <p data-i18n="manifesto_p3">  Graduates of this course can work effectively and with confidence both on software development teams at large, well-known companies and within innovative, agile startups.</p>
+      <p data-i18n="manifesto_p4">
+        Moreover, learners can leverage the skills and knowledge acquired through this program to independently and self-directedly pursue their own career paths or personal business ventures.
+      </p>
+    </div>
+    <div class="p_container">
+      <p data-i18n="manifesto_p5">
+        This flexibility enables them to advance toward their professional and personal goals and secure a distinguished place in the world of technology.
+      </p>
+    </div>
+  </section>
+
+
+  <!-- ============ REQUIERMENTS ============ -->
+  <section id="requirements">
+    <h2 class="title_with_line" data-i18n="requirements_title">Manifesto</h2>
+    <div class="p_container">
+      <p data-i18n="requirements_p1">
+        This course is offered to teenagers and young adults aged 15 and above who are interested in software engineering and technology.
+      </p>
+    </div>
+    <div class="p_container">
+      <p data-i18n="requirements_p2">
+        Upon completion, participants can work in remote software teams and, if they wish, in-person.
+      </p>
+    </div>
+    <div class="p_container">
+      <p data-i18n="requirements_p3">
+        Motivation and perseverance are more important than academic background, which is not a prerequisite.
+      </p>
+    </div>
+    <div class="p_container">
+      <p data-i18n="requirements_p4">
+        Access to a suitable computer for coding, with a webcam and sufficient internet speed for online sessions, is required.
+      </p>
+    </div>
+    <div class="p_container">
+      <p data-i18n="requirements_p5">
+        Because much of the course material is in English, a basic proficiency in reading, listening, and comprehension of the language is necessary.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ PROCESS ============ -->
+  <section id="process">
+    <h2 class="title_with_line" data-i18n="process_title">Your development journey</h2>
+    <div class="timeline">
+      <h3 data-i18n="process_step1">1-choose the technical path</h3>
+      <div class="step">
+        <p data-i18n="process_p1">choose a technical path from the following branches:</p>
+        <p data-i18n="process_p2" style="font-weight: bold;">Front-end web development, back-end web development, artificial intelligence, Graphic design</p>
+      </div>
+
+      <h3 data-i18n="process_step2">2-Complete the educational steps of your chosen path.</h3>
+      <div class="step">
+        <p data-i18n="process_p3">Each learning path consists of several steps, and in each step, learners are taught not only technical skills but also soft skills such as:</p>
+        <p data-i18n="process_p4">
+          mental development, communication enhancement, personal growth, and cognitive skill improvement.
+        </p>
+      </div>
+      <h3 data-i18n="process_step3">3-Start of the practical internship phase</h3>
+      <div class="step">
+        <p data-i18n="process_p5">In the practical internship stage, after successfully completing all study phases and related presentations, the intern will begin working on real projects and teams. This stage includes the following actions:</p>
+        <ul class="process_list">
+          <li data-i18n="process_p6">
+            Joining the dedicated Neurobit career-opportunity channel to be introduced and connected to collaborating projects or teams.
+          </li>
+          <li data-i18n="process_p7">
+            Starting practical collaboration with Neurobit’s partner teams and companies based on personal profile, expertise, and performance achieved during the study phase.
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  
+
+  <!-- ============ APPLY ============ -->
+  <section id="apply">
+    <div>
+      <h4 class="apply-title" data-i18n="apply_title">apply and join us</h4>
+      <p class="apply-text" data-i18n="apply_p">
+        Participation in the introductory session is free of charge.<br/>In this session, held with the presence of Neurobit’s core team, participants will gain a comprehensive understanding of the program’s educational structure and its key objectives.
+      </p>
+      <a href='{% url "apply" %}' class="join-btn glitch" data-i18n="join_btn">Join Now</a>
+    </div>
+  </section>
+
+
+
+  <!-- ============ PARTNERS ============ -->
+  <section id="partners">
+    <h2 class="title_with_line" data-i18n="partners_title">
+      Companies we work with
+    </h2>
+
+    <!-- Logo grid -->
+    <div class="partners-grid">
+      <!-- ⬇️  Replace partner?.png / example.com with your real assets & links -->
+      <a href="https://www.digikala.com/" class="partner" aria-label="Partner 1">
+        <img src='{% static "images/digikala.svg" %}' class="glitch" alt="Partner 1 logo" />
+      </a>
+
+      <a href="https://www.jabama.com/" class="partner" aria-label="Partner 2">
+        <img src='{% static "images/jabama.svg" %}' class="glitch" alt="Partner 2 logo" />
+      </a>
+
+      <a href="https://medrickgames.com/" class="partner" aria-label="Partner 3">
+        <img src='{% static "images/medrik.png" %}' class="glitch" alt="Partner 3 logo" />
+      </a>
+
+      <a href="https://example.com" class="partner" aria-label="Partner 4">
+        <img src='{% static "images/yasanlogo.png" %}' class="glitch" alt="Partner 4 logo" />
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ TESTIMONIALS (CAROUSEL) ============ -->
+  <section id="testimonials">
+    <h2 class="title_with_line" data-i18n="testimonials_title">User comments</h2>
+  
+    <div class="testimonial-carousel">
+      <!-- nav buttons -->
+      <button class="tst-nav prev" aria-label="Previous slide">
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+  
+      <div class="carousel-track">
+        <!-- Slide 1 -->
+        <figure class="testimonial-slide">
+          <blockquote>
+            <p data-i18n="testimonial_1">
+              “Neurobit transformed my understanding of AI and gave me the confidence
+              to join a cutting‑edge startup.”
+            </p>
+          </blockquote>
+          <figcaption>
+            <span class="avatar" aria-hidden="true"></span>
+            <span class="name">Sara K.</span>
+            <span class="role" data-i18n="role_ai_engineer">AI Engineer @ Medrick</span>
+          </figcaption>
+        </figure>
+    
+        <!-- Slide 2 -->
+        <figure class="testimonial-slide">
+          <blockquote>
+            <p data-i18n="testimonial_2">
+              “The mix of technical depth and soft‑skill mentoring is unmatched.
+              I landed my first front‑end job two weeks after graduation.”
+            </p>
+          </blockquote>
+          <figcaption>
+            <span class="avatar" aria-hidden="true"></span>
+            <span class="name">Mohammad R.</span>
+            <span class="role" data-i18n="role_frontend_dev">Front‑end Dev @ Digikala</span>
+          </figcaption>
+        </figure>
+    
+        <!-- Slide 3 -->
+        <figure class="testimonial-slide">
+          <blockquote>
+            <p data-i18n="testimonial_3">
+              “Neurobit’s internship phase put me straight onto real projects—
+              now I’m leading a small team at a health‑tech scale‑up.”
+            </p>
+          </blockquote>
+          <figcaption>
+            <span class="avatar" aria-hidden="true"></span>
+            <span class="name">Niloofar T.</span>
+            <span class="role" data-i18n="role_product_designer">Product Designer @ Jabama</span>
+          </figcaption>
+        </figure>
+      </div>
+  
+      <button class="tst-nav next" aria-label="Next slide">
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </div>
+  
+    <!-- dot indicators -->
+    <div class="tst-dots">
+      <button class="dot active"></button>
+      <button class="dot"></button>
+      <button class="dot"></button>
+    </div>
+  </section>
+
+
+  
+  <!-- ============ TEAM ============ -->
+  <section id="team">
+    <h2 class="title_with_line" data-i18n="team_title">Meet the Core Team</h2>
+
+    <div class="team-grid">
+      <figure class="team-card glitch">
+        <img src='{% static "images/neurobit_ceo1.jpg" %}' alt="ali esmaeilzadeh" loading="lazy" />
+        <figcaption>
+          <span class="name" data-i18n="role_name_ceo">Ali Esmaeilzadeh</span>
+          <span class="role" data-i18n="role_ceo">CEO</span>
+        </figcaption>
+      </figure>
+
+      <figure class="team-card glitch">
+        <img src='{% static "images/neurobit_ceo2.jpg" %}' alt="abdollah feizollahzadeh" loading="lazy" />
+        <figcaption>
+          <span class="name" data-i18n="role_name_cbo">A. Feizollahzadeh</span>
+          <span class="role" data-i18n="role_cbo">CBO</span>
+        </figcaption>
+      </figure>
+
+      <figure class="team-card glitch">
+        <img src='{% static "images/neurobit_cto.jpg" %}' alt="farhad rezagholi" loading="lazy" />
+        <figcaption>
+          <span class="name" data-i18n="role_name_cto">F. Rezagholi</span>
+          <span class="role" data-i18n="role_cto">CTO</span>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+
+
+
+
+  <!-- ============ FOOTER ============ -->
+  <footer>
+    <span data-i18n="footer_copy">© 2025 – All rights neurobit-reserved.</span>
+    <span data-i18n="footer_made">Crafted with ❤️ for Iranian youth</span>
+  </footer>
+
+  <!-- ============ JS ============ -->
+  <script src="https://cdn.jsdelivr.net/npm/scramble-text@0.0.9/dist/ScrambleText.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/motion@latest/dist/motion.js"></script>
+  
+  <script src='{% static "js/glitch.js" %}'></script>
+  <script src='{% static "js/translate.js" %}'></script>
+  <script src='{% static "js/script.js" %}'></script>
+{% endblock content %}
+
