@@ -27,7 +27,7 @@ def apply_view(request):
                 age       = int(data['age']),
                 sopfile   = file
             )
-            return redirect('apply_success')
+            return redirect('home')
     return render(request, 'joinapp/join.html', {
         'errors': errors
     })

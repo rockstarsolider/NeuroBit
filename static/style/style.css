@@ -8,7 +8,7 @@
     font-display: swap;
 }
 /* ---------- TOKENS ---------- */
-:root {
+/* :root {
     --bg: #050505;
     --grid-line: rgba(255, 255, 255, .04);
     --grid-size: 40px;
@@ -27,8 +27,37 @@
                  0 0 12px var(--accent);
 
                  
-}
+} */
 
+/* ---------- TOKENS ---------- */
+/* 1.  LIGHT is now the baseline ---------------------------------- */
+:root {
+    --bg: #ffffff;
+    --grid-line: rgba(0, 0, 0, .05);
+    --grid-size: 40px;
+    --cursor-x: 50vw;
+    --cursor-y: 50vh;
+    --fg: #050505;
+    --accent: #1dae4b;
+    --font-display: "Orbitron", sans-serif;
+    --font-body: "Space Grotesk", sans-serif;
+    --font-display-fa: "ModamVF", sans-serif;
+    --font-body-fa: "ModamVF", sans-serif;
+    --acrylic-dark: rgba(255, 255, 255, .85);
+    --acrylic-border: rgba(0, 0, 0, .08);
+    --neon-glow: 0 0 4px var(--accent),
+                 0 0 8px var(--accent),
+                 0 0 12px var(--accent);
+  }
+  
+/* 2.  DARK theme overrides --------------------------------------- */
+[data-theme="dark"] {
+    --bg: #050505;
+    --grid-line: rgba(255, 255, 255, .04);
+    --fg: #ffffff;
+    --acrylic-dark: rgba(20, 20, 20, .85);
+    --acrylic-border: rgba(255, 255, 255, .08);
+}
 /* ---------- RESET ---------- */
 *,
 *::before,
@@ -78,7 +107,9 @@ header {
     top: 4%;
     left: 5%;
     width: 90%;
+    right: 5%;
     height: 64px;
+    margin: auto;
     max-width: 1280px;
     display: flex;
     align-items: center;
@@ -89,7 +120,15 @@ header {
     z-index: 30;
     border-radius: 4rem;
     backdrop-filter: blur(8px);
-    background-color: rgba(8, 8, 8, .8)
+    background-color: var(--acrylic-dark);
+}
+
+[data-theme="dark"] {
+    --bg: #050505;
+    --grid-line: rgba(255, 255, 255, .04);
+    --fg: #ffffff;
+    --acrylic-dark: rgba(20, 20, 20, .85);
+    --acrylic-border: rgba(255, 255, 255, .08);
 }
 
 .logo-square {
@@ -109,6 +148,8 @@ span.logo-text{
     margin-right: 1rem;
     font-family: var(--font-display)
 }
+
+
 /* desktop nav */
 .desktop-nav {
     display: flex;
@@ -144,7 +185,7 @@ span.logo-text{
     padding-bottom: 0.5rem;
 }
 .apply-text{
-    color: #ccc;
+    color: var(--fg);
 }
 .btn-apply {
     background: var(--accent);
@@ -179,7 +220,16 @@ span.logo-text{
     background: var(--accent);
     color: #000
 }
-
+html[dir="ltr"] #themeToggle{
+    margin-left: 1rem;
+}
+#themeToggle {
+    background: none;
+    border: none;
+}
+#themeToggle:hover {
+    cursor: pointer;
+}
 /* ---------- HAMBURGER ---------- */
 .menu-icon {
     display: none;
@@ -398,12 +448,14 @@ section h2 {
 .ethics-list li{
     position:relative;
     padding:1rem 1.25rem;
-    background:rgba(10,10,10,.75);
-    border-bottom:1px solid rgba(255,255,255,.08);
+    background:var(--acrylic-dark);
+    border-bottom:1px solid var(--acrylic-border);
     backdrop-filter:blur(6px);
     font-size:.85rem;
     text-align:left;
 }
+
+
 
 
 
@@ -430,8 +482,8 @@ section h2 {
 .join-btn {
     text-decoration: none;
     background-color: transparent;
-    border: 1px solid rgba(82, 82, 82, .4);
-    color: #fff;
+    border: 1px solid var(--fg);
+    color: var(--fg);
     font-weight: bold;
     margin-top: 2rem;
     padding: .2rem 0
@@ -459,10 +511,22 @@ section h2 {
     max-width: 140px;
     max-height: 64px;
     object-fit: contain;
+}
+/* [data-theme="dark"] .partner img{
     filter: grayscale(1);
     opacity: .8;
     transition: filter .35s, opacity .35s, transform .35s;
+} */
+[data-theme="light"] #medrik-logo{
+    /* turn white → pure black, then hue-shift to green */
+    filter:
+    invert(1)        /* white → black */
+    sepia(1)         /* take it into the warm channel */
+    hue-rotate(90deg)/* spin until it’s greenish */
+    saturate(600%)   /* crank up colour */
+    brightness(.75); /* back to the desired value */
 }
+
 
 .partner img:hover {
     filter: grayscale(0);
@@ -491,7 +555,7 @@ section h2 {
 /* slide ------------------------------------------------------------- */
 .testimonial-slide{
     min-width:100%;
-    background:rgba(10,10,10,.75);
+    background:var(--bg);
     backdrop-filter:blur(10px);
     padding:2.5rem 6.5rem;
     display:flex;
@@ -568,8 +632,8 @@ section h2 {
 .team-card{
     position:relative;
     overflow:hidden;
-    border:1px solid rgba(82,82,82,.25);
-    background:rgba(10,10,10,.6);
+    border:1px solid var(--acrylic-border);
+    background:var(--bg);
     backdrop-filter:blur(8px);
     transition:transform .35s, box-shadow .35s;
 }

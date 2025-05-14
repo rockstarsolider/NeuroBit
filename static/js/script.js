@@ -1,3 +1,31 @@
+// handle theming
+const root = document.documentElement;
+const themeToggleBtns = document.querySelectorAll('.theme-toggle');
+const savedTheme = localStorage.getItem('theme');
+
+// ----- 1. set the initial theme --------------------------------
+if (savedTheme) {
+    root.dataset.theme = savedTheme;      // restores last choice
+    themeToggleBtns.forEach(themeToggleBtn => {
+        themeToggleBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    });
+    
+    
+} else {
+    root.dataset.theme = 'light';         // default
+}
+
+// ----- 2. click handler ----------------------------------------
+themeToggleBtns.forEach(themeToggleBtn => {
+    themeToggleBtn.addEventListener('click', () => {
+        const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+        root.dataset.theme = next;
+        localStorage.setItem('theme', next);
+        themeToggleBtn.textContent = next === 'dark' ? '☀️' : '🌙';
+    });
+});
+
+
 
 // ---------- SCRAMBLE CYCLE ----------
 const handleScramble = text => {
