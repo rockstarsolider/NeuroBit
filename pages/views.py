@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views import generic
+from django.http import JsonResponse
 
 from .models import Application
 
@@ -32,30 +33,36 @@ class GameDevCourseView(generic.TemplateView):
     template_name = 'pages/learning_path_detail_GameDevelopment.html'
 
 
-# def apply_view(request):
-#     errors = {}
-#     if request.method == 'POST':
-#         data = request.POST
-#         file = request.FILES.get('sopfile')
-#         # basic validation
-#         if not data.get('full_name'):
-#             errors['full_name'] = 'This field is required.'
-#         if not data.get('age'):
-#             errors['age'] = 'This field is required.'
-#         # you can add more checks here…
-#         if not errors:
-#             Application.objects.create(
-#                 full_name = data['full_name'],
-#                 phone     = data.get('phone',''),
-#                 location  = data.get('location',''),
-#                 age       = int(data['age']),
-#                 sopfile   = file
-#             )
-#             return redirect('home')
-#     return render(request, 'joinapp/join.html', {
-#         'errors': errors
-#     })
+class JoinView(generic.View):
+    template_name = 'pages/join.html'
 
+    def get(self, request):
+        # Render the form as usual
+        return render(request, self.template_name)
 
-# def success_view(request):
-#     return render(request, 'joinapp/success.html')
+    def post(self, request):
+        # Expecting AJAX POST with form data
+        data = request.POST
+        file = request.FILES.get('sopfile')
+        errors = {}
+
+        # Validate fields
+        if not data.get('fullName'):
+            errors['fullName'] = 'This field is required.'
+        if not data.get('age'):
+            errors['age'] = 'This field is required.'
+        # Add more validation as needed
+
+        if errors:
+            # Return errors as JSON for AJAX
+            return JsonResponse({'success': False, 'errors': errors}, status=400)
+
+        # Save application
+        Application.objects.create(
+            full_name=data['fullName'],
+            phone=data.get('phone', ''),
+            location=data.get('location', ''),
+            age=int(data['age']),
+            sopfile=file
+        )
+        return JsonResponse({'success': True})

@@ -14,6 +14,5 @@ urlpatterns = [
     path('uiux/', views.UIUXCourseView.as_view(), name='uiux_course'),
     path('gamedev/', views.GameDevCourseView.as_view(), name='gamedev_course'),
 
-    # path('apply/', views.apply_view, name='apply'),
-    # path('success/', views.success_view, name='apply_success'),
+    path('apply/', views.JoinView.as_view(), name='apply')
 ]
