@@ -1,0 +1,14 @@
+<div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+    <button class="close-btn" id="closeMenu" aria-label="Close menu">&times;</button>
+    <div class="mobile-menu-inner">
+    <div style="text-align: center;">
+        <button  class="lang-toggle lang-btn-mobile" style="margin-left: 0;">FA</button>
+        <button class="theme-toggle" aria-label="Switch theme"><span>🌙</span></button>
+    </div>
+    <a href="#manifesto" class="mobile-link" data-i18n="nav_manifesto">Manifesto</a>
+    <a href="#process" class="mobile-link" data-i18n="nav_process">Process</a>
+    <a href='{% url "courses" %}' class="mobile-link" data-i18n="nav_courses">Courses</a>
+    <button class="btn-apply mobile-apply" data-i18n="nav_apply"
+        onclick="document.getElementById('apply').scrollIntoView({behavior:'smooth'});document.getElementById('mobileMenu').classList.remove('open');">Apply</button>
+    </div>
+</div>

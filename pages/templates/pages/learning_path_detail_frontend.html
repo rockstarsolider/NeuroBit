@@ -1,0 +1,218 @@
+{% extends "_base.html" %}
+{% load static %}
+
+
+  {# Base + shared design tokens #}
+{% block extra_style %}
+<link rel="stylesheet" href="style/learning_path_details.css">
+{% endblock extra_style %}
+
+
+{% block content %}
+  <main data-page-key="frontend">
+      {# ============ PATH HERO ============ #}
+      <section class="path-hero">
+        <div>
+          <h1 data-i18n="path_title_placeholder">Front‑End Web Development</h1>
+          <p data-i18n="path_summary_placeholder">
+            Craft interactive, accessible and responsive user‑interfaces using HTML, CSS & JavaScript frameworks.
+          </p>
+          <button class="btn-primary" data-i18n="join_program_btn" onclick="window.location.href='join.html'">Join the Program</button>
+        </div>
+        <img src='{% static "images/front_path.png" %}' alt="Learning path hero image" />
+      </section>
+
+      {# ============ CAREER OVERVIEW ============ #}
+      <section class="lp-section" id="career-overview">
+        <h2 data-i18n="career_overview_title">Career Snapshot</h2>
+        <div class="overview-grid">
+          <div class="overview-item"><strong data-i18n="fe_role">Front‑End Dev</strong><span data-i18n="career_role_label">Potential Role</span></div>
+          <div class="overview-item"><strong data-i18n="fe_salary">$102,500</strong><span data-i18n="median_salary_label">Median Salary ¹</span></div>
+          <div class="overview-item"><strong data-i18n="fe_jobs">68,000+</strong><span data-i18n="jobs_available_label">Jobs Available ¹</span></div>
+          <div class="overview-item"><strong data-i18n="fe_growth">23%</strong><span data-i18n="career_growth_label">5‑Year Growth</span></div>
+        </div>
+      </section>
+      
+
+      {# ============ TECH & TOOLS ============ #}
+      <section class="lp-section" id="tech-stack">
+        <h2 data-i18n="tech_stack_title">Technologies You’ll Master</h2>
+        <div class="tech-grid">
+          {# repeat .tech blocks as needed #}
+          <div class="tech">
+            <img src='{% static "images/HTML5.svg" %}' alt="">
+            <span>HTML5</span>
+          </div>
+          <div class="tech">
+            <img src='{% static "images/CSS3.svg" %}' alt="">
+            <span>CSS3</span>
+          </div>
+          <div class="tech">
+            <img src='{% static "images/JavaScript.svg" %}' alt="">
+            <span>JavaScript</span>
+        </div>
+          <div class="tech">
+            <img src='{% static "images/React.svg" %}' alt="">
+            <span>React</span>
+            </div>
+          <div class="tech">
+            <img src='{% static "images/Git.svg" %}' alt="">
+            <span>Git</span>
+        </div>
+          <div class="tech">
+            <img src='{% static "images/Tailwind CSS.svg" %}' alt="">
+            <span>tailwind css</span>
+        </div>
+        </div>
+      </section>
+
+      {# ============ CURRICULUM / MODULES ============ #}
+      <section class="lp-section" id="curriculum">
+        <h2 data-i18n="curriculum_title">Curriculum Breakdown</h2>
+        <div class="modules-list">
+          <div class="module-item" data-i18n="module_1_placeholder">HTML & Semantic Markup</div>
+          <div class="module-item" data-i18n="module_2_placeholder">CSS Fundamentals & Responsive Design</div>
+          <div class="module-item" data-i18n="module_3_placeholder">Modern JavaScript (ES6+)</div>
+          <div class="module-item" data-i18n="module_4_placeholder">Version Control with Git & GitHub</div>
+          <div class="module-item" data-i18n="module_5_placeholder">Frameworks – React Basics</div>
+          <div class="module-item" data-i18n="module_6_placeholder">Capstone Project & Portfolio</div>
+        </div>
+      </section>
+
+      {# ============ SAMPLE PROJECTS ============ #}
+      <section class="lp-section" id="sample-projects">
+        <h2 data-i18n="sample_projects_title">Projects You’ll Build</h2>
+        <div class="project-gallery">
+          {# repeat .project-card blocks as needed #}
+          <article class="project-card">
+            <img src='{% static "images/project_analyticl_dashboard.png" %}' alt="Analytics Dashboard screenshot" />
+            <div class="proj-body">
+              <h3 data-i18n="project_1_title_placeholder">Interactive Analytics Dashboard</h3>
+              <p data-i18n="project_1_desc_placeholder">Build a fully responsive dashboard with charts, filters and dark‑mode toggle.</p>
+            </div>
+          </article>
+          <article class="project-card">
+            <img src='{% static "images/project_ecommerce.png" %}' alt="E‑commerce storefront" />
+            <div class="proj-body">
+              <h3 data-i18n="project_2_title_placeholder">Headless E‑Commerce Storefront</h3>
+              <p data-i18n="project_2_desc_placeholder">Implement product listings, cart, and checkout flow powered by a mock API.</p>
+            </div>
+          </article>
+          <article class="project-card">
+            <img src='{% static "images/project_portfolio.png" %}' alt="Personal portfolio" />
+            <div class="proj-body">
+              <h3 data-i18n="project_3_title_placeholder">Personal Portfolio Generator</h3>
+              <p data-i18n="project_3_desc_placeholder">Create and deploy a dynamic portfolio site, featuring your own work.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      {# ============ REAL-WORLD RESPONSIBILITIES (NEW) ============ #}
+      <section class="lp-section" id="responsibilities">
+          <h2 data-i18n="responsibilities_title">A Day in the Life</h2>
+
+          <div class="responsibilities-grid">
+              {# کارت ۱ #}
+              <article class="resp-card">
+                  <div class="resp-icon">
+                      {# Lucide icon: Braces #}
+                      <svg width="28" height="28" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round">
+                          <path d="M7 4c-2 2-2 5-2 10s0 8 2 10" />
+                          <path d="M17 4c2 2 2 5 2 10s0 8-2 10" />
+                      </svg>
+                  </div>
+                  <h3 data-i18n="resp_1_title">Pixel-Perfect Coding</h3>
+                  <p data-i18n="resp_1_placeholder">
+                      Translating UI/UX designs into high-quality, semantic code.
+                  </p>
+              </article>
+
+              {# کارت ۲ #}
+              <article class="resp-card">
+                  <div class="resp-icon">
+                      {# Lucide icon: Users #}
+                      <svg width="28" height="28" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round">
+                          <path d="M17 21v-2a4 4 0 0 0-3-3.87" />
+                          <path d="M9 21v-2a4 4 0 0 1 3-3.87" />
+                          <circle cx="12" cy="7" r="4" />
+                          <path d="M22 21v-2a4 4 0 0 0-2-3.46" />
+                          <path d="M2 21v-2a4 4 0 0 1 2-3.46" />
+                      </svg>
+                  </div>
+                  <h3 data-i18n="resp_2_title">Agile Collaboration</h3>
+                  <p data-i18n="resp_2_placeholder">
+                      Working with designers &amp; back-end devs in fast sprints.
+                  </p>
+              </article>
+
+              {# کارت ۳ #}
+              <article class="resp-card">
+                  <div class="resp-icon">
+                      {# Lucide icon: Zap #}
+                      <svg width="28" height="28" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round">
+                          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                      </svg>
+                  </div>
+                  <h3 data-i18n="resp_3_title">Performance &amp; A11y</h3>
+                  <p data-i18n="resp_3_placeholder">
+                      Optimising apps for speed and accessibility.
+                  </p>
+              </article>
+
+              {# کارت ۴ #}
+              <article class="resp-card">
+                  <div class="resp-icon">
+                      {# Lucide icon: Check-square #}
+                      <svg width="28" height="28" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round">
+                          <polyline points="9 11 12 14 22 4" />
+                          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11" />
+                      </svg>
+                  </div>
+                  <h3 data-i18n="resp_4_title">Quality-First Testing</h3>
+                  <p data-i18n="resp_4_placeholder">
+                      Writing unit &amp; integration tests for critical flows.
+                  </p>
+              </article>
+
+              {# کارت ۵ #}
+              <article class="resp-card">
+                  <div class="resp-icon">
+                      {# Lucide icon: Heart-handshake #}
+                      <svg width="28" height="28" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round">
+                          <path d="M4 14s1.5-2 4-2 3 2 4 2 3-2 4-2 4 2 4 2" />
+                          <path d="M12 14v7" />
+                          <path d="M8 14v7" />
+                          <path d="M16 14v7" />
+                          <path d="M2 14s2 2 10 2 10-2 10-2" />
+                      </svg>
+                  </div>
+                  <h3 data-i18n="resp_5_title">Mentorship &amp; Reviews</h3>
+                  <p data-i18n="resp_5_placeholder">
+                      Reviewing PRs, sharing feedback &amp; coaching juniors.
+                  </p>
+              </article>
+          </div>
+      </section>
+
+      {# ============ CTA ============ #}
+      <section class="cta-block">
+        <p data-i18n="cta_text_placeholder">Ready to level‑up your front‑end skills and land your dream job?</p>
+        <button class="btn-primary" data-i18n="join_program_btn" onclick="window.location.href='join.html'">Join the Program</button>
+      </section>
+  </main>
+
+  {# ============ FOOTER ============ #}
+  <footer>
+    <span data-i18n="footer_copy">© 2025 – All rights neurobit‑reserved.</span>
+    <span data-i18n="footer_made">Crafted with ❤️ for Iranian youth</span>
+  </footer>
+
+  {# ============ JS (existing scripts reused) ============ #}
+  <script src='{% static "js/translate_learning_path_details.js" %}'></script>
+{% endblock content %}

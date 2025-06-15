@@ -1,0 +1,548 @@
+{% extends "_base.html" %}
+{% load static %}
+
+
+{% block title %}NEUROBIT – Learning Paths{% endblock title %}
+
+{% block extra_style %}
+  <link rel="stylesheet" href='{% static "style/learning_paths.css" %}'>
+{% endblock extra_style %}
+
+
+{% block content %}
+{# ============ MAIN CONTENT ============ #}
+  <main id="learning-paths-main">
+    {# learning path cards #}
+    <section>
+      <h1 class="learning_path_title sc_text" data-i18n="learning_path_title">
+        مسیر های یادگیری 
+      </h1>
+      <div class="role_container">
+        <div class="role_title" data-i18n="role_title">انتخاب مسیر شغلی</div>
+        <p class="role_description" data-i18n="role_description">
+          دانش و مهارت‌های لازم برای پیشرفت را کسب کنید.
+        </p>
+        <div class="role_cards">
+          {# Front-End Web Development #}
+          <article class="career-card" dir="auto">
+            <div class="card-cover">
+              <img src='{% static "images/front_path.png" %}' alt="Illustration of a front-end developer working on UI" class="card-photo">
+            </div>
+            <div class="card-body">
+              <h3 class="card-title" data-i18n="frontend_title">
+                Front-End Web Development
+              </h3>
+        
+              <p class="card-summary" data-i18n="frontend_summary">
+                Front-end developers craft the user-facing side of websites and
+                web apps with HTML, CSS, and JavaScript—turning design mock-ups
+                into responsive, interactive experiences.
+              </p>
+        
+              <p class="card-like">
+                <span data-i18n="if_you_like">If you like:</span>
+                <span data-i18n="frontend_like">
+                  designing beautiful UIs, solving UX challenges, working with
+                  React/Vue, perfecting responsive layouts
+                </span>
+              </p>
+        
+              <div class="card-stats">
+                <span class="stat">
+                  <strong data-i18n="frontend_salary">$102,500</strong>
+                  <small data-i18n="median_salary_label">median salary ¹</small>
+                </span>
+                <span class="stat">
+                  <strong data-i18n="frontend_jobs">68,000</strong>
+                  <small data-i18n="jobs_available_label">jobs available ¹</small>
+                </span>
+              </div>
+        
+              <div class="card-apply">
+                <button class="card-apply-btn" data-i18n="join_program_btn">
+                  Join the Program
+                </button>
+                <button class="card-path-details-btn" data-i18n="program_details_btn">
+                  Program Details
+                </button>
+              </div>
+            </div>
+          </article>
+        
+          {# Back-End Web Development #}
+          <article class="career-card" dir="auto">
+            <div class="card-cover">
+              <img src='{% static "images/backend_path.png" %}' alt="Illustration of back-end services and databases" class="card-photo">
+            </div>
+            <div class="card-body">
+              <h3 class="card-title" data-i18n="backend_title">
+                Back-End Web Development
+              </h3>
+        
+              <p class="card-summary" data-i18n="backend_summary">
+                Back-end developers build the server logic, databases, APIs, and
+                security that power modern web applications—keeping everything fast,
+                secure, and scalable.
+              </p>
+        
+              <p class="card-like">
+                <span data-i18n="if_you_like">If you like:</span>
+                <span data-i18n="backend_like">
+                  designing RESTful APIs, optimizing server performance,
+                  working with SQL/NoSQL, solving scalability puzzles
+                </span>
+              </p>
+        
+              <div class="card-stats">
+                <span class="stat">
+                  <strong data-i18n="backend_salary">$115,000</strong>
+                  <small data-i18n="median_salary_label">median salary ¹</small>
+                </span>
+                <span class="stat">
+                  <strong data-i18n="backend_jobs">75,000</strong>
+                  <small data-i18n="jobs_available_label">jobs available ¹</small>
+                </span>
+              </div>
+        
+              <div class="card-apply">
+                <button class="card-apply-btn" data-i18n="join_program_btn">
+                  Join the Program
+                </button>
+                <a href='{% url "backend_course" %}'>
+                  <button class="card-path-details-btn" data-i18n="program_details_btn">
+                      
+                    Program Details
+                  </button>
+                </a>
+              </div>
+            </div>
+          </article>
+        
+          {# Artificial Intelligence #}
+          <article class="career-card" dir="auto">
+            <div class="card-cover">
+              <img src='{% static "images/ai_path.png" %}' alt="Illustration of artificial intelligence concept" class="card-photo">
+            </div>
+            <div class="card-body">
+              <h3 class="card-title" data-i18n="ai_title">Artificial Intelligence</h3>
+        
+              <p class="card-summary" data-i18n="ai_summary">
+                AI engineers design, train, and deploy machine-learning models that
+                solve real-world problems—from predictive analytics to computer
+                vision and natural-language understanding.
+              </p>
+        
+              <p class="card-like">
+                <span data-i18n="if_you_like">If you like:</span>
+                <span data-i18n="ai_like">
+                  math &amp; statistics, Python &amp; TensorFlow, experimenting with
+                  neural networks, turning data into smart solutions
+                </span>
+              </p>
+        
+              <div class="card-stats">
+                <span class="stat">
+                  <strong data-i18n="ai_salary">$150,000</strong>
+                  <small data-i18n="median_salary_label">median salary ¹</small>
+                </span>
+                <span class="stat">
+                  <strong data-i18n="ai_jobs">40,000</strong>
+                  <small data-i18n="jobs_available_label">jobs available ¹</small>
+                </span>
+              </div>
+        
+              <div class="card-apply">
+                <button class="card-apply-btn" data-i18n="join_program_btn">
+                  Join the Program
+                </button>
+                <button class="card-path-details-btn" data-i18n="program_details_btn">
+                  Program Details
+                </button>
+              </div>
+            </div>
+          </article>
+        
+          {# UI/UX Designer #}
+          <article class="career-card" dir="auto">
+            <div class="card-cover">
+              <img src='{% static "images/graphic_path.png" %}' alt="UI/UX designer working on wireframes and prototyping" class="card-photo">
+            </div>
+            <div class="card-body">
+              <h3 class="card-title" data-i18n="uiux_title">
+                UI/UX Designer
+              </h3>
+
+              <p class="card-summary" data-i18n="uiux_summary">
+                UI/UX designers craft intuitive interfaces and seamless user journeys through wireframes, prototyping, and user research.
+              </p>
+
+              <p class="card-like">
+                <span data-i18n="if_you_like">If you like:</span>
+                <span data-i18n="uiux_like">
+                  user research, wireframing & prototyping, interaction design, usability testing
+                </span>
+              </p>
+
+              <div class="card-stats">
+                <span class="stat">
+                  <strong data-i18n="uiux_salary">$85,000</strong>
+                  <small data-i18n="median_salary_label">median salary ¹</small>
+                </span>
+                <span class="stat">
+                  <strong data-i18n="uiux_jobs">42,000</strong>
+                  <small data-i18n="jobs_available_label">jobs available ¹</small>
+                </span>
+              </div>
+
+              <div class="card-apply">
+                <button class="card-apply-btn" data-i18n="join_program_btn">
+                  Join the Program
+                </button>
+                <button class="card-path-details-btn" data-i18n="program_details_btn">
+                  Program Details
+                </button>
+              </div>
+            </div>
+          </article>
+
+        
+          {# Game Development #}
+          <article class="career-card" dir="auto">
+            <div class="card-cover">
+              <img src='{% static "images/gamedev_path.png" %}' alt="Game developer creating an immersive world" class="card-photo">
+            </div>
+            <div class="card-body">
+              <h3 class="card-title" data-i18n="game_title">Game Development</h3>
+        
+              <p class="card-summary" data-i18n="game_summary">
+                Game developers blend coding, design, and storytelling to build
+                engaging experiences across PC, console, and mobile platforms with
+                engines like Unity or Unreal.
+              </p>
+        
+              <p class="card-like">
+                <span data-i18n="if_you_like">If you like:</span>
+                <span data-i18n="game_like">
+                  writing game mechanics, level design, 3D assets, collaborating with
+                  artists &amp; sound designers
+                </span>
+              </p>
+        
+              <div class="card-stats">
+                <span class="stat">
+                  <strong data-i18n="game_salary">$100,000</strong>
+                  <small data-i18n="median_salary_label">median salary ¹</small>
+                </span>
+                <span class="stat">
+                  <strong data-i18n="game_jobs">12,000</strong>
+                  <small data-i18n="jobs_available_label">jobs available ¹</small>
+                </span>
+              </div>
+        
+              <div class="card-apply">
+                <button class="card-apply-btn" data-i18n="join_program_btn">
+                  Join the Program
+                </button>
+                <button class="card-path-details-btn" data-i18n="program_details_btn">
+                  Program Details
+                </button>
+              </div>
+            </div>
+          </article>
+        
+        </div>
+      </div>
+    </section>
+
+    {# ================================================================ #}
+    {# Path-Discovery Quiz  (20 Qs, 5 sections) #}
+    {# ---------------------------------------------------------------- #}
+    <section id="path-discovery">
+      <div class="pdq_title" data-i18n="pdq_title"></div>
+      <div data-i18n="pdq_intro"></div>
+
+      {# progress bar #}
+      <div class="pdq-progress"><div class="pdq-bar"></div></div>
+
+      <form id="pdq-form">
+
+      {# ========== SECTION A (6 Qs) ================================= #}
+      <fieldset data-step="1">
+        <legend data-i18n="pdq_secA"></legend>
+
+        {# Q1 #}
+        <div class="pdq-q">
+          <p data-i18n="pdq_q1"></p>
+          <label><input type="radio" name="q1" value="F,G" required> <span data-i18n="pdq_q1_a1"></span></label>
+          <label><input type="radio" name="q1" value="F,GM">          <span data-i18n="pdq_q1_a2"></span></label>
+          <label><input type="radio" name="q1" value="B">             <span data-i18n="pdq_q1_a3"></span></label>
+          <label><input type="radio" name="q1" value="AI">            <span data-i18n="pdq_q1_a4"></span></label>
+          <label><input type="radio" name="q1" value="GM">            <span data-i18n="pdq_q1_a5"></span></label>
+        </div>
+
+        {# Q2 #}
+        <div class="pdq-q">
+          <p data-i18n="pdq_q2"></p>
+          <label><input type="radio" name="q2" value="F,G" required>  <span data-i18n="pdq_q2_a1"></span></label>
+          <label><input type="radio" name="q2" value="B">             <span data-i18n="pdq_q2_a2"></span></label>
+          <label><input type="radio" name="q2" value="AI">            <span data-i18n="pdq_q2_a3"></span></label>
+          <label><input type="radio" name="q2" value="GM,G">          <span data-i18n="pdq_q2_a4"></span></label>
+          <label><input type="radio" name="q2" value="G">             <span data-i18n="pdq_q2_a5"></span></label>
+        </div>
+
+        {# Q3 #}
+        <div class="pdq-q">
+          <p data-i18n="pdq_q3"></p>
+          <label><input type="radio" name="q3" value="G,F" required>  <span data-i18n="pdq_q3_a1"></span></label>
+          <label><input type="radio" name="q3" value="B,AI">          <span data-i18n="pdq_q3_a2"></span></label>
+          <label><input type="radio" name="q3" value="GM">            <span data-i18n="pdq_q3_a3"></span></label>
+          <label><input type="radio" name="q3" value="B">             <span data-i18n="pdq_q3_a4"></span></label>
+          <label><input type="radio" name="q3" value="F,GM">          <span data-i18n="pdq_q3_a5"></span></label>
+        </div>
+
+        {# Q4 #}
+        <div class="pdq-q">
+          <p data-i18n="pdq_q4"></p>
+          <label><input type="radio" name="q4" value="G,F" required>  <span data-i18n="pdq_q4_a1"></span></label>
+          <label><input type="radio" name="q4" value="B">             <span data-i18n="pdq_q4_a2"></span></label>
+          <label><input type="radio" name="q4" value="AI">            <span data-i18n="pdq_q4_a3"></span></label>
+          <label><input type="radio" name="q4" value="GM,F">          <span data-i18n="pdq_q4_a4"></span></label>
+          <label><input type="radio" name="q4" value="G">             <span data-i18n="pdq_q4_a5"></span></label>
+        </div>
+
+        {# Q5 #}
+        <div class="pdq-q">
+          <p data-i18n="pdq_q5"></p>
+          <label><input type="radio" name="q5" value="F"    required> <span data-i18n="pdq_q5_a1"></span></label>
+          <label><input type="radio" name="q5" value="B">             <span data-i18n="pdq_q5_a2"></span></label>
+          <label><input type="radio" name="q5" value="AI">            <span data-i18n="pdq_q5_a3"></span></label>
+          <label><input type="radio" name="q5" value="GM">            <span data-i18n="pdq_q5_a4"></span></label>
+          <label><input type="radio" name="q5" value="G">             <span data-i18n="pdq_q5_a5"></span></label>
+        </div>
+
+        {# Q6 #}
+        <div class="pdq-q">
+          <p data-i18n="pdq_q6"></p>
+          <label><input type="radio" name="q6" value="F,G" required>  <span data-i18n="pdq_q6_a1"></span></label>
+          <label><input type="radio" name="q6" value="B">             <span data-i18n="pdq_q6_a2"></span></label>
+          <label><input type="radio" name="q6" value="AI,GM">         <span data-i18n="pdq_q6_a3"></span></label>
+          <label><input type="radio" name="q6" value="G,GM">          <span data-i18n="pdq_q6_a4"></span></label>
+          <label><input type="radio" name="q6" value="B,F">           <span data-i18n="pdq_q6_a5"></span></label>
+        </div>
+      </fieldset>
+
+      {# ========== SECTION B (4 Qs) ================================= #}
+      <fieldset data-step="2">
+        <legend data-i18n="pdq_secB"></legend>
+
+        {# Q7 #}
+        <div class="pdq-q">
+          <p data-i18n="pdq_q7"></p>
+          <label><input type="radio" name="q7" value="B" required>    <span data-i18n="pdq_q7_a1"></span></label>
+          <label><input type="radio" name="q7" value="F">             <span data-i18n="pdq_q7_a2"></span></label>
+          <label><input type="radio" name="q7" value="AI">            <span data-i18n="pdq_q7_a3"></span></label>
+          <label><input type="radio" name="q7" value="G">             <span data-i18n="pdq_q7_a4"></span></label>
+          <label><input type="radio" name="q7" value="GM">            <span data-i18n="pdq_q7_a5"></span></label>
+        </div>
+
+        {# Q8 #}
+        <div class="pdq-q">
+          <p data-i18n="pdq_q8"></p>
+          <label><input type="radio" name="q8" value="AI" required>   <span data-i18n="pdq_q8_a1"></span></label>
+          <label><input type="radio" name="q8" value="B">             <span data-i18n="pdq_q8_a2"></span></label>
+          <label><input type="radio" name="q8" value="F,G">           <span data-i18n="pdq_q8_a3"></span></label>
+          <label><input type="radio" name="q8" value="GM">            <span data-i18n="pdq_q8_a4"></span></label>
+        </div>
+
+        {# Q9 #}
+        <div class="pdq-q">
+          <p data-i18n="pdq_q9"></p>
+          <label><input type="radio" name="q9" value="B" required>    <span data-i18n="pdq_q9_a1"></span></label>
+          <label><input type="radio" name="q9" value="G,F">           <span data-i18n="pdq_q9_a2"></span></label>
+          <label><input type="radio" name="q9" value="AI">            <span data-i18n="pdq_q9_a3"></span></label>
+          <label><input type="radio" name="q9" value="GM">            <span data-i18n="pdq_q9_a4"></span></label>
+        </div>
+
+        {# Q10 #}
+        <div class="pdq-q">
+          <p data-i18n="pdq_q10"></p>
+          <label><input type="radio" name="q10" value="GM" required>  <span data-i18n="pdq_q10_a1"></span></label>
+          <label><input type="radio" name="q10" value="AI">           <span data-i18n="pdq_q10_a2"></span></label>
+          <label><input type="radio" name="q10" value="F">            <span data-i18n="pdq_q10_a3"></span></label>
+          <label><input type="radio" name="q10" value="B">            <span data-i18n="pdq_q10_a4"></span></label>
+          <label><input type="radio" name="q10" value="G">            <span data-i18n="pdq_q10_a5"></span></label>
+        </div>
+      </fieldset>
+
+      {# ========== SECTION C (4 Likert) ============================ #}
+      <fieldset data-step="3">
+        <legend data-i18n="pdq_secC"></legend>
+
+        {# Likert helper #}
+        <div class="pdq-scale-labels">
+          <span data-i18n="pdq_scale1"></span>
+          <span>2</span><span>3</span><span>4</span>
+          <span data-i18n="pdq_scale5"></span>
+        </div>
+
+        {# Q11 #}
+        <div class="pdq-q">
+          <p data-i18n="pdq_q11"></p>
+          <div class="pdq-scale">
+            <label><input type="radio" name="q11" value="F,G" data-val="1" required>1</label>
+            <label><input type="radio" name="q11" value="F,G" data-val="2">2</label>
+            <label><input type="radio" name="q11" value="F,G" data-val="3">3</label>
+            <label><input type="radio" name="q11" value="F,G" data-val="4">4</label>
+            <label><input type="radio" name="q11" value="F,G" data-val="5">5</label>
+          </div>
+        </div>
+
+        {# Q12 #}
+        <div class="pdq-q">
+          <p data-i18n="pdq_q12"></p>
+          <div class="pdq-scale">
+            <label><input type="radio" name="q12" value="B,AI" data-val="1" required>1</label>
+            <label><input type="radio" name="q12" value="B,AI" data-val="2">2</label>
+            <label><input type="radio" name="q12" value="B,AI" data-val="3">3</label>
+            <label><input type="radio" name="q12" value="B,AI" data-val="4">4</label>
+            <label><input type="radio" name="q12" value="B,AI" data-val="5">5</label>
+          </div>
+        </div>
+
+        {# Q13 #}
+        <div class="pdq-q">
+          <p data-i18n="pdq_q13"></p>
+          <div class="pdq-scale">
+            <label><input type="radio" name="q13" value="GM,F" data-val="1" required>1</label>
+            <label><input type="radio" name="q13" value="GM,F" data-val="2">2</label>
+            <label><input type="radio" name="q13" value="GM,F" data-val="3">3</label>
+            <label><input type="radio" name="q13" value="GM,F" data-val="4">4</label>
+            <label><input type="radio" name="q13" value="GM,F" data-val="5">5</label>
+          </div>
+        </div>
+
+        {# Q14 #}
+        <div class="pdq-q">
+          <p data-i18n="pdq_q14"></p>
+          <div class="pdq-scale">
+            <label><input type="radio" name="q14" value="AI" data-val="1" required>1</label>
+            <label><input type="radio" name="q14" value="AI" data-val="2">2</label>
+            <label><input type="radio" name="q14" value="AI" data-val="3">3</label>
+            <label><input type="radio" name="q14" value="AI" data-val="4">4</label>
+            <label><input type="radio" name="q14" value="AI" data-val="5">5</label>
+          </div>
+        </div>
+      </fieldset>
+
+      {# ========== SECTION D (3 self-assessment) =================== #}
+      <fieldset data-step="4">
+        <legend data-i18n="pdq_secD"></legend>
+
+        {# Q15 #}
+        <div class="pdq-q">
+          <p data-i18n="pdq_q15"></p>
+          <div class="pdq-scale">
+            <label><input type="radio" name="q15" value="G" data-val="1" required>1</label>
+            <label><input type="radio" name="q15" value="G" data-val="2">2</label>
+            <label><input type="radio" name="q15" value="G" data-val="3">3</label>
+            <label><input type="radio" name="q15" value="G" data-val="4">4</label>
+            <label><input type="radio" name="q15" value="G" data-val="5">5</label>
+          </div>
+        </div>
+
+        {# Q16 #}
+        <div class="pdq-q">
+          <p data-i18n="pdq_q16"></p>
+          <div class="pdq-scale">
+            <label><input type="radio" name="q16" value="AI,B" data-val="1" required>1</label>
+            <label><input type="radio" name="q16" value="AI,B" data-val="2">2</label>
+            <label><input type="radio" name="q16" value="AI,B" data-val="3">3</label>
+            <label><input type="radio" name="q16" value="AI,B" data-val="4">4</label>
+            <label><input type="radio" name="q16" value="AI,B" data-val="5">5</label>
+          </div>
+        </div>
+
+        {# Q17 #}
+        <div class="pdq-q">
+          <p data-i18n="pdq_q17"></p>
+          <div class="pdq-scale">
+            <label><input type="radio" name="q17" value="F,G" data-val="1" required>1</label>
+            <label><input type="radio" name="q17" value="F,G" data-val="2">2</label>
+            <label><input type="radio" name="q17" value="F,G" data-val="3">3</label>
+            <label><input type="radio" name="q17" value="F,G" data-val="4">4</label>
+            <label><input type="radio" name="q17" value="F,G" data-val="5">5</label>
+          </div>
+        </div>
+      </fieldset>
+
+      {# ========== SECTION E (3 ranking 1–5) ======================= #}
+      <fieldset data-step="5">
+        <legend data-i18n="pdq_secE"></legend>
+
+        {# helper #}
+        <div class="pdq-scale-labels">
+          <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+        </div>
+
+        {# Q18 #}
+        <div class="pdq-q">
+          <p data-i18n="pdq_q18"></p>
+          <div class="pdq-scale">
+            <label><input type="radio" name="q18" value="F,B,AI" data-val="1" required>1</label>
+            <label><input type="radio" name="q18" value="F,B,AI" data-val="2">2</label>
+            <label><input type="radio" name="q18" value="F,B,AI" data-val="3">3</label>
+            <label><input type="radio" name="q18" value="F,B,AI" data-val="4">4</label>
+            <label><input type="radio" name="q18" value="F,B,AI" data-val="5">5</label>
+          </div>
+        </div>
+
+        {# Q19 #}
+        <div class="pdq-q">
+          <p data-i18n="pdq_q19"></p>
+          <div class="pdq-scale">
+            <label><input type="radio" name="q19" value="G,GM" data-val="1" required>1</label>
+            <label><input type="radio" name="q19" value="G,GM" data-val="2">2</label>
+            <label><input type="radio" name="q19" value="G,GM" data-val="3">3</label>
+            <label><input type="radio" name="q19" value="G,GM" data-val="4">4</label>
+            <label><input type="radio" name="q19" value="G,GM" data-val="5">5</label>
+          </div>
+        </div>
+
+        {# Q20 #}
+        <div class="pdq-q">
+          <p data-i18n="pdq_q20"></p>
+          <div class="pdq-scale">
+            <label><input type="radio" name="q20" value="GM" data-val="1" required>1</label>
+            <label><input type="radio" name="q20" value="GM" data-val="2">2</label>
+            <label><input type="radio" name="q20" value="GM" data-val="3">3</label>
+            <label><input type="radio" name="q20" value="GM" data-val="4">4</label>
+            <label><input type="radio" name="q20" value="GM" data-val="5">5</label>
+          </div>
+        </div>
+      </fieldset>
+
+      {# nav buttons (shared) #}
+      <div class="pdq-nav">
+        <button type="button" class="pdq-prev"  data-i18n="pdq_prev"></button>
+        <button type="button" class="pdq-next"  data-i18n="pdq_next"></button>
+     </div>
+      </form>
+
+      {# result card #}
+      <div id="pdq-result" hidden>
+          <h3 data-i18n="pdq_result_title"></h3>
+          <canvas id="pdq-chart" width="320" height="320"></canvas>
+          <p><span data-i18n="pdq_primary"></span> <strong id="pdq-primary"></strong></p>
+          <p><span data-i18n="pdq_secondary"></span> <strong id="pdq-secondary"></strong></p>
+          <div id="pdq-advice" class="pdq-advice"></div>
+          <button class="btn-apply" id="pdq-scroll-cards" data-i18n="pdq_see_cards"></button>
+      </div>
+    </section>
+
+
+  </main>
+
+  {# ============ JS ============ #}
+  <script src='{% static "js/translate_learning_paths.js" %}'></script>
+  <script src='{% static "js/learning_paths.js" %}'></script>
+{% endblock content %}

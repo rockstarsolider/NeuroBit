@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Neurobit – Game Development & Design Learning Path" />
+  <title>NEUROBIT – Game Development & Design</title>
+
+  <!-- ============ FONTS ============ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Syne:wght@600;700&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="yasanlogo.png" />
+
+  <!-- Shared design tokens -->
+  <link rel="stylesheet" href="style/style.css" />
+  <link rel="stylesheet" href="style/learning_path_details.css">
+</head>
+
+<body>
+  <!-- ============ HEADER ============ -->
+  <header>
+    <a href="index.html#hero" class="logo-square" aria-label="Home">
+      <img src="assets/neurobit_main_logo.webp" alt="Neurobit logo">
+      <span data-i18n="logo_text" class="logo-text">neurobit</span>
+    </a>
+
+    <nav class="desktop-nav">
+      <a href="index.html#manifesto"  data-i18n="nav_manifesto">What Neurobit do?</a>
+      <a href="index.html#process"    data-i18n="nav_process">Process</a>
+      <a href="learning-paths.html"   data-i18n="nav_learning_paths">Learning Paths</a>
+      <button class="btn-apply" data-i18n="nav_apply" onclick="window.location.href='join.html'">Apply</button>
+      <button id="langToggle" class="lang-toggle">FA</button>
+      <button class="theme-toggle" aria-label="Switch theme"><span>🌙</span></button>
+    </nav>
+
+    <button class="menu-icon" id="openMenu" aria-label="Open menu"><span></span><span></span></button>
+  </header>
+
+  <!-- ============ MOBILE MENU ============ -->
+  <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+    <button class="close-btn" id="closeMenu" aria-label="Close menu">&times;</button>
+    <div class="mobile-menu-inner">
+      <div style="text-align:center;">
+        <button class="lang-toggle lang-btn-mobile" style="margin-left:0;">FA</button>
+        <button class="theme-toggle" aria-label="Switch theme"><span>🌙</span></button>
+      </div>
+      <a href="index.html#manifesto" class="mobile-link" data-i18n="nav_manifesto">Manifesto</a>
+      <a href="index.html#process"   class="mobile-link" data-i18n="nav_process">Process</a>
+      <a href="learning-paths.html"  class="mobile-link" data-i18n="nav_learning_paths">Learning Paths</a>
+      <button class="btn-apply mobile-apply" data-i18n="nav_apply"
+              onclick="window.location.href='join.html';
+                       document.getElementById('mobileMenu').classList.remove('open');">
+        Apply
+      </button>
+    </div>
+  </div>
+
+  <main data-page-key="gamedev">
+    <!-- ============ PATH HERO ============ -->
+    <section class="path-hero">
+      <div>
+        <h1 data-i18n="game_title">Game Development &amp; Design</h1>
+        <p data-i18n="game_summary">
+          Learn to build engaging 2D, 3D and XR experiences with industry-standard engines,
+          craft compelling gameplay loops, and publish cross-platform titles loved by millions.
+        </p>
+        <button class="btn-primary" data-i18n="join_program_btn"
+                onclick="window.location.href='join.html'">Join the Program</button>
+      </div>
+      <img src="assets/gamedev_path.png" alt="Game development illustration">
+    </section>
+
+    <!-- ============ CAREER SNAPSHOT ============ -->
+    <section class="lp-section" id="career-overview">
+      <h2 data-i18n="career_overview_title">Career Snapshot</h2>
+      <div class="overview-grid">
+        <div class="overview-item">
+          <strong data-i18n="game_role">Game Developer / Technical Designer</strong>
+          <span data-i18n="career_role_label">Potential Role</span>
+        </div>
+        <div class="overview-item">
+          <strong data-i18n="game_salary">$110,000</strong>
+          <span data-i18n="median_salary_label">Median Salary ¹</span>
+        </div>
+        <div class="overview-item">
+          <strong data-i18n="game_jobs">30,000+</strong>
+          <span data-i18n="jobs_available_label">Jobs Available ¹</span>
+        </div>
+        <div class="overview-item">
+          <strong data-i18n="game_growth">12 %</strong>
+          <span data-i18n="career_growth_label">5-Year Growth ²</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ TECH & TOOLS ============ -->
+    <section class="lp-section" id="tech-stack">
+      <h2 data-i18n="tech_stack_title">Technologies You’ll Master</h2>
+      <div class="tech-grid">
+
+        <!-- Unity -->
+        <div class="tech">
+          <svg fill="#000000" style="width: 40px;height:40px;" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>unity</title> <path d="M25.94 25.061l-5.382-9.060 5.382-9.064 2.598 9.062-2.599 9.060zM13.946 24.191l-6.768-6.717h10.759l5.38 9.061-9.372-2.342zM13.946 7.809l9.371-2.342-5.379 9.061h-10.761zM30.996 12.917l-3.282-11.913-12.251 3.193-1.812 3.112-3.68-0.027-8.966 8.719 8.967 8.72 3.678-0.029 1.817 3.112 12.246 3.192 3.283-11.908-1.864-3.087z"></path> </g></svg>
+          <span>Unity &amp; C#</span>
+        </div>
+
+        <!-- Blender -->
+        <div class="tech">
+          <svg xmlns="http://www.w3.org/2000/svg" style="width: 40px;height:40px;" viewBox="0 0 24 24" fill="currentColor"><path d="M13.1222 2.21716C12.6898 1.87354 12.0608 1.94549 11.7172 2.37786C11.3735 2.81023 11.4455 3.43929 11.8779 3.78291L15.2968 6.50004H4.50004C3.94775 6.50004 3.50004 6.94775 3.50004 7.50004C3.50004 8.05232 3.94775 8.50004 4.50004 8.50004H9.97176L0.878395 15.7167C0.445791 16.0601 0.373415 16.6891 0.71674 17.1217C1.06006 17.5543 1.68908 17.6267 2.12168 17.2833L7.54456 12.9796C7.51516 13.2324 7.50004 13.4894 7.50004 13.75C7.50004 17.8577 11.1913 21 15.5 21C19.8087 21 23.5 17.8577 23.5 13.75C23.5 11.5033 22.3763 9.52296 20.6647 8.21146L13.1222 2.21716ZM11.5646 9.78924C12.6109 8.99203 13.9834 8.50004 15.5 8.50004C17.0201 8.50004 18.3953 8.99422 19.4425 9.79456C20.7262 10.7757 21.5 12.1982 21.5 13.75C21.5 16.546 18.9233 19 15.5 19C12.0768 19 9.50004 16.546 9.50004 13.75C9.50004 12.2702 10.2037 10.908 11.3822 9.93395L11.5646 9.78924ZM14.4777 14.0919C14.2012 13.8314 14.0793 13.5265 14.0965 13.2102C14.1287 12.6453 14.7205 12 15.595 12C16.468 12 17.0599 12.6438 17.0932 13.209C17.1106 13.539 16.9851 13.8423 16.7153 14.0962C16.4296 14.3651 16.018 14.536 15.595 14.536C15.1815 14.536 14.7685 14.366 14.4777 14.0919ZM15.595 10C13.849 10 12.2007 11.2947 12.0996 13.0992C11.9923 15.0452 13.7253 16.536 15.595 16.536C17.471 16.536 19.1971 15.0592 19.0901 13.098C18.9879 11.2944 17.3406 10 15.595 10Z"></path></svg>
+          <span>Blender &amp; Substance</span>
+        </div>
+
+        <!-- Git -->
+        <div class="tech">
+          <svg xmlns="http://www.w3.org/2000/svg" style="width: 40px;height:40px;" viewBox="0 0 24 24" fill="currentColor"><path d="M7.10508 8.78991C7.45179 10.0635 8.61653 11 10 11H14C16.4703 11 18.5222 12.7915 18.9274 15.1461C20.1303 15.5367 21 16.6668 21 18C21 19.6569 19.6569 21 18 21C16.3431 21 15 19.6569 15 18C15 16.7334 15.7849 15.6501 16.8949 15.2101C16.5482 13.9365 15.3835 13 14 13H10C8.87439 13 7.83566 12.6281 7 12.0004V15.1707C8.16519 15.5825 9 16.6938 9 18C9 19.6569 7.65685 21 6 21C4.34315 21 3 19.6569 3 18C3 16.6938 3.83481 15.5825 5 15.1707V8.82929C3.83481 8.41746 3 7.30622 3 6C3 4.34315 4.34315 3 6 3C7.65685 3 9 4.34315 9 6C9 7.26661 8.21506 8.34988 7.10508 8.78991ZM6 7C6.55228 7 7 6.55228 7 6C7 5.44772 6.55228 5 6 5C5.44772 5 5 5.44772 5 6C5 6.55228 5.44772 7 6 7ZM6 19C6.55228 19 7 18.5523 7 18C7 17.4477 6.55228 17 6 17C5.44772 17 5 17.4477 5 18C5 18.5523 5.44772 19 6 19ZM18 19C18.5523 19 19 18.5523 19 18C19 17.4477 18.5523 17 18 17C17.4477 17 17 17.4477 17 18C17 18.5523 17.4477 19 18 19Z"></path></svg>
+          <span>Git &amp; CI Pipelines</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CURRICULUM ============ -->
+    <section class="lp-section" id="curriculum">
+      <h2 data-i18n="curriculum_title">Curriculum Breakdown</h2>
+      <div class="modules-list">
+        <div class="module-item" data-i18n="game_module_1">Game Design Theory &amp; Production Pipelines</div>
+        <div class="module-item" data-i18n="game_module_2">Programming Fundamentals in C# &amp; C++</div>
+        <div class="module-item" data-i18n="game_module_3">2D Rendering, Physics &amp; Animation</div>
+        <div class="module-item" data-i18n="game_module_4">3D Graphics, Shaders &amp; Lighting</div>
+        <div class="module-item" data-i18n="game_module_5">Gameplay Systems, AI &amp; Scripting</div>
+        <div class="module-item" data-i18n="game_module_6">Multiplayer Networking &amp; Backend Services</div>
+        <div class="module-item" data-i18n="game_module_7">Performance Optimisation &amp; Profiling</div>
+        <div class="module-item" data-i18n="game_module_8">Publishing, Live Ops &amp; Monetisation</div>
+        <div class="module-item" data-i18n="game_module_9">Capstone Vertical Slice Demo</div>
+      </div>
+    </section>
+
+    <!-- ============ SAMPLE PROJECTS ============ -->
+    <section class="lp-section" id="sample-projects">
+      <h2 data-i18n="sample_projects_title">Projects You’ll Build</h2>
+      <div class="project-gallery">
+
+        <!-- Project 1 -->
+        <article class="project-card">
+          <img src="assets/2dplatformer_game_cover.png" alt="2D platformer screenshot">
+          <div class="proj-body">
+            <h3 data-i18n="game_proj_1_title">Hand-Drawn 2D Platformer</h3>
+            <p  data-i18n="game_proj_1_desc">Parallax-scrolling, physics-based movement &amp; enemy AI in Unity.</p>
+          </div>
+        </article>
+
+        <!-- Project 2 -->
+        <article class="project-card">
+          <img src="assets/3dopenworld_prototype.jpg" alt="Open world prototype screenshot">
+          <div class="proj-body">
+            <h3 data-i18n="game_proj_2_title">3D Open-World Prototype</h3>
+            <p  data-i18n="game_proj_2_desc">Landscape sculpting, dynamic day–night cycle &amp; quest system in Unreal.</p>
+          </div>
+        </article>
+
+        <!-- Project 3 -->
+        <article class="project-card">
+          <img src="assets/network_arena_shooter_cover.png" alt="Multiplayer arena screenshot">
+          <div class="proj-body">
+            <h3 data-i18n="game_proj_3_title">Networked Arena Shooter</h3>
+            <p  data-i18n="game_proj_3_desc">Authoritative server, lag compensation &amp; Steam integration.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============ REAL-WORLD RESPONSIBILITIES ============ -->
+    <section class="lp-section" id="responsibilities">
+      <h2 data-i18n="responsibilities_title">A Day in the Life</h2>
+      <div class="responsibilities-grid">
+
+        <article class="resp-card">
+          <div class="resp-icon">
+            <!-- cpu icon -->
+            <svg width="28" height="28" stroke="currentColor" fill="none" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+              <path d="M9 9h6v6H9z"></path>
+            </svg>
+          </div>
+          <h3 data-i18n="game_resp_1_title">Gameplay Programming</h3>
+          <p  data-i18n="game_resp_1_desc">Implementing mechanics, input systems &amp; feel-good feedback loops.</p>
+        </article>
+
+        <article class="resp-card">
+          <div class="resp-icon">
+            <!-- map icon -->
+            <svg width="28" height="28" stroke="currentColor" fill="none" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="1 6 10 1 19 6 19 23 10 18 1 23"></polygon>
+              <polyline points="10 1 10 18"></polyline>
+            </svg>
+          </div>
+          <h3 data-i18n="game_resp_2_title">Level &amp; World Design</h3>
+          <p  data-i18n="game_resp_2_desc">Blocking out environments that guide players &amp; balance challenge.</p>
+        </article>
+
+        <article class="resp-card">
+          <div class="resp-icon">
+            <!-- activity icon -->
+            <svg width="28" height="28" stroke="currentColor" fill="none" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+          </div>
+          <h3 data-i18n="game_resp_3_title">Performance Profiling</h3>
+          <p  data-i18n="game_resp_3_desc">Analysing frame-time spikes, memory leaks &amp; optimising shaders.</p>
+        </article>
+
+        <article class="resp-card">
+          <div class="resp-icon">
+            <!-- network icon -->
+            <svg width="28" height="28" stroke="currentColor" fill="none" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <line x1="12" y1="2" x2="12" y2="5"></line>
+              <line x1="12" y1="19" x2="12" y2="22"></line>
+              <line x1="4.93" y1="4.93" x2="7.05" y2="7.05"></line>
+              <line x1="16.95" y1="16.95" x2="19.07" y2="19.07"></line>
+            </svg>
+          </div>
+          <h3 data-i18n="game_resp_4_title">Multiplayer &amp; Live Ops</h3>
+          <p  data-i18n="game_resp_4_desc">Synchronising state, patching content &amp; measuring player telemetry.</p>
+        </article>
+
+        <article class="resp-card">
+          <div class="resp-icon">
+            <!-- dollar icon -->
+            <svg width="28" height="28" stroke="currentColor" fill="none" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="1" x2="12" y2="23"></line>
+              <path d="M17 5H9a3 3 0 0 1 0-6h10a3 3 0 0 1 0 6z"></path>
+              <path d="M17 19H9a3 3 0 0 1 0 6h10a3 3 0 0 1 0-6z"></path>
+            </svg>
+          </div>
+          <h3 data-i18n="game_resp_5_title">Monetisation &amp; Publishing</h3>
+          <p  data-i18n="game_resp_5_desc">Integrating stores, IAPs &amp; analytics for sustainable revenue.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============ CTA ============ -->
+    <section class="cta-block">
+      <p data-i18n="game_cta_text">
+        Ready to build immersive worlds that players will never forget?
+      </p>
+      <button class="btn-primary" data-i18n="join_program_btn"
+              onclick="window.location.href='join.html'">Join the Program</button>
+    </section>
+  </main>
+  
+
+  <!-- ============ FOOTER ============ -->
+  <footer>
+    <span data-i18n="footer_copy">© 2025 – All rights neurobit-reserved.</span>
+    <span data-i18n="footer_made">Crafted with ❤️ for Iranian youth</span>
+  </footer>
+
+  <!-- ============ JS (shared) ============ -->
+  <script src="https://cdn.jsdelivr.net/npm/scramble-text@0.0.9/dist/ScrambleText.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/motion@latest/dist/motion.js"></script>
+  <script src="script/glitch.js"></script>
+  <script src="script/translate_learning_path_details.js"></script>
+  <script src="script/script.js"></script>
+</body>
+</html>

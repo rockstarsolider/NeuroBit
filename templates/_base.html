@@ -9,7 +9,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <title>{% block title %}{% endblock %}</title>
+        <title>{% block title %}{% endblock title %}</title>
 
         <script>
             (function () {
@@ -45,7 +45,7 @@
             <nav class="desktop-nav">
             <a href="#manifesto" data-i18n="nav_manifesto">What Neurobit do?</a>
             <a href="#process" data-i18n="nav_process">Process</a>
-            {% comment %} <a href='{% url "learning-paths" %}' data-i18n="nav_learning_paths">Learning Paths</a> {% endcomment %}
+            <a href='{% url "courses" %}' data-i18n="nav_learning_paths">Learning Paths</a>
             <button class="btn-apply" data-i18n="nav_apply" onclick="document.getElementById('apply').scrollIntoView({behavior:'smooth'})">Apply</button>
             <button id="langToggle" class="lang-toggle">FA</button>
             <button class="theme-toggle" aria-label="Switch theme"><span>🌙</span></button>
@@ -63,7 +63,7 @@
             </div>
             <a href="#manifesto" class="mobile-link" data-i18n="nav_manifesto">Manifesto</a>
             <a href="#process" class="mobile-link" data-i18n="nav_process">Process</a>
-            {% comment %} <a href='{% url "learning-paths" %}' class="mobile-link" data-i18n="nav_learning_paths">Learning Paths</a> {% endcomment %}
+            <a href='{% url "courses" %}' class="mobile-link" data-i18n="nav_learning_paths">Learning Paths</a>
             <button class="btn-apply mobile-apply" data-i18n="nav_apply"
                 onclick="document.getElementById('apply').scrollIntoView({behavior:'smooth'});document.getElementById('mobileMenu').classList.remove('open');">Apply</button>
             </div>
@@ -72,11 +72,13 @@
         <main>
             {% block content %}{% endblock content %}            
         </main>
+        
         {# ============ JS ============ #}
         {% render_bundle 'main' 'js' %}
+        {% comment %} <script src='{% static "js/script.js" %}'></script> {% endcomment %}
         {% block extra_js %}{% endblock extra_js %}
     </body>
-
+    
     {# ============ FOOTER ============ #}
     <footer>
         <span data-i18n="footer_copy">© 2025 – All rights neurobit-reserved.</span>

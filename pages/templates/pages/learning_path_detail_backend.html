@@ -1,0 +1,246 @@
+{% extends "_base.html" %}
+{% load static %}
+
+
+{% block title %}
+    NEUROBIT – Back-End Web Development
+{% endblock title %}
+
+{% block extra_style %}
+<link rel="stylesheet" href="style/learning_path_details.css">
+{% endblock extra_style %}
+
+
+{% block content %}
+  <main data-page-key="backend">
+      <!-- ============ PATH HERO ============ -->
+      <section class="path-hero">
+        <div>
+          <h1 data-i18n="be_title">Back-End Web Development</h1>
+          <p data-i18n="be_summary">
+            Design robust server logic, build secure REST & GraphQL APIs, and deploy
+            scalable micro-services in the cloud with Python, Node.js, Go, and modern
+            DevOps practices.
+          </p>
+          <button class="btn-primary" data-i18n="join_program_btn"
+                  onclick="window.location.href='join.html'">Join the Program</button>
+        </div>
+        <img src='{% static "images/backend_path.png" %}' alt="Back-End development illustration">
+      </section>
+
+      <!-- ============ CAREER SNAPSHOT ============ -->
+      <section class="lp-section" id="career-overview">
+        <h2 data-i18n="career_overview_title">Career Snapshot</h2>
+        <div class="overview-grid">
+          <div class="overview-item">
+            <strong data-i18n="be_role">Back-End Developer</strong>
+            <span data-i18n="career_role_label">Potential Role</span>
+          </div>
+          <div class="overview-item">
+            <strong data-i18n="be_salary">$115,000</strong>
+            <span data-i18n="median_salary_label">Median Salary ¹</span>
+          </div>
+          <div class="overview-item">
+            <strong data-i18n="be_jobs">75,000+</strong>
+            <span data-i18n="jobs_available_label">Jobs Available ¹</span>
+          </div>
+          <div class="overview-item">
+            <strong data-i18n="be_growth">21 %</strong>
+            <span data-i18n="career_growth_label">5-Year Growth ²</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ TECH & TOOLS ============ -->
+      <section class="lp-section" id="tech-stack">
+        <h2 data-i18n="tech_stack_title">Technologies You’ll Master</h2>
+        <div class="tech-grid">
+
+          <!-- Python -->
+          <div class="tech">
+            <img src='{% static "images/python.svg" %}' alt="Python logo" width="48" height="48">
+            <span>Python</span>
+          </div>
+
+          <!-- Django -->
+          <div class="tech">
+            <img src='{% static "images/django.svg" %}' alt="Django logo" width="48" height="48">
+            <span>Django</span>
+          </div>
+
+          <!-- Django Rest -->
+          <div class="tech">
+            <img src='{% static "images/DjangoRestlogo.png" %}' alt="Django Rest logo" width="48" height="48">
+            <span>DRF</span>
+          </div>
+
+          <!-- SQL and Database design -->
+          <div class="tech">
+            <img src='{% static "images/postfresql.svg" %}' alt="PostgreSQL logo" width="48" height="48">
+            <span>DataBase Design</span>
+          </div>
+
+          <!-- Docker -->
+          <div class="tech">
+            <img src='{% static "images/docker.svg" %}' alt="Docker logo" width="48" height="48">
+            <span>Docker</span>
+          </div>
+
+          
+        </div>
+      </section>
+
+      <!-- ============ CURRICULUM ============ -->
+      <section class="lp-section" id="curriculum">
+        <h2 data-i18n="curriculum_title">Curriculum Breakdown</h2>
+        <div class="modules-list">
+          <div class="module-item" data-i18n="be_module_1">Programming Fundamentals &amp; Git Workflow</div>
+          <div class="module-item" data-i18n="be_module_2">Relational Databases, SQL & Data Modelling</div>
+          <div class="module-item" data-i18n="be_module_3">RESTful & GraphQL API Design</div>
+          <div class="module-item" data-i18n="be_module_4">Authentication, OAuth 2 & Web Security</div>
+          <div class="module-item" data-i18n="be_module_5">Testing, Observability &amp; Performance Tuning</div>
+          <div class="module-item" data-i18n="be_module_6">Docker, Kubernetes &amp; Cloud Deployments</div>
+          <div class="module-item" data-i18n="be_module_7">Capstone Micro-services Project</div>
+        </div>
+      </section>
+
+      <!-- ============ SAMPLE PROJECTS ============ -->
+      <section class="lp-section" id="sample-projects">
+        <h2 data-i18n="sample_projects_title">Projects You’ll Build</h2>
+        <div class="project-gallery">
+
+          <!-- Project 1 -->
+          <article class="project-card">
+            <img src='{% static "images/E-commerce RESTAPI.png" %}' alt="REST API project screenshot">
+            <div class="proj-body">
+              <h3 data-i18n="be_proj_1_title">E-commerce REST API</h3>
+              <p  data-i18n="be_proj_1_desc">Full CRUD catalogue, auth, payments &amp; unit tests.</p>
+            </div>
+          </article>
+
+          <!-- Project 2 -->
+          <article class="project-card">
+            <img src='{% static "images/Containerised Micro-services.jpg" %}' alt="Micro-services architecture diagram">
+            <div class="proj-body">
+              <h3 data-i18n="be_proj_2_title">Containerised Micro-services Suite</h3>
+              <p  data-i18n="be_proj_2_desc">Polyglot services with Docker-Compose &amp; gRPC.</p>
+            </div>
+          </article>
+
+          <!-- Project 3 -->
+          <article class="project-card">
+            <img src='{% static "images/Real-Time-Chat Platform,jpg" %}' alt="Real-time chat app screenshot">
+            <div class="proj-body">
+              <h3 data-i18n="be_proj_3_title">Real-Time Chat Platform</h3>
+              <p  data-i18n="be_proj_3_desc">WebSocket gateway, Redis pub/sub &amp; JWT auth.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ REAL-WORLD RESPONSIBILITIES ============ -->
+      <section class="lp-section" id="responsibilities">
+        <h2 data-i18n="responsibilities_title">A Day in the Life</h2>
+        <div class="responsibilities-grid">
+
+          <article class="resp-card">
+            <div class="resp-icon">
+              <!-- database icon -->
+              <svg width="28" height="28" stroke="currentColor" fill="none" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                <path d="M3 5v14a9 3 0 0 0 18 0V5"></path>
+                <path d="M3 12a9 3 0 0 0 18 0"></path>
+              </svg>
+            </div>
+            <h3 data-i18n="be_resp_1_title">Database Design</h3>
+            <p  data-i18n="be_resp_1_desc">Modeling entities, optimising queries &amp; indexing.</p>
+          </article>
+
+          <article class="resp-card">
+            <div class="resp-icon">
+              <!-- network icon -->
+              <svg width="28" height="28" stroke="currentColor" fill="none" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M12 2v2"></path>
+                <path d="M12 20v2"></path>
+                <path d="M4.93 4.93l1.41 1.41"></path>
+                <path d="M17.66 17.66l1.41 1.41"></path>
+                <path d="M2 12h2"></path>
+                <path d="M20 12h2"></path>
+                <path d="M4.93 19.07l1.41-1.41"></path>
+                <path d="M17.66 6.34l1.41-1.41"></path>
+              </svg>
+            </div>
+            <h3 data-i18n="be_resp_2_title">API Engineering</h3>
+            <p  data-i18n="be_resp_2_desc">Designing REST/GraphQL endpoints &amp; versioning.</p>
+          </article>
+
+          <article class="resp-card">
+            <div class="resp-icon">
+              <!-- shield icon -->
+              <svg width="28" height="28" stroke="currentColor" fill="none" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              </svg>
+            </div>
+            <h3 data-i18n="be_resp_3_title">Security Hardening</h3>
+            <p  data-i18n="be_resp_3_desc">Implementing OAuth 2, JWT, rate-limiting &amp; audits.</p>
+          </article>
+
+          <article class="resp-card">
+            <div class="resp-icon">
+              <!-- cpu icon -->
+              <svg width="28" height="28" stroke="currentColor" fill="none" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+                <rect x="9" y="9" width="6" height="6"></rect>
+                <path d="M15 2v2"></path><path d="M9 2v2"></path>
+                <path d="M15 20v2"></path><path d="M9 20v2"></path>
+                <path d="M2 15h2"></path><path d="M2 9h2"></path>
+                <path d="M20 15h2"></path><path d="M20 9h2"></path>
+              </svg>
+            </div>
+            <h3 data-i18n="be_resp_4_title">Performance &amp; Scaling</h3>
+            <p  data-i18n="be_resp_4_desc">Profiling code, caching &amp; load-balancing.</p>
+          </article>
+
+          <article class="resp-card">
+            <div class="resp-icon">
+              <!-- upload icon -->
+              <svg width="28" height="28" stroke="currentColor" fill="none" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 16l-4-4-4 4"></path>
+                <path d="M12 12v9"></path>
+                <path d="M20 21H4"></path>
+                <path d="M20 15v4"></path><path d="M4 15v4"></path>
+              </svg>
+            </div>
+            <h3 data-i18n="be_resp_5_title">CI/CD &amp; Cloud Ops</h3>
+            <p  data-i18n="be_resp_5_desc">Automating tests, builds &amp; Kubernetes roll-outs.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ CTA ============ -->
+      <section class="cta-block">
+        <p data-i18n="be_cta_text">
+          Ready to power the next billion-user app from the server side?
+        </p>
+        <button class="btn-primary" data-i18n="join_program_btn"
+                onclick="window.location.href='join.html'">Join the Program</button>
+      </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer>
+    <span data-i18n="footer_copy">© 2025 – All rights neurobit-reserved.</span>
+    <span data-i18n="footer_made">Crafted with ❤️ for Iranian youth</span>
+  </footer>
+
+  <!-- ============ JS (existing scripts reused) ============ -->
+  
+  <script src='{% static "js/translate_learning_path_details.js" %}'></script>
+  
+{% endblock content %}

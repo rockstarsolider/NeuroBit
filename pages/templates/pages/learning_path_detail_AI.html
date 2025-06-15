@@ -1,0 +1,242 @@
+{% extends "_base.html" %}
+{% load static %}
+
+
+{% block extra_style %}
+  <link rel="stylesheet" href='{% static "style/learning_path_details.css" %}'>
+{% endblock extra_style %}
+
+
+{% block content %}
+
+  <main data-page-key="ai">
+      <!-- ============ PATH HERO ============ -->
+      <section class="path-hero">
+        <div>
+          <h1 data-i18n="ai_title">Artificial Intelligence</h1>
+          <p data-i18n="ai_summary">
+            Build intelligent systems that learn from data, understand language and
+            perceive the world. Master machine learning, deep learning and MLOps to
+            turn algorithms into real-world products that scale.
+          </p>
+          <button class="btn-primary" data-i18n="join_program_btn"
+                  onclick="window.location.href='join.html'">Join the Program</button>
+        </div>
+        <img src="assets/ai_path.png" alt="Artificial Intelligence illustration">
+      </section>
+
+      <!-- ============ CAREER SNAPSHOT ============ -->
+      <section class="lp-section" id="career-overview">
+        <h2 data-i18n="career_overview_title">Career Snapshot</h2>
+        <div class="overview-grid">
+          <div class="overview-item">
+            <strong data-i18n="ai_role">AI / ML Engineer</strong>
+            <span data-i18n="career_role_label">Potential Role</span>
+          </div>
+          <div class="overview-item">
+            <strong data-i18n="ai_salary">$138,000</strong>
+            <span data-i18n="median_salary_label">Median Salary ¹</span>
+          </div>
+          <div class="overview-item">
+            <strong data-i18n="ai_jobs">120,000+</strong>
+            <span data-i18n="jobs_available_label">Jobs Available ¹</span>
+          </div>
+          <div class="overview-item">
+              <strong data-i18n="ai_growth">31 %</strong>
+              <span data-i18n="career_growth_label">5-Year Growth ²</span>
+            </div>
+        </div>
+      </section>
+
+      <!-- ============ TECH & TOOLS ============ -->
+      <section class="lp-section" id="tech-stack">
+        <h2 data-i18n="tech_stack_title">Technologies You’ll Master</h2>
+        <div class="tech-grid">
+
+          <!-- Python / Jupyter -->
+          <div class="tech">
+            <img src="assets/jupyter.svg" alt="Python logo" width="48" height="48">
+            <span>Python &amp; Jupyter</span>
+          </div>
+
+          <!-- fast ai -->
+          <div class="tech">
+            <img src="assets/Fast.ai.png" alt="fast ai logo" width="48" height="48">
+            <span>fast ai</span>
+          </div>
+
+          <!-- scikit-learn -->
+          <div class="tech">
+            <img src="assets/scikit-learn-logo-without-subtitle.svg" alt="Scikit-learn logo" width="48" height="48">
+            <span>scikit-learn</span>
+          </div>
+
+          <!-- pandas -->
+          <div class="tech">
+            <img src="assets/pandas.svg" alt="pandas logo" width="48" height="48">
+            <span>pandas</span>
+          </div>
+
+          <!-- numpy -->
+          <div class="tech">
+            <img src="assets/numpy.svg" alt="numpy logo" width="48" height="48">
+            <span>numpy</span>
+          </div>
+
+          <!-- matplotlib -->
+          <div class="tech">
+            <img src="assets/Matplotlib_icon.svg" alt="matplotlib logo" width="48" height="48">
+            <span>matplotlib</span>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ============ CURRICULUM ============ -->
+      <section class="lp-section" id="curriculum">
+        <h2 data-i18n="curriculum_title">Curriculum Breakdown</h2>
+        <div class="modules-list">
+          <div class="module-item" data-i18n="ai_module_1">Python, Linear Algebra &amp; Probabilities for ML</div>
+          <div class="module-item" data-i18n="ai_module_2">Data Wrangling, Feature Engineering &amp; Viz</div>
+          <div class="module-item" data-i18n="ai_module_3">Supervised Learning Algorithms &amp; Metrics</div>
+          <div class="module-item" data-i18n="ai_module_4">Unsupervised Learning &amp; Clustering</div>
+          <div class="module-item" data-i18n="ai_module_5">Deep Learning with CNNs &amp; RNNs</div>
+          <div class="module-item" data-i18n="ai_module_6">NLP, Transformers &amp; Large Language Models</div>
+          <div class="module-item" data-i18n="ai_module_7">MLOps: Experiment Tracking, CI/CD &amp; Deployment</div>
+          <div class="module-item" data-i18n="ai_module_8">Capstone AI Product Sprint</div>
+        </div>
+      </section>
+
+      <!-- ============ SAMPLE PROJECTS ============ -->
+      <section class="lp-section" id="sample-projects">
+        <h2 data-i18n="sample_projects_title">Projects You’ll Build</h2>
+        <div class="project-gallery">
+
+          <!-- Project 1 -->
+          <article class="project-card">
+            <img src="assets/da_project_cover.png" alt="Interactive data analysis dashboard">
+            <div class="proj-body">
+              <h3 data-i18n="ai_proj_1_title">Interactive Data Analysis Dashboard</h3>
+              <p data-i18n="ai_proj_1_desc">
+                Analyze real-world datasets, perform exploratory data analysis and create visualizations using Pandas and Matplotlib.
+              </p>
+            </div>
+          </article>
+
+          <!-- Project 2 -->
+          <article class="project-card">
+            <img src="assets/ml_project_cover.png" alt="Predictive machine learning model">
+            <div class="proj-body">
+              <h3 data-i18n="ai_proj_2_title">Predictive Machine Learning Model</h3>
+              <p data-i18n="ai_proj_2_desc">
+                Train and evaluate regression and classification models with scikit-learn to forecast key outcomes.
+              </p>
+            </div>
+          </article>
+
+          <!-- Project 3 -->
+          <article class="project-card">
+            <img src="assets/dl_project_cover.png" alt="Deep learning neural network">
+            <div class="proj-body">
+              <h3 data-i18n="ai_proj_3_title">Deep Learning Neural Network</h3>
+              <p data-i18n="ai_proj_3_desc">
+                Build, train, and deploy a neural network with TensorFlow/Keras for advanced image or text applications.
+              </p>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+
+      <!-- ============ REAL-WORLD RESPONSIBILITIES ============ -->
+      <section class="lp-section" id="responsibilities">
+        <h2 data-i18n="responsibilities_title">A Day in the Life</h2>
+        <div class="responsibilities-grid">
+
+          <article class="resp-card">
+            <div class="resp-icon">
+              <!-- database icon -->
+              <svg width="28" height="28" stroke="currentColor" fill="none" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                <path d="M3 5v14a9 3 0 0 0 18 0V5"></path>
+                <path d="M3 12a9 3 0 0 0 18 0"></path>
+              </svg>
+            </div>
+            <h3 data-i18n="ai_resp_1_title">Data Preparation</h3>
+            <p  data-i18n="ai_resp_1_desc">Cleaning, balancing and visualising large-scale datasets.</p>
+          </article>
+
+          <article class="resp-card">
+            <div class="resp-icon">
+              <!-- brain icon -->
+              <svg width="28" height="28" stroke="currentColor" fill="none" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 7a4 4 0 0 0-8 0"></path>
+                <path d="M12 7v12"></path>
+                <path d="M16 19a4 4 0 0 0-8 0"></path>
+              </svg>
+            </div>
+            <h3 data-i18n="ai_resp_2_title">Model Research &amp; Training</h3>
+            <p  data-i18n="ai_resp_2_desc">Experimenting with architectures, hyper-tuning &amp; cross-validation.</p>
+          </article>
+
+          <article class="resp-card">
+            <div class="resp-icon">
+              <!-- chart icon -->
+              <svg width="28" height="28" stroke="currentColor" fill="none" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 3v18h18"></path>
+                <path d="M18 17l-5-5-4 4-3-3"></path>
+              </svg>
+            </div>
+            <h3 data-i18n="ai_resp_3_title">Evaluation &amp; Explainability</h3>
+            <p  data-i18n="ai_resp_3_desc">Using ROC-AUC, SHAP &amp; fairness audits to validate models.</p>
+          </article>
+
+          <article class="resp-card">
+            <div class="resp-icon">
+              <!-- cloud upload -->
+              <svg width="28" height="28" stroke="currentColor" fill="none" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 16l-4-4-4 4"></path>
+                <path d="M12 12v9"></path>
+                <path d="M20 21H4"></path>
+                <path d="M20 15v4"></path><path d="M4 15v4"></path>
+              </svg>
+            </div>
+            <h3 data-i18n="ai_resp_4_title">Deployment &amp; Monitoring</h3>
+            <p  data-i18n="ai_resp_4_desc">Containerising models, setting up CI/CD &amp; drift alerts.</p>
+          </article>
+
+          <article class="resp-card">
+            <div class="resp-icon">
+              <!-- people icon -->
+              <svg width="28" height="28" stroke="currentColor" fill="none" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M17 11a4 4 0 1 0-8 0"></path>
+                <path d="M9 11v10"></path><path d="M17 11v4"></path>
+              </svg>
+            </div>
+            <h3 data-i18n="ai_resp_5_title">Cross-functional Collaboration</h3>
+            <p  data-i18n="ai_resp_5_desc">Working with product, design &amp; ethics teams to ship AI responsibly.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ CTA ============ -->
+      <section class="cta-block">
+        <p data-i18n="ai_cta_text">
+          Ready to invent the future with data-driven intelligence?
+        </p>
+        <button class="btn-primary" data-i18n="join_program_btn"
+                onclick="window.location.href='join.html'">Join the Program</button>
+      </section>
+
+  </main>
+
+  <!-- ============ JS (shared) ============ -->
+  <script src='{% static "js/translate_learning_path_details.js" %}'></script>
+{% endblock content %}

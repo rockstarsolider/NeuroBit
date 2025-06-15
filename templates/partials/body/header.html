@@ -1,0 +1,16 @@
+{% load static %}
+
+
+{# ============ HEADER ============ #}
+<header>
+    <a href="#hero" class="logo-square" aria-label="Home"><img src='{% static "images/neurobit_main_logo.webp" %}' alt=""><span data-i18n="logo_text" class="logo-text">neurobit</span></a>
+    <nav class="desktop-nav">
+    <a href="#manifesto" data-i18n="nav_manifesto">What Neurobit do?</a>
+    <a href="#process" data-i18n="nav_process">Process</a>
+    <a href='{% url "courses" %}' data-i18n="nav_courses">Courses</a>
+    <button class="btn-apply" data-i18n="nav_apply" onclick="document.getElementById('apply').scrollIntoView({behavior:'smooth'})">Apply</button>
+    <button id="langToggle" class="lang-toggle">FA</button>
+    <button class="theme-toggle" aria-label="Switch theme"><span>🌙</span></button>
+    </nav>
+    <button class="menu-icon" id="openMenu" aria-label="Open menu"><span></span><span></span></button>
+</header>

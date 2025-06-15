@@ -1,0 +1,75 @@
+{% extends "_base.html" %}
+{% load static %}
+
+{% block extra_style %}
+  <link rel="stylesheet" href="style/join_style.css">
+{% endblock extra_style %}
+
+
+{% block content %}
+
+  {# ============ APPLICATION FORM ============ #}
+  <section id="application">
+    <p class="intro" data-i18n="application_intro">
+      Start your journey by filling in the details below and take the first
+      step toward building your future.
+    </p>
+
+    <form id="applyForm" autocomplete="off" novalidate>
+      {# Full name #}
+      <div class="field-group">
+        <label for="fullName" data-i18n="application_fullname_label">Full name</label>
+        <input type="text" id="fullName" required />
+      </div>
+
+      {# Phone #}
+      <div class="field-group">
+        <label for="phone" data-i18n="application_phone_label">Phone number</label>
+        <input
+          type="tel"
+          id="phone"
+          maxlength="30"
+        />
+      </div>
+
+      {# Location #}
+      <div class="field-group">
+        <label for="location" data-i18n="application_location_label">Location</label>
+        <input type="text" id="location" />
+      </div>
+
+      {# Age #}
+      <div class="field-group">
+        <label for="age" data-i18n="application_age_label">Age</label>
+        <input type="number" id="age" min="10" max="99" />
+      </div>
+
+      {# sop intro #}
+      <div class="field-group">
+        <label for="sopfile" data-i18n="application_sop_label">Your SOP file to join Neurobit</label>
+
+        <ul class="sop-guidelines">
+          <li data-i18n="application_guideline1">
+            Tell us who you are, what you’ve done, and why you want to be part of Neurobit.
+          </li>
+          <li data-i18n="application_guideline2">
+            Be honest and transparent, and write a concise text.
+          </li>
+          <li data-i18n="application_guideline3">
+            The SOP letter should be a maximum of 2 pages.
+          </li>
+        </ul>
+
+        <input type="file" id="sopfile" name="sopfile">
+      </div>
+
+      {# Submit #}
+      <button class="btn-submit" type="submit" data-i18n="application_submit">
+        Submit
+      </button>
+    </form>
+  </section>
+
+  {# ============ JS ============ #}
+  <script src='{% static "js/translate_join.js" %}'></script>
+{% endblock content %}
