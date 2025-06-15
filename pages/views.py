@@ -16,6 +16,22 @@ class BackendCoursView(generic.TemplateView):
     template_name = 'pages/learning_path_detail_backend.html'
 
 
+class FrontendCourseView(generic.TemplateView):
+    template_name = 'pages/learning_path_detail_frontend.html'
+
+
+class AICourseView(generic.TemplateView):
+    template_name = 'pages/learning_path_detail_AI.html'
+
+
+class UIUXCourseView(generic.TemplateView):
+    template_name = 'pages/learning_path_detail_UIUX.html'
+
+
+class GameDevCourseView(generic.TemplateView):
+    template_name = 'pages/learning_path_detail_GameDevelopment.html'
+
+
 # def apply_view(request):
 #     errors = {}
 #     if request.method == 'POST':

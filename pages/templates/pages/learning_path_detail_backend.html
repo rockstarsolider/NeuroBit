@@ -7,7 +7,7 @@
 {% endblock title %}
 
 {% block extra_style %}
-<link rel="stylesheet" href="style/learning_path_details.css">
+<link rel="stylesheet" href="{% static 'style/learning_path_details.css' %}">
 {% endblock extra_style %}
 
 
@@ -129,7 +129,7 @@
 
           <!-- Project 3 -->
           <article class="project-card">
-            <img src='{% static "images/Real-Time-Chat Platform,jpg" %}' alt="Real-time chat app screenshot">
+            <img src='{% static "images/Real-Time-Chat Platform.jpg" %}' alt="Real-time chat app screenshot">
             <div class="proj-body">
               <h3 data-i18n="be_proj_3_title">Real-Time Chat Platform</h3>
               <p  data-i18n="be_proj_3_desc">WebSocket gateway, Redis pub/sub &amp; JWT auth.</p>
@@ -232,12 +232,6 @@
                 onclick="window.location.href='join.html'">Join the Program</button>
       </section>
   </main>
-
-  <!-- ============ FOOTER ============ -->
-  <footer>
-    <span data-i18n="footer_copy">© 2025 – All rights neurobit-reserved.</span>
-    <span data-i18n="footer_made">Crafted with ❤️ for Iranian youth</span>
-  </footer>
 
   <!-- ============ JS (existing scripts reused) ============ -->
   
