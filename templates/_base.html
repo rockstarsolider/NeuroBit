@@ -1,33 +1,85 @@
 {% load static %}
 {% load i18n %}
+{% load render_bundle from webpack_loader %}
 
 
 <!DOCTYPE html>
-<html 
-    lang="fa-IR" 
-    dir="rtl"
-    >
-
+<html lang="en" data-theme="dark">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <title>{% block title %}{% endblock %}</title>
 
-        <!-- ============ FONTS ============ -->
+        <script>
+            (function () {
+            const saved = localStorage.getItem('theme');
+            if (saved) {
+                document.documentElement.setAttribute('data-theme', saved);
+            }
+            /* If nothing saved yet you can also respect the user’s OS preference: */
+            else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                localStorage.setItem('theme', saved);
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+            })();
+        </script>
+
+        {# ============ FONTS ============ #}
         <link rel="preconnect" href="https://fonts.googleapis.com"/>
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
         <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Syne:wght@600;700&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet"/>
-
+        
+        {# ============ ICON ============ #}
         <link rel="icon" type="image/png" href='{% static "images/yasanlogo.png" %}'/>
-      
+        
+        {# ============ STYLE ============ #}
         <link rel="stylesheet" href='{% static "style/style.css" %}'>
+        {% render_bundle 'main' 'css' %}
         {% block extra_style %}{% endblock extra_style %}
     </head>
     <body>
+        {# ============ HEADER ============ #}
+        <header>
+            <a href="#hero" class="logo-square" aria-label="Home"><img src='{% static "images/neurobit_main_logo.webp" %}' alt=""><span data-i18n="logo_text" class="logo-text">neurobit</span></a>
+            <nav class="desktop-nav">
+            <a href="#manifesto" data-i18n="nav_manifesto">What Neurobit do?</a>
+            <a href="#process" data-i18n="nav_process">Process</a>
+            {% comment %} <a href='{% url "learning-paths" %}' data-i18n="nav_learning_paths">Learning Paths</a> {% endcomment %}
+            <button class="btn-apply" data-i18n="nav_apply" onclick="document.getElementById('apply').scrollIntoView({behavior:'smooth'})">Apply</button>
+            <button id="langToggle" class="lang-toggle">FA</button>
+            <button class="theme-toggle" aria-label="Switch theme"><span>🌙</span></button>
+            </nav>
+            <button class="menu-icon" id="openMenu" aria-label="Open menu"><span></span><span></span></button>
+        </header>
+        
+        {# ============ MOBILE MENU ============ #}
+        <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+            <button class="close-btn" id="closeMenu" aria-label="Close menu">&times;</button>
+            <div class="mobile-menu-inner">
+            <div style="text-align: center;">
+                <button  class="lang-toggle lang-btn-mobile" style="margin-left: 0;">FA</button>
+                <button class="theme-toggle" aria-label="Switch theme"><span>🌙</span></button>
+            </div>
+            <a href="#manifesto" class="mobile-link" data-i18n="nav_manifesto">Manifesto</a>
+            <a href="#process" class="mobile-link" data-i18n="nav_process">Process</a>
+            {% comment %} <a href='{% url "learning-paths" %}' class="mobile-link" data-i18n="nav_learning_paths">Learning Paths</a> {% endcomment %}
+            <button class="btn-apply mobile-apply" data-i18n="nav_apply"
+                onclick="document.getElementById('apply').scrollIntoView({behavior:'smooth'});document.getElementById('mobileMenu').classList.remove('open');">Apply</button>
+            </div>
+        </div>
+
         <main>
             {% block content %}{% endblock content %}            
         </main>
+        {# ============ JS ============ #}
+        {% render_bundle 'main' 'js' %}
+        {% block extra_js %}{% endblock extra_js %}
     </body>
 
+    {# ============ FOOTER ============ #}
+    <footer>
+        <span data-i18n="footer_copy">© 2025 – All rights neurobit-reserved.</span>
+        <span data-i18n="footer_made">Crafted with ❤️ for Iranian youth</span>
+    </footer>
 </html>

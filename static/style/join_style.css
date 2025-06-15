@@ -29,11 +29,11 @@
 #application select{
     width:100%;
     padding:.7rem 1rem;
-    background:rgba(0,0,0,.8);
-    border:1px solid rgba(255,255,255,.12);
+    background:var(--bg);
+    border:1px solid var(--fg);
     border-radius:2px;
     font-family:var(--font-body);
-    color:#fff;
+    color: var(--fg);
     transition:border-color .25s, box-shadow .25s;
 }
 
@@ -88,8 +88,8 @@
     width:100%;
     padding:.75rem 0;
     background:transparent;
-    border:1px solid rgba(255,255,255,.3);
-    color:#fff;
+    border:1px solid var(--fg);
+    color: var(--fg);
     font-weight:700;
     font-family:var(--font-display);
     cursor:pointer;

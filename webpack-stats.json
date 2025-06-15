@@ -1,0 +1,27 @@
+{
+  "status": "done",
+  "assets": {
+    "main-8e1df3aafd5fa2615a14.js": {
+      "name": "main-8e1df3aafd5fa2615a14.js",
+      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\main-8e1df3aafd5fa2615a14.js",
+      "publicPath": "/static/webpack_output/main-8e1df3aafd5fa2615a14.js"
+    },
+    "vendors-d4eeb4341a35a8ec53d3.js": {
+      "name": "vendors-d4eeb4341a35a8ec53d3.js",
+      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\vendors-d4eeb4341a35a8ec53d3.js",
+      "publicPath": "/static/webpack_output/vendors-d4eeb4341a35a8ec53d3.js"
+    },
+    "vendors-d4eeb4341a35a8ec53d3.js.LICENSE.txt": {
+      "name": "vendors-d4eeb4341a35a8ec53d3.js.LICENSE.txt",
+      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\vendors-d4eeb4341a35a8ec53d3.js.LICENSE.txt",
+      "publicPath": "/static/webpack_output/vendors-d4eeb4341a35a8ec53d3.js.LICENSE.txt"
+    }
+  },
+  "chunks": {
+    "main": [
+      "vendors-d4eeb4341a35a8ec53d3.js",
+      "main-8e1df3aafd5fa2615a14.js"
+    ]
+  },
+  "publicPath": "/static/webpack_output/"
+}

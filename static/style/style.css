@@ -48,7 +48,10 @@
     --neon-glow: 0 0 4px var(--accent),
                  0 0 8px var(--accent),
                  0 0 12px var(--accent);
-  }
+    --surface-1: color-mix(in srgb, var(--accent) 3%, var(--bg));
+    /*  accent-alt برای گرادیان نوار پیشرفت */
+    --accent-alt:    color-mix(in srgb, var(--accent) 50%, #ffffff);
+}
   
 /* 2.  DARK theme overrides --------------------------------------- */
 [data-theme="dark"] {
@@ -57,7 +60,20 @@
     --fg: #ffffff;
     --acrylic-dark: rgba(20, 20, 20, .85);
     --acrylic-border: rgba(255, 255, 255, .08);
+    --surface-1:     color-mix(in srgb, var(--accent) 6%, var(--bg));
+    --accent-alt:    color-mix(in srgb, var(--accent) 45%, #000000);
 }
+
+@supports not (background: color-mix(in srgb, red 50%, blue)){
+    :root{
+      --surface-1: #f6fffe;           /* برای لایت */
+      --accent-alt:#66ffe6;
+    }
+    [data-theme="dark"]{
+      --surface-1:#0d1417;            /* برای دارک */
+      --accent-alt:#2efed0;
+    }
+  }
 /* ---------- RESET ---------- */
 *,
 *::before,
@@ -220,14 +236,14 @@ span.logo-text{
     background: var(--accent);
     color: #000
 }
-html[dir="ltr"] #themeToggle{
+html[dir="ltr"] .theme-toggle{
     margin-left: 1rem;
 }
-#themeToggle {
+.theme-toggle {
     background: none;
     border: none;
 }
-#themeToggle:hover {
+.theme-toggle:hover {
     cursor: pointer;
 }
 /* ---------- HAMBURGER ---------- */
@@ -244,7 +260,7 @@ html[dir="ltr"] #themeToggle{
 .menu-icon span {
     width: 24px;
     height: 1px;
-    background: rgba(255, 255, 255, 0.6);
+    background: var(--fg);
     display: block
 }
 
@@ -256,8 +272,8 @@ html[dir="ltr"] #themeToggle{
     width: 90%;
     background: var(--acrylic-dark);
     backdrop-filter: blur(8px);
-    background-color: black;
-    border-top: 1px solid var(--acrylic-border);
+    background-color: var(--bg);
+    border: 1px solid var(--acrylic-border);
     transform: translateY(-100%);
     transition: transform .35s ease;
     z-index: 30;
@@ -276,7 +292,7 @@ html[dir="ltr"] #themeToggle{
     background: none;
     border: none;
     font-size: 1.75rem;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--fg);
     cursor: pointer
 }
 
@@ -333,8 +349,10 @@ section {
 section h2 {
     font-family: var(--font-display);
     font-size: 1.2rem;
-    letter-spacing: .2rem;
     margin-bottom: 2rem;
+}
+html[dir="ltr"] section h2{
+    letter-spacing: .2rem;
     text-transform: uppercase
 }
 
@@ -692,6 +710,20 @@ footer {
     font-size: .875rem
 }
 
+
+/* buttons */
+.btn-primary {
+    background: var(--accent);
+    color: #000;
+    padding: .75rem 2rem;
+    border: none;
+    font-family: var(--font-display);
+    font-weight: 700;
+    cursor: pointer;
+    transition: filter .25s, transform .25s;
+}
+
+
 /* ---------- MOBILE BREAKPOINT ---------- */
 @media(max-width:640px) {
     .desktop-nav {
@@ -701,7 +733,12 @@ footer {
     .menu-icon {
         display: flex
     }
-
+    .theme-toggle{
+        border: 1px solid var(--accent);
+        margin-right: 1rem;
+        padding: 0.2rem 0.9rem;
+        border-radius: 1rem;
+    }
     .title {
         font-size: clamp(2rem, 10vw, 3.5rem);
         letter-spacing: .4rem
@@ -713,6 +750,7 @@ footer {
     .btn-apply{
         margin-left: 0;
     }
+
     #ethics{ margin:5rem auto 6rem; }
     .partners-grid { gap: 2rem 1.5rem; }
     .partner img   { max-width: 110px; }
@@ -725,7 +763,9 @@ footer {
 /* ------------------------------------------------------------------ */
 /*  RTL‑ONLY FIXES                                                    */
 /* ------------------------------------------------------------------ */
-
+html[dir="rtl"]{
+    --font-display: "ModamVF", sans-serif!important;
+}
 html[dir="rtl"] header {
     direction: rtl
 }
@@ -789,3 +829,4 @@ html[dir="rtl"] .ethics-list li{
 html[dir="rtl"] .carousel-track{
     direction:ltr;        /* or: flex-direction:row; direction:ltr; */
   }
+

@@ -5,7 +5,7 @@ from .models import Application
 
 
 class HomeView(generic.TemplateView):
-    template_name = 'index.html'
+    template_name = 'pages/home.html'
 
 
 def apply_view(request):

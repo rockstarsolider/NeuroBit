@@ -2,18 +2,15 @@ venv/
 .idea/
 staticfiles/
 media/
-
-*.pyc
+node_modules/
 __pycache__/
-migrations/
-
-.env
-db.sqlite3
-
-se.py
 
 static/webpack_output/
 static/bundles/
-node_modules/
+
+*.pyc
+.env
+db.sqlite3
+webpack-stats.json
 
 package-lock.json

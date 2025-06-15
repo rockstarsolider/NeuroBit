@@ -5,9 +5,13 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('joinapp.urls')),
+    
+    path('', include('pages.urls')),
 ]
 
 # serve media in development
 if settings.DEBUG:
+    from debug_toolbar.toolbar import debug_toolbar_urls
+    from django.conf.urls.static import static
+    urlpatterns += debug_toolbar_urls()
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

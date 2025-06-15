@@ -1,0 +1,187 @@
+/* ============================  pricing.css  ============================ */
+
+/* ---------- HERO ---------- */
+.pricing-hero{
+    max-width:900px;
+    margin:6rem auto 4rem;
+    text-align:center;
+  }
+  .pricing-hero h1{
+    font-family:var(--font-display-fa);
+    font-size:clamp(2.2rem,6vw,3.2rem);
+  }
+  .pricing-hero p{font-size:1.1rem;margin-bottom:2rem}
+  
+  /* ---------- PLAN CARDS ---------- */
+  .pricing-cards{
+    display:flex;
+    gap:2rem;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin-bottom:5rem;
+    scroll-snap-type:x mandatory; /* موبایل */
+  }
+  .plan-card{
+    position:relative;
+    width:320px;
+    background:var(--bg);
+    border:1px solid var(--acrylic-border);
+    box-shadow:0 6px 18px rgba(0,0,0,.08);
+    padding:2rem 1.75rem 2.5rem;
+    display:flex;flex-direction:column;gap:1rem;
+    text-align:center;
+    transition:transform .3s ease, box-shadow .3s ease;
+    scroll-snap-align:center;
+  }
+  .plan-card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 12px 28px rgba(0,0,0,.15);
+  }
+  .plan-card.popular{border:2px solid var(--accent)}
+  .plan-card.premium::after{
+    content:"★";
+    position:absolute;top:1rem;left:1rem;
+    font-size:1.5rem;color:var(--accent);
+  }
+  /* نام و قیمت */
+  .plan-name{font-family:var(--font-display-fa);font-size:1.3rem}
+  .plan-price{font-size:1.2rem;font-weight:600}
+  .plan-discount{font-size:.95rem;color:var(--accent)}
+  .plan-discount del{margin-left:.25rem;color:var(--fg)}
+  .chip{
+    background:var(--accent);
+    color:#000;
+    border-radius:4px;
+    padding:.05rem .4rem;
+    font-weight:700;
+    margin-right:.25rem;
+  }
+  /* لیست امکانات */
+  .plan-features{
+    margin:1rem 0 auto;
+    text-align:right;
+    font-size:.9rem;
+    line-height:1.8;
+  }
+  .plan-features li{display:flex;align-items:center;gap:.35rem}
+  .plan-features li::before{content:"✓";color:var(--accent)}
+  /* CTA */
+  .plan-cta{
+    background:var(--accent);
+    color:#000;
+    border:none;
+    font-family:var(--font-display-fa);
+    font-weight:700;
+    padding:.6rem 1.5rem;
+    cursor:pointer;
+    margin-top:1rem;
+  }
+  
+  /* ---------- FEATURE MATRIX ---------- */
+  .feature-matrix{max-width:900px;margin:0 auto 4rem}
+  .feature-matrix h2{text-align:center;margin-bottom:1.5rem}
+  .feature-matrix table{
+    width:100%;border-collapse:collapse;font-size:.9rem;text-align:center
+  }
+  .feature-matrix thead{background:var(--surface-1)}
+  .feature-matrix th,
+  .feature-matrix td{border:1px solid var(--acrylic-border);padding:.75rem}
+  .feature-matrix td:first-child{text-align:right}
+  .feature-matrix td:not(:first-child){font-family:var(--font-display-fa)}
+  .feature-matrix td:contains("✕"){opacity:.4}
+  
+  /* ---------- DISCOUNT STRIP ---------- */
+  .discount-strip{
+    background:var(--accent);
+    color:#000;
+    text-align:center;
+    padding:.75rem;
+    font-weight:700;
+    animation:pulse 4s infinite;
+  }
+  @keyframes pulse{
+    0%,100%{filter:brightness(1)}
+    50%{filter:brightness(1.3)}
+  }
+  
+  /* ---------- FAQ ---------- */
+  .pricing-faq{max-width:800px;margin:0 auto 6rem}
+  .pricing-faq h2{text-align:center;margin-bottom:1rem}
+  .pricing-faq details{border:1px solid var(--acrylic-border);margin-bottom:.75rem;padding:1rem;border-radius:6px}
+  .pricing-faq summary{font-weight:600;cursor:pointer}
+  
+  /* ---------- GUARANTEE ---------- */
+  .pricing-guarantee{
+    max-width:700px;margin:0 auto 6rem;
+    background:var(--bg);
+    border:1px solid var(--acrylic-border);
+    text-align:center;padding:2rem 1rem;
+    display:flex;flex-direction:column;gap:1.5rem;
+  }
+  .pricing-guarantee .shield{font-size:2.5rem}
+  
+  /* ============ FINAL CTA UPGRADES ============ */
+.cta-block {
+  background: var(--acrylic-dark);
+  padding: 3rem 1rem;
+  margin: 4rem auto;
+  border: 1px solid var(--acrylic-border);
+}
+
+.cta-block .cta-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 900px;
+  margin: 0 auto;
+  gap: 2rem;
+
+}
+
+.cta-block .cta-text {
+  font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+  font-weight: 600;
+  line-height: 1.4;
+  flex: 1;
+}
+
+.cta-block .btn-inverse {
+  background: var(--fg);
+  color: var(--accent);
+  border: none;
+  padding: 0.8rem 2rem;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.cta-block .btn-inverse:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+}
+
+/* stack on mobile */
+@media (max-width: 768px) {
+  .cta-block .cta-container {
+    flex-direction: column;
+    text-align: center;
+  }
+  .cta-block .btn-inverse {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
+  
+  /* ---------- RESPONSIVE ---------- */
+  @media(max-width:640px){
+    .plan-card{width:280px}
+    .feature-matrix table{font-size:.8rem}
+  }
+  
+
+/* when in LTR (English) */
+html[dir="ltr"] .feature-matrix td:first-child {
+  text-align: left;
+}
