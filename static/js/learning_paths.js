@@ -176,7 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
     showStep(step);
   });
 
-  const { animate, scroll, inView } = Motion;
+  // const { animate, scroll, inView } = Motion;
 inView(".learning_path_title", (element) => {
     animate(element, { y: 30},
         { duration: 1 });

@@ -22,7 +22,7 @@
       <button class="btn-primary" data-i18n="join_program_btn"
               onclick="window.location.href='join.html'">Join the Program</button>
     </div>
-    <img src="{% static 'images/graphic_path.png' %}" alt="UI/UX design illustration">
+    <img src="{% static 'images/graphic_path.webp' %}" alt="UI/UX design illustration">
   </section>
 
   <!-- ============ CAREER SNAPSHOT ============ -->
@@ -101,7 +101,7 @@
 
       <!-- Project 1 -->
       <article class="project-card">
-        <img src="{% static 'images/End-to-End Mobile Banking App.png' %}" alt="Mobile banking app prototype">
+        <img src="{% static 'images/End-to-End Mobile Banking App.webp' %}" alt="Mobile banking app prototype">
         <div class="proj-body">
           <h3 data-i18n="uiux_proj_1_title">End-to-End Mobile Banking App</h3>
           <p  data-i18n="uiux_proj_1_desc">From persona research to hi-fi prototype with motion micro-interactions.</p>
@@ -110,7 +110,7 @@
 
       <!-- Project 2 -->
       <article class="project-card">
-        <img src="{% static 'images/SaaS Dashboard Redesign.jpg' %}" alt="SaaS dashboard redesign">
+        <img src="{% static 'images/SaaS Dashboard Redesign.webp' %}" alt="SaaS dashboard redesign">
         <div class="proj-body">
           <h3 data-i18n="uiux_proj_2_title">SaaS Dashboard Redesign</h3>
           <p  data-i18n="uiux_proj_2_desc">Turn complex data into an accessible, responsive B2B dashboard.</p>
@@ -119,7 +119,7 @@
 
       <!-- Project 3 -->
       <article class="project-card">
-        <img src="{% static 'images/Cross-Platform Design System.png' %}" alt="Design system documentation">
+        <img src="{% static 'images/Cross-Platform Design System.webp' %}" alt="Design system documentation">
         <div class="proj-body">
           <h3 data-i18n="uiux_proj_3_title">Cross-Platform Design System</h3>
           <p  data-i18n="uiux_proj_3_desc">Build tokens, components &amp; Storybook docs for web & mobile.</p>
@@ -215,5 +215,5 @@
   {% endblock content %}
 
   {% block extra_js %}
-    <script src="{% static 'js/translate_learning_path_detail_UIUX.js' %}"></script>
+    <script src='{% static "js/translate_learning_path_details.js" %}'></script>
   {% endblock extra_js %}
