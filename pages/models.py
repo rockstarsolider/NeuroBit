@@ -1,9 +1,9 @@
 from django.db import models
-from django.core.validators import FileExtensionValidator
+from django.core.validators import FileExtensionValidator, MinValueValidator, MaxValueValidator
 
 
 def directory_path(instance, filename):
-    return f'{instance.id}/{instance.fullname}/{filename}'
+    return f'{instance.phone}/{filename}'
 
 
 class Application(models.Model):
@@ -13,7 +13,7 @@ class Application(models.Model):
     age = models.PositiveIntegerField("Age")
     sopfile = models.FileField(
         upload_to=directory_path, 
-        validators=[FileExtensionValidator(['pdf'])],
+        validators=[FileExtensionValidator(['pdf', 'docx']), MinValueValidator(1)],
         blank=True, null=True,
         verbose_name="SOP file", 
         )

@@ -4,6 +4,10 @@ import os
 from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
+from django.urls import reverse_lazy
+from django.templatetags.static import static
+from django.utils.translation import gettext_lazy as _
+
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -11,13 +15,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
-# DEBUG = os.environ.get('DEBUG') == 'False'
-DEBUG = True
+DEBUG = os.environ.get('DEBUG') == 'True'
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 # Application definition
 
 INSTALLED_APPS = [
+    "unfold",  # before django.contrib.admin
+    "unfold.contrib.filters",  # optional, if special filters are needed
+    "unfold.contrib.forms",  # optional, if special form elements are needed
+    "unfold.contrib.inlines",  # optional, if special inlines are needed
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -135,3 +143,63 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CRISPY_TEMPLATE_PACK = "unfold_crispy"
+CRISPY_ALLOWED_TEMPLATE_PACKS = ["unfold_crispy"]
+# unfold
+UNFOLD = {
+    # "SHOW_LANGUAGES": True,
+    "SITE_DROPDOWN": [
+        {
+            "icon": "home",
+            "title": _("Home"),
+            "link": reverse_lazy("admin:index"),
+        },
+        {
+            "icon": "info",
+            "title": _("about us"),
+            "link": reverse_lazy("home"),
+        },
+    ],
+    "SITE_TITLE": "AliEsmaeilzadeh",
+    "SITE_HEADER": "Admin Panel",
+    "SITE_SUBHEADER": "AliEsmaeilzadeh",
+    "SITE_SYMBOL": "settings",
+    "LOGIN": {
+        "image": lambda request: static(r"static_src/images/neurobit_main_logo.webp"),
+        # "redirect_after": lambda request: reverse_lazy("admin:APP_MODEL_changelist"),
+    },
+    "SIDEBAR": {
+        "show_search": True, 
+        "show_all_applications": True, 
+        "navigation": [
+            {
+                "title": _("Navigation"),
+                "separator": True,  # Top border
+                "collapsible": False,  # Collapsible group of links
+                "items": [
+                    {
+                        "title": _("Dashboard"),
+                        "icon": "dashboard",  # Supported icon set: https://fonts.google.com/icons
+                        "link": reverse_lazy("admin:index"),
+                    },
+                    {   
+                        "title": _("info"),
+                        "label": "Dashboard",
+                        "link": "/admin/dashboard/",
+                    },
+                    {
+                        "title": _("Users"),
+                        "icon": "people",
+                        "link": reverse_lazy("admin:auth_user_changelist"),
+                    },
+                    {
+                        "title": _("Applications"),
+                        "icon": "school",
+                        "link": reverse_lazy("admin:app_list", kwargs={'app_label': 'pages'}),
+                    },
+                ],
+            },
+        ],
+    },
+}

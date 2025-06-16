@@ -36,19 +36,26 @@
           name="phone"
           maxlength="30"
           required
+          value="{{ data.phone|default_if_none:'' }}"
         />
+        {% if errors.phone %}
+          <div class="field-error" style="color: #b00;">{{ errors.phone }}</div>
+        {% endif %}
       </div>
 
       {# Location #}
       <div class="field-group">
         <label for="location" data-i18n="application_location_label">Location</label>
-        <input type="text" id="location" name="location" />
+        <input type="text" id="location" name="location" value="{{ data.location|default_if_none:'' }}">
       </div>
 
       {# Age #}
       <div class="field-group">
         <label for="age" data-i18n="application_age_label">Age</label>
-        <input type="number" id="age" name="age" min="10" max="99" />
+        <input type="number" id="age" name="age" min="15" max="99" value="{{ data.age|default_if_none:'' }}">
+        {% if errors.age %}
+          <div class="field-error" style="color: #b00;">{{ errors.age }}</div>
+        {% endif %}
       </div>
 
       {# sop intro #}
@@ -65,9 +72,15 @@
           <li data-i18n="application_guideline3">
             The SOP letter should be a maximum of 2 pages.
           </li>
+          <li data-i18n="application_guideline4">
+            Only pdf and docx files are excpected.
+          </li>
         </ul>
 
         <input type="file" id="sopfile" name="sopfile">
+        {% if errors.sopfile %}
+          <div class="field-error" style="color: #b00;">{{ errors.sopfile }}</div>
+        {% endif %}
       </div>
 
       {# Submit #}
@@ -77,9 +90,9 @@
     </form>
   </section>
 
-  {% endblock content %}
+{% endblock content %}
 
-  {% block extra_js %}
-    {# ============ JS ============ #}
-    <script src='{% static "js/translate_join.js" %}'></script>
-  {% endblock extra_js %}
+{% block extra_js %}
+  {# ============ JS ============ #}
+  <script src='{% static "js/translate_join.js" %}'></script>
+{% endblock extra_js %}
