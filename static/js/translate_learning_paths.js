@@ -170,7 +170,7 @@ const translations = {
         "logo_text": "نوروبیت",
         "join_btn": "به نوروبیت بپیوندید",
         /* shared labels */
-        "learning_path_title": "مسیرهای یادگیری",
+        "nav_learning_paths": "مسیرهای یادگیری",
         "role_title": "انتخاب مسیر شغلی",
         "role_description": "دانش و مهارت‌های لازم برای پیشرفت را کسب کنید.",
         "if_you_like": "اگر به این‌ها علاقه دارید:",

@@ -1,8 +1,14 @@
-// Scramble TEXT
-cycle('.lead-text');
+// ---------- SCRAMBLE CYCLE ----------
+const handleScramble = text => {
+    const el = document.querySelector(".lead-text"); el.innerHTML = text;
+    new ScrambleText(el).play().start();
+};
+function cycle() {
+    handleScramble(TEXTS[i % TEXTS.length]);
+    i++; setTimeout(cycle, 5000);
+}
+cycle();
 
-// title animations
-const { animate, scroll, inView } = Motion;
 inView(".title_with_line", (element) => {
     new ScrambleText(element).play().start();
 });

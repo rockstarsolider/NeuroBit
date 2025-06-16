@@ -18,11 +18,13 @@
       step toward building your future.
     </p>
 
-    <form id="applyForm" autocomplete="off" novalidate>
+    <form action='{% url "apply" %}' method="post" id="applyForm" autocomplete="off" novalidate enctype="multipart/form-data">
+      {% csrf_token %}
+
       {# Full name #}
       <div class="field-group">
         <label for="fullName" data-i18n="application_fullname_label">Full name</label>
-        <input type="text" id="fullName" required />
+        <input type="text" id="fullName" name="fullName" required />
       </div>
 
       {# Phone #}
@@ -31,20 +33,22 @@
         <input
           type="tel"
           id="phone"
+          name="phone"
           maxlength="30"
+          required
         />
       </div>
 
       {# Location #}
       <div class="field-group">
         <label for="location" data-i18n="application_location_label">Location</label>
-        <input type="text" id="location" />
+        <input type="text" id="location" name="location" />
       </div>
 
       {# Age #}
       <div class="field-group">
         <label for="age" data-i18n="application_age_label">Age</label>
-        <input type="number" id="age" min="10" max="99" />
+        <input type="number" id="age" name="age" min="10" max="99" />
       </div>
 
       {# sop intro #}
@@ -73,6 +77,9 @@
     </form>
   </section>
 
-  {# ============ JS ============ #}
-  <script src='{% static "js/translate_join.js" %}'></script>
-{% endblock content %}
+  {% endblock content %}
+
+  {% block extra_js %}
+    {# ============ JS ============ #}
+    <script src='{% static "js/translate_join.js" %}'></script>
+  {% endblock extra_js %}

@@ -146,7 +146,9 @@
     background: var(--accent);
 }
 
-
+.card-path-details-btn:visited {
+    columns: var(--text);
+}
 
 /* ---------------------------------------------------------------
    RESPONSIVE GRID FOR ROLE CARDS

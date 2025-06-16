@@ -212,5 +212,8 @@
     </section>
   </main>
 
-  <script src="{% static 'js/translate_learning_path_details.js' %}"></script>
-{% endblock content %}
+  {% endblock content %}
+
+  {% block extra_js %}
+    <script src="{% static 'js/translate_learning_path_details.js' %}"></script>
+  {% endblock extra_js %}

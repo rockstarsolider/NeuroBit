@@ -35,6 +35,7 @@ class GameDevCourseView(generic.TemplateView):
 
 class JoinView(generic.View):
     template_name = 'pages/join.html'
+    
 
     def get(self, request):
         # Render the form as usual

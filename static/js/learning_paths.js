@@ -6,6 +6,8 @@
    • single “Next/Finish” button
    • theme-aware radar chart (Chart.js)
 ==================================================================*/
+// import Chart from 'chart.js/auto';
+
 document.addEventListener("DOMContentLoaded", () => {
 
     /* ---------- DOM refs ---------------------------------------- */

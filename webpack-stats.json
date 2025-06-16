@@ -1,26 +1,26 @@
 {
   "status": "done",
   "assets": {
-    "main-7687e0dff9da13bc5131.js": {
-      "name": "main-7687e0dff9da13bc5131.js",
-      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\main-7687e0dff9da13bc5131.js",
-      "publicPath": "/static/webpack_output/main-7687e0dff9da13bc5131.js"
+    "main-825085219a25cdee6ba1.js": {
+      "name": "main-825085219a25cdee6ba1.js",
+      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\main-825085219a25cdee6ba1.js",
+      "publicPath": "/static/webpack_output/main-825085219a25cdee6ba1.js"
     },
-    "vendors-c5c4487229956486cdbd.js": {
-      "name": "vendors-c5c4487229956486cdbd.js",
-      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\vendors-c5c4487229956486cdbd.js",
-      "publicPath": "/static/webpack_output/vendors-c5c4487229956486cdbd.js"
+    "vendors-d4eeb4341a35a8ec53d3.js": {
+      "name": "vendors-d4eeb4341a35a8ec53d3.js",
+      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\vendors-d4eeb4341a35a8ec53d3.js",
+      "publicPath": "/static/webpack_output/vendors-d4eeb4341a35a8ec53d3.js"
     },
-    "vendors-c5c4487229956486cdbd.js.LICENSE.txt": {
-      "name": "vendors-c5c4487229956486cdbd.js.LICENSE.txt",
-      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\vendors-c5c4487229956486cdbd.js.LICENSE.txt",
-      "publicPath": "/static/webpack_output/vendors-c5c4487229956486cdbd.js.LICENSE.txt"
+    "vendors-d4eeb4341a35a8ec53d3.js.LICENSE.txt": {
+      "name": "vendors-d4eeb4341a35a8ec53d3.js.LICENSE.txt",
+      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\vendors-d4eeb4341a35a8ec53d3.js.LICENSE.txt",
+      "publicPath": "/static/webpack_output/vendors-d4eeb4341a35a8ec53d3.js.LICENSE.txt"
     }
   },
   "chunks": {
     "main": [
-      "vendors-c5c4487229956486cdbd.js",
-      "main-7687e0dff9da13bc5131.js"
+      "vendors-d4eeb4341a35a8ec53d3.js",
+      "main-825085219a25cdee6ba1.js"
     ]
   },
   "publicPath": "/static/webpack_output/"

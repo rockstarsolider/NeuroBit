@@ -1,3 +1,10 @@
+// Import libraries and attach to window object
+import { animate, scroll, inView } from 'motion';
+import ScrambleText from 'scramble-text';
+import { PowerGlitch } from 'powerglitch';
+
+
+
 // handle theming
 const root = document.documentElement;
 const themeToggleBtns = document.querySelectorAll('.theme-toggle');
@@ -64,8 +71,5 @@ function cycle(el_selector) {
         i++; setTimeout(cycle, 5000);
     } catch (error) {
         // passs
-    }
-    
-    
+    }   
 }
-

@@ -35,7 +35,7 @@
         
         {# ============ STYLE ============ #}
         <link rel="stylesheet" href='{% static "style/style.css" %}'>
-        {% render_bundle 'main' 'css' %}
+        {% comment %} {% render_bundle 'main' 'css' %} {% endcomment %}
         {% block extra_style %}{% endblock extra_style %}
     </head>
     <body>
@@ -73,19 +73,17 @@
             </div>
         </div>
 
-        {% comment %} <main> {% endcomment %}
-            {% block content %}{% endblock content %}            
-        {% comment %} </main> {% endcomment %}
+        
+        {% block content %}{% endblock content %}            
+        
+        {# ============ FOOTER ============ #}
+        <footer>
+            <span data-i18n="footer_copy">© 2025 – All rights neurobit-reserved.</span>
+            <span data-i18n="footer_made">Crafted with ❤️ for Iranian youth</span>
+        </footer>
         
         {# ============ JS ============ #}
         {% render_bundle 'main' 'js' %}
-        {% comment %} <script src='{% static "js/script.js" %}'></script> {% endcomment %}
         {% block extra_js %}{% endblock extra_js %}
     </body>
-    
-    {# ============ FOOTER ============ #}
-    <footer>
-        <span data-i18n="footer_copy">© 2025 – All rights neurobit-reserved.</span>
-        <span data-i18n="footer_made">Crafted with ❤️ for Iranian youth</span>
-    </footer>
 </html>
