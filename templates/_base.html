@@ -35,7 +35,7 @@
         
         {# ============ STYLE ============ #}
         <link rel="stylesheet" href='{% static "style/style.css" %}'>
-        {% comment %} {% render_bundle 'main' 'css' %} {% endcomment %}
+        {% render_bundle 'main' 'css' %}
         {% block extra_style %}{% endblock extra_style %}
     </head>
     <body>

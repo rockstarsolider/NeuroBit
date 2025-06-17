@@ -1,8 +1,8 @@
 // ---------- SCRAMBLE CYCLE ----------
-const handleScramble = text => {
-    const el = document.querySelector(".lead-text"); el.innerHTML = text;
-    new ScrambleText(el).play().start();
-};
+// const handleScramble = text => {
+//     const el = document.querySelector(".lead-text"); el.innerHTML = text;
+//     new ScrambleText(el).play().start();
+// };
 function cycle() {
     handleScramble(TEXTS[i % TEXTS.length]);
     i++; setTimeout(cycle, 5000);

@@ -7,10 +7,10 @@ window.scroll = scroll;
 window.inView = inView;
 
 import ScrambleText from 'scramble-text';
-window.ScrambleText = ScrambleText;
+// window.ScrambleText = ScrambleText;
 
 import { PowerGlitch } from 'powerglitch';
-window.PowerGlitch = PowerGlitch;
+// window.PowerGlitch = PowerGlitch;
 
 // import htmx from 'htmx.org';
 // window.htmx = htmx;
@@ -65,9 +65,6 @@ function setSpot(e) {
 }
 window.addEventListener("mousemove", setSpot);
 window.addEventListener("touchmove", e => setSpot(e.touches[0]));
-
-
-
 
 
 // ---------- SCRAMBLE CYCLE ----------
