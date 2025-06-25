@@ -1,0 +1,13 @@
+# It’s only useful when you want Liara to skip the Node + Webpack step and ship the pre-built assets you committed.
+
+# --- Liara: skip Node build ---
+package.json
+package-lock.json
+npm-shrinkwrap.json
+webpack.config.js
+postcss.config.js
+.browserslistrc
+babel.config.js
+node_modules/
+# optional: source maps, test files, docs …
+*.map
