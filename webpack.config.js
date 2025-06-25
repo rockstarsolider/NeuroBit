@@ -8,6 +8,7 @@ module.exports = {
     context: __dirname,
     entry: {
         main: './static/webpack_entry/js/index.js',
+        // home_animate: './static/js/home_animate.js'
     },
     output: {
         path: path.resolve('./static/webpack_output/'),

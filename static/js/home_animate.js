@@ -1,8 +1,13 @@
+// static\js\home_animate.js
+
 // ---------- SCRAMBLE CYCLE ----------
 // const handleScramble = text => {
 //     const el = document.querySelector(".lead-text"); el.innerHTML = text;
 //     new ScrambleText(el).play().start();
 // };
+
+
+
 function cycle() {
     handleScramble(TEXTS[i % TEXTS.length]);
     i++; setTimeout(cycle, 5000);
@@ -57,6 +62,3 @@ track.addEventListener('touchend',   e => {
     else if (diff < -40) nextBtn.click();
     startX = null;
 });
-
-
-PowerGlitch.glitch('.glitch',{ playMode: 'hover' });

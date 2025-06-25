@@ -1,10 +1,10 @@
 {
   "status": "done",
   "assets": {
-    "main-825085219a25cdee6ba1.js": {
-      "name": "main-825085219a25cdee6ba1.js",
-      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\main-825085219a25cdee6ba1.js",
-      "publicPath": "/static/webpack_output/main-825085219a25cdee6ba1.js"
+    "main-02fc93f5d1160601ef5f.js": {
+      "name": "main-02fc93f5d1160601ef5f.js",
+      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\main-02fc93f5d1160601ef5f.js",
+      "publicPath": "/static/webpack_output/main-02fc93f5d1160601ef5f.js"
     },
     "vendors-d4eeb4341a35a8ec53d3.js": {
       "name": "vendors-d4eeb4341a35a8ec53d3.js",
@@ -20,7 +20,7 @@
   "chunks": {
     "main": [
       "vendors-d4eeb4341a35a8ec53d3.js",
-      "main-825085219a25cdee6ba1.js"
+      "main-02fc93f5d1160601ef5f.js"
     ]
   },
   "publicPath": "/static/webpack_output/"

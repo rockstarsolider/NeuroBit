@@ -1,3 +1,4 @@
+// static\js\script.js
 // Import libraries and attach to window object
 import { animate, scroll, inView } from 'motion';
 import ScrambleText from 'scramble-text';
@@ -73,3 +74,4 @@ function cycle(el_selector) {
         // passs
     }   
 }
+

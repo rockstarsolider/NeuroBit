@@ -170,6 +170,9 @@ const TEXTS_FA = [
     "خلاق، بااعتمادبه‌نفس و سازگار شوید"
 ];
 let TEXTS = TEXTS_EN, i = 0;
+// Make sure the dynamic text array is visible to every bundle
+// window.TEXTS = TEXTS;
+// window.i = i;
 
 function applyTranslations() {
     document.querySelectorAll("[data-i18n]").forEach(el => {
@@ -181,6 +184,7 @@ function applyTranslations() {
         langBtn.textContent = currentLang === "fa" ? "EN" : "FA";
     });
     TEXTS = currentLang === "fa" ? TEXTS_FA : TEXTS_EN;
+    // window.TEXTS = TEXTS;        // keep global copy up-to-date
     document.querySelector(".lead-text").innerHTML = "";
 }
 

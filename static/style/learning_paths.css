@@ -133,7 +133,7 @@
     filter: brightness(1.15)
 }
 .card-path-details-btn{
-    background: transparent;
+    background: white;
     color: var(--text);
     padding: .4rem 1.5rem;
     border: 1px solid var(--accent);

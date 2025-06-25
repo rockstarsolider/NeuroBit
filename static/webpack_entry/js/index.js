@@ -7,10 +7,13 @@ window.scroll = scroll;
 window.inView = inView;
 
 import ScrambleText from 'scramble-text';
-// window.ScrambleText = ScrambleText;
+window.ScrambleText = ScrambleText;
 
 import { PowerGlitch } from 'powerglitch';
 // window.PowerGlitch = PowerGlitch;
+PowerGlitch.glitch('.glitch',{ playMode: 'hover' });
+
+// import { handleScramble } from './handleScramble';
 
 // import htmx from 'htmx.org';
 // window.htmx = htmx;
@@ -73,3 +76,5 @@ const handleScramble = text => {
     el.innerHTML = text;
     new ScrambleText(el).play().start();
 };
+
+window.handleScramble = handleScramble;

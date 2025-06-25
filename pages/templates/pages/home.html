@@ -1,6 +1,6 @@
 {% extends "_base.html" %}
 {% load static %}
-
+{% load render_bundle from webpack_loader %}
 
 {% block title %}
 NEUROBIT
@@ -269,7 +269,7 @@ NEUROBIT
         <img src='{% static "images/neurobit_ceo1.jpg" %}' alt="ali esmaeilzadeh" loading="lazy" />
         <figcaption>
           <span class="name" data-i18n="role_name_ceo">Ali Esmaeilzadeh</span>
-          <span class="role" data-i18n="role_ceo">CEO</span>
+          {% comment %} <span class="role" data-i18n="role_ceo">CEO</span> {% endcomment %}
         </figcaption>
       </figure>
 
@@ -277,7 +277,7 @@ NEUROBIT
         <img src='{% static "images/neurobit_ceo2.jpg" %}' alt="abdollah feizollahzadeh" loading="lazy" />
         <figcaption>
           <span class="name" data-i18n="role_name_cbo">A. Feizollahzadeh</span>
-          <span class="role" data-i18n="role_cbo">CBO</span>
+          {% comment %} <span class="role" data-i18n="role_cbo">CBO</span> {% endcomment %}
         </figcaption>
       </figure>
 
@@ -285,7 +285,7 @@ NEUROBIT
         <img src='{% static "images/neurobit_cto.jpg" %}' alt="farhad rezagholi" loading="lazy" />
         <figcaption>
           <span class="name" data-i18n="role_name_cto">F. Rezagholi</span>
-          <span class="role" data-i18n="role_cto">CTO</span>
+          {% comment %} <span class="role" data-i18n="role_cto">CTO</span> {% endcomment %}
         </figcaption>
       </figure>
     </div>
@@ -297,4 +297,5 @@ NEUROBIT
   {% block extra_js %}
     <script src='{% static "js/translate.js" %}'></script>
     <script src='{% static "js/home_animate.js" %}' defer></script>
+    {% comment %} {% render_bundle 'home_animate' %} {% endcomment %}
   {% endblock extra_js %}
