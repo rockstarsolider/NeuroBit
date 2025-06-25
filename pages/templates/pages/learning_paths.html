@@ -1,12 +1,13 @@
 {% extends "_base.html" %}
 {% load static %}
+{% load render_bundle from webpack_loader %}
 
 
 {% block title %}NEUROBIT – Learning Paths{% endblock title %}
 
 {% block extra_style %}
   <link rel="stylesheet" href='{% static "style/learning_paths.css" %}'>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  {% comment %} <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> {% endcomment %}
 {% endblock extra_style %}
 
 
@@ -554,5 +555,6 @@
 {% block extra_js %}
   {# ============ JS ============ #}
   <script src='{% static "js/translate_learning_paths.js" %}'></script>
-  <script src='{% static "js/learning_paths.js" %}'></script>
+  {% comment %} <script src='{% static "js/learning_paths.js" %}'></script> {% endcomment %}
+  {% render_bundle 'learning_paths' 'js' %}
 {% endblock extra_js %}

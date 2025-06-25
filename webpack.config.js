@@ -8,7 +8,7 @@ module.exports = {
     context: __dirname,
     entry: {
         main: './static/webpack_entry/js/index.js',
-        // home_animate: './static/js/home_animate.js'
+        learning_paths: './static/js/learning_paths.js',
     },
     output: {
         path: path.resolve('./static/webpack_output/'),
@@ -41,17 +41,6 @@ module.exports = {
                 },
             },
         ],
-    },
-    optimization: {
-        splitChunks: { // Separate vendor libraries for better caching
-            cacheGroups: {
-                vendor: {
-                    test: /[\\/]node_modules[\\/]/,
-                    name: 'vendors',
-                    chunks: 'all',
-                },
-            },
-        },
     },
     plugins: [
         new MiniCssExtractPlugin({

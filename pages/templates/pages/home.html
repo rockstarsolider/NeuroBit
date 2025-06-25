@@ -1,6 +1,5 @@
 {% extends "_base.html" %}
 {% load static %}
-{% load render_bundle from webpack_loader %}
 
 {% block title %}
 NEUROBIT
@@ -297,5 +296,4 @@ NEUROBIT
   {% block extra_js %}
     <script src='{% static "js/translate.js" %}'></script>
     <script src='{% static "js/home_animate.js" %}' defer></script>
-    {% comment %} {% render_bundle 'home_animate' %} {% endcomment %}
   {% endblock extra_js %}

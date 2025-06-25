@@ -8,6 +8,27 @@
 ==================================================================*/
 // import Chart from 'chart.js/auto';
 
+import {
+  Chart,               // core
+  RadarController,     // ↳ chart-type controller
+  RadialLinearScale,   // ↳ default “r” scale for radar
+  PointElement,        // ↳ small circles
+  LineElement,         // ↳ spokes / outline
+  Filler,              // (optional) area fill under the line
+  Tooltip, Legend      // (optional) nice to keep
+} from 'chart.js';
+
+// tell Chart.js which pieces you actually need
+Chart.register(
+  RadarController,
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend
+);
+
 document.addEventListener("DOMContentLoaded", () => {
 
     /* ---------- DOM refs ---------------------------------------- */

@@ -1,26 +1,33 @@
 {
   "status": "done",
   "assets": {
-    "main-02fc93f5d1160601ef5f.js": {
-      "name": "main-02fc93f5d1160601ef5f.js",
-      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\main-02fc93f5d1160601ef5f.js",
-      "publicPath": "/static/webpack_output/main-02fc93f5d1160601ef5f.js"
+    "learning_paths-95ef2f69be920195fc0b.js": {
+      "name": "learning_paths-95ef2f69be920195fc0b.js",
+      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\learning_paths-95ef2f69be920195fc0b.js",
+      "publicPath": "/static/webpack_output/learning_paths-95ef2f69be920195fc0b.js"
     },
-    "vendors-d4eeb4341a35a8ec53d3.js": {
-      "name": "vendors-d4eeb4341a35a8ec53d3.js",
-      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\vendors-d4eeb4341a35a8ec53d3.js",
-      "publicPath": "/static/webpack_output/vendors-d4eeb4341a35a8ec53d3.js"
+    "learning_paths-95ef2f69be920195fc0b.js.LICENSE.txt": {
+      "name": "learning_paths-95ef2f69be920195fc0b.js.LICENSE.txt",
+      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\learning_paths-95ef2f69be920195fc0b.js.LICENSE.txt",
+      "publicPath": "/static/webpack_output/learning_paths-95ef2f69be920195fc0b.js.LICENSE.txt"
     },
-    "vendors-d4eeb4341a35a8ec53d3.js.LICENSE.txt": {
-      "name": "vendors-d4eeb4341a35a8ec53d3.js.LICENSE.txt",
-      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\vendors-d4eeb4341a35a8ec53d3.js.LICENSE.txt",
-      "publicPath": "/static/webpack_output/vendors-d4eeb4341a35a8ec53d3.js.LICENSE.txt"
+    "main-d75a348d3b406e6acf55.js": {
+      "name": "main-d75a348d3b406e6acf55.js",
+      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\main-d75a348d3b406e6acf55.js",
+      "publicPath": "/static/webpack_output/main-d75a348d3b406e6acf55.js"
+    },
+    "main-d75a348d3b406e6acf55.js.LICENSE.txt": {
+      "name": "main-d75a348d3b406e6acf55.js.LICENSE.txt",
+      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\main-d75a348d3b406e6acf55.js.LICENSE.txt",
+      "publicPath": "/static/webpack_output/main-d75a348d3b406e6acf55.js.LICENSE.txt"
     }
   },
   "chunks": {
+    "learning_paths": [
+      "learning_paths-95ef2f69be920195fc0b.js"
+    ],
     "main": [
-      "vendors-d4eeb4341a35a8ec53d3.js",
-      "main-02fc93f5d1160601ef5f.js"
+      "main-d75a348d3b406e6acf55.js"
     ]
   },
   "publicPath": "/static/webpack_output/"
