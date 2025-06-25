@@ -171,7 +171,7 @@ const translations = {
         "join_btn": "به نوروبیت بپیوندید",
         /* shared labels */
         "nav_learning_paths": "مسیرهای یادگیری",
-        "role_title": "انتخاب مسیر شغلی",
+        "role_title": "انتخاب مسیر گسب درآمد",
         "role_description": "دانش و مهارت‌های لازم برای پیشرفت را کسب کنید.",
         "if_you_like": "اگر به این‌ها علاقه دارید:",
         "median_salary_label": "حقوق متوسط در سال",
@@ -213,7 +213,7 @@ const translations = {
         "game_salary": "حدود ۴۵۵ میلیون تومان",
         "game_jobs": "۵۳,۳۰۴",
         /* UI */
-        "pdq_title":"آزمون کشف مسیر پیشنهادی مناسب برای شما",
+        "pdq_title":"نمیدونی کدام مسیر برای تو مناسب هست؟",
         "pdq_intro":"۲۰ پرسش کوتاه (≈۱۱ دقیقه) → کارت علاقه‌مندی فردی.",
         "pdq_prev":"قبلی","pdq_next":"بعدی","pdq_finish":"نمایش نتایج",
         "pdq_result_title":"کارت علاقه‌مندی شما",
