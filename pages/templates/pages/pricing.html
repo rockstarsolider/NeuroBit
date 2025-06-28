@@ -9,8 +9,11 @@
   <section class="pricing-hero">
     <h1 data-i18n="pricing_hero_title">پلن مناسب خود را انتخاب کنید</h1>
     <p data-i18n="pricing_hero_subtitle">دسترسی کامل به مسیرهای یادگیری، منتورینگ و انجمن خصوصی</p>
-    <button class="btn-primary" data-i18n="pricing_hero_cta"
-            onclick="window.location.href='join.html'">جلسهٔ معارفه رایگان</button>
+    <a href='{% url "apply" %}'>
+        <button class="btn-primary" data-i18n="pricing_hero_cta">
+          جلسهٔ معارفه رایگان
+        </button>
+    </a>
   </section>
 
   {# ============ PLAN CARDS (NEW) ============ #}
@@ -30,7 +33,11 @@
         <li>چت با منتور فنی و دریافت بازخورد</li>
         <li>وبینار ماهانه والدین</li>
       </ul>
-      <button class="plan-cta" data-i18n="nav_apply" onclick="window.location.href='join.html'">ثبت‌نام</button>
+      <a href='{% url "apply" %}'>
+        <button class="plan-cta" data-i18n="nav_apply">
+          ثبت‌نام
+        </button>
+      </a>
     </article>
 
     {# Neuro Plus #}
@@ -51,7 +58,11 @@
         <li>چت با منتور فنی و دریافت بازخورد</li>
         <li>جلسه آنلاین گروهی با منتور فنی</li>
       </ul>
-      <button class="plan-cta" data-i18n="nav_apply" onclick="window.location.href='join.html'">ثبت‌نام</button>
+      <a href='{% url "apply" %}'>
+        <button class="plan-cta" data-i18n="nav_apply">
+          ثبت‌نام
+        </button>
+      </a>
     </article>
 
     {# Neuro Pro #}
@@ -72,7 +83,11 @@
         <li>مشاوره ویژه توسعه فردی</li>
         <li>جلسه خصوصی ۶۰ دقیقه‌ای با منتور فنی</li>
       </ul>
-      <button class="plan-cta" data-i18n="nav_apply" onclick="window.location.href='join.html'">ثبت‌نام</button>
+      <a href='{% url "apply" %}'>
+        <button class="plan-cta" data-i18n="nav_apply">
+          ثبت‌نام
+        </button>
+      </a>
     </article>
   </section>
 
@@ -157,10 +172,11 @@
       <p class="cta-text" data-i18n="final_cta_text">
         هنوز مردد هستید؟ جلسهٔ معارفه رایگان را امتحان کنید.
       </p>
-      <button class="btn-inverse" data-i18n="final_cta_btn"
-              onclick="window.location.href='join.html'">
-        رزرو جلسه
-      </button>
+      <a href='{% url "apply" %}'>
+        <button class="btn-inverse" data-i18n="final_cta_btn">
+          جلسهٔ معارفه رایگان
+        </button>
+      </a>
     </div>
   </section>
 {% endblock content %}

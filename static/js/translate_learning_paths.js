@@ -4,6 +4,8 @@ const translations = {
         "nav_manifesto": "What Neurobit do?",
         "nav_process": "Process",
         "nav_apply": "joinUS",
+        "nav_pricing": "Pricing",
+        "nav_mentorship": "Mentorship",
         "logo_text": "Neurobit",
         "join_btn": "Joint Neurobit",
         /* shared labels */
@@ -167,6 +169,8 @@ const translations = {
         "nav_manifesto": "نوروبیت چیست؟",
         "nav_process": "پروسه رشد",
         "nav_apply": "پیوستن به برنامه",
+        "nav_pricing": "هزینه ها",
+        "nav_mentorship": "منتورشیپ",
         "logo_text": "نوروبیت",
         "join_btn": "به نوروبیت بپیوندید",
         /* shared labels */

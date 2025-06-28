@@ -8,6 +8,8 @@ const translations = {
       "nav_apply": "پیوستن به برنامه",
       "nav_playbook": "شرایط پذیرش",
       "nav_learning_paths": "مسیرهای یادگیری",
+      "nav_pricing": "هزینه ها",
+      "nav_mentorship": "منتورشیپ",
       "join_btn": "به نوروبیت بپیوندید",
       /* --- HERO --- */
       pricing_hero_title: "پلن مناسب خود را انتخاب کنید",
@@ -68,6 +70,8 @@ const translations = {
       "nav_apply": "joinUS",
       "nav_playbook": "Admission Requirements",
       "nav_learning_paths": "Learning Paths",
+      "nav_pricing": "Pricing",
+      "nav_mentorship": "Mentorship",
       "join_btn": "Joint Neurobit",
       /* --- HERO --- */
       pricing_hero_title: "Choose Your Ideal Plan",

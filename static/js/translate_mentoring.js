@@ -5,6 +5,8 @@ const translations = {
         "nav_process": "فرآیند رشد",
         "nav_apply": "پیوستن به برنامه",
         "nav_playbook": "شرایط پذیرش",
+        "nav_pricing": "هزینه ها",
+        "nav_mentorship": "منتورشیپ",
         "nav_learning_paths": "مسیرهای یادگیری",
         "join_btn": "به نوروبیت بپیوندید",
   
@@ -98,6 +100,8 @@ const translations = {
         "nav_manifesto": "What Neurobit do?",
         "nav_process": "Process",
         "nav_apply": "joinUS",
+        "nav_pricing": "Pricing",
+        "nav_mentorship": "Mentorship",
         "logo_text": "Neurobit",
         "nav_learning_paths": "Learning Paths",
         "join_btn": "Joint Neurobit",
