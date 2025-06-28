@@ -96,7 +96,7 @@
             <p data-i18n="missing_link_description">
               ما در نوروبیت معتقدیم که منتورینگ، پلی است که دانش تئوری را به تجربه عملی و آمادگی برای ورود به بازار کار تبدیل می‌کند. این همان بخش ویژه‌ای است که تفاوت یک متخصص معمولی با یک حرفه‌ای برجسته را رقم می‌زند.
             </p>
-            <a href="join.html" class="btn-apply" data-i18n="missing_link_button">همین حالا شروع کنید</a>
+            <a href='{% url "apply" %}' class="btn-apply" data-i18n="missing_link_button">همین حالا شروع کنید</a>
           </div>
         </section>
 
@@ -134,12 +134,12 @@
                 {# کارت منتور ۱ (Front-End / UX) #}
                 <div class="mentor-card" data-category="front-end ui-ux">
                   <div class="mentor-header">
-                    <img src="assets/neurobit_ceo2.jpg" alt="سارا نادری" class="mentor-photo">
+                    <img src="{% static 'images/neurobit_ceo2.jpg' %}" alt="سارا نادری" class="mentor-photo">
                     <div class="mentor-info">
                       <h3 class="mentor-name"  data-i18n="mentor1_name">سارا نادری</h3>
                       <p  class="mentor-role"  data-i18n="mentor1_role">توسعه‌دهنده فرانت‌اند و طراح تجربه کاربری</p>
                       <div class="mentor-company">
-                        <img src="assets/jabama2.svg" alt="جاباما" class="company-logo">
+                        <img src="{% static 'images/jabama2.svg' %}" alt="جاباما" class="company-logo">
                         <span data-i18n="mentor1_company">جاباما</span>
                       </div>
                     </div>
@@ -175,12 +175,12 @@
                 {# کارت منتور ۲ (AI / Back-End) #}
                 <div class="mentor-card" data-category="ai back-end">
                   <div class="mentor-header">
-                    <img src="assets/neurobit_ceo1.jpg" alt="امیرحسین تقوی" class="mentor-photo">
+                    <img src="{% static 'images/neurobit_ceo1.jpg' %}" alt="امیرحسین تقوی" class="mentor-photo">
                     <div class="mentor-info">
                       <h3 class="mentor-name" data-i18n="mentor2_name">امیرحسین تقوی</h3>
                       <p  class="mentor-role" data-i18n="mentor2_role">پژوهشگر یادگیری ماشین و توسعه‌دهنده بک‌اند</p>
                       <div class="mentor-company">
-                        <img src="assets/digikala.svg" alt="دیجی‌کالا" class="company-logo">
+                        <img src="{% static 'images/digikala.svg' %}" alt="دیجی‌کالا" class="company-logo">
                         <span data-i18n="mentor2_company">دیجی‌کالا</span>
                       </div>
                     </div>
@@ -234,7 +234,7 @@
                 </p>
               </div>
               <div class="testimonial-author">
-                <img src="assets/neurobit_ceo1.jpg" alt="Profile Picture" class="testimonial-image">
+                <img src="{% static 'images/neurobit_ceo1.jpg' %}" alt="Profile Picture" class="testimonial-image">
                 <div class="testimonial-info">
                   <strong data-i18n="testimonial_author_1_name">پوریا غیاثی</strong>
                   <span data-i18n="testimonial_author_1_role">توسعه‌دهنده بک اند</span>
@@ -251,7 +251,7 @@
                 </p>
               </div>
               <div class="testimonial-author">
-                <img src="assets/neurobit_cto.jpg" alt="Profile Picture" class="testimonial-image">
+                <img src="{% static 'images/neurobit_cto.jpg' %}" alt="Profile Picture" class="testimonial-image">
                 <div class="testimonial-info">
                   <strong data-i18n="testimonial_author_2_name">یاسین گودرزی</strong>
                   <span data-i18n="testimonial_author_2_role">توسعه دهنده فرانت اند</span>
@@ -268,7 +268,7 @@
                 </p>
               </div>
               <div class="testimonial-author">
-                <img src="assets/neurobit_cto.jpg" alt="Profile Picture" class="testimonial-image">
+                <img src="{% static 'images/neurobit_cto.jpg' %}" alt="Profile Picture" class="testimonial-image">
                 <div class="testimonial-info">
                   <strong data-i18n="testimonial_author_3_name">دانیال برزگر</strong>
                   <span data-i18n="testimonial_author_3_role">طراح رابط کاربری</span>
