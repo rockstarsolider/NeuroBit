@@ -1,50 +1,11 @@
-<!-- ============================  pricing.html  ============================ -->
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>قیمت دوره‌ها | Neurobit</title>
+{% extends "_base.html" %}
+{% load static %}
 
-  <!-- توکن‌ها و ریشهٔ استایل‌ها -->
-  <link rel="stylesheet" href="style/style.css" />
-  <!-- استایل‌های اختصاصی صفحهٔ قیمت -->
-  <link rel="stylesheet" href="style/pricing.css" />
-</head>
+{% block extra_style %}
+  <link rel="stylesheet" href='{% static "style/pricing.css" %}'>
+{% endblock extra_style %}
 
-<body>
-  <!-- ============ HEADER ============ -->
-  <header>
-    <a href="#hero" class="logo-square" aria-label="Home"><img src="assets/neurobit_main_logo.webp" alt=""><span data-i18n="logo_text" class="logo-text">neurobit</span></a>
-    <nav class="desktop-nav">
-      <a href="#manifesto" data-i18n="nav_manifesto">What Neurobit do?</a>
-      <a href="#process" data-i18n="nav_process">Process</a>
-      <a href="learning-paths.html" data-i18n="nav_learning_paths">Learning Paths</a>
-      <button class="btn-apply" data-i18n="nav_apply" onclick="document.getElementById('apply').scrollIntoView({behavior:'smooth'})">Apply</button>
-      <button id="langToggle" class="lang-toggle">FA</button>
-      <button class="theme-toggle" aria-label="Switch theme"><span>🌙</span></button>
-    </nav>
-    <button class="menu-icon" id="openMenu" aria-label="Open menu"><span></span><span></span></button>
-    
-  </header>
-
-  <!-- ============ MOBILE MENU ============ -->
-  <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
-    <button class="close-btn" id="closeMenu" aria-label="Close menu">&times;</button>
-    <div class="mobile-menu-inner">
-      <div style="text-align: center;">
-        <button  class="lang-toggle lang-btn-mobile" style="margin-left: 0;">FA</button>
-        <button class="theme-toggle" aria-label="Switch theme"><span>🌙</span></button>
-      </div>
-      <a href="#manifesto" class="mobile-link" data-i18n="nav_manifesto">Manifesto</a>
-      <a href="#process" class="mobile-link" data-i18n="nav_process">Process</a>
-      <a href="learning-paths.html" class="mobile-link" data-i18n="nav_learning_paths">Learning Paths</a>
-      <button class="btn-apply mobile-apply" data-i18n="nav_apply"
-        onclick="document.getElementById('apply').scrollIntoView({behavior:'smooth'});document.getElementById('mobileMenu').classList.remove('open');">Apply</button>
-    </div>
-  </div>
-
-  <!-- ============ HERO ============ -->
+{% block content %}
   <section class="pricing-hero">
     <h1 data-i18n="pricing_hero_title">پلن مناسب خود را انتخاب کنید</h1>
     <p data-i18n="pricing_hero_subtitle">دسترسی کامل به مسیرهای یادگیری، منتورینگ و انجمن خصوصی</p>
@@ -52,9 +13,9 @@
             onclick="window.location.href='join.html'">جلسهٔ معارفه رایگان</button>
   </section>
 
-  <!-- ============ PLAN CARDS (NEW) ============ -->
+  {# ============ PLAN CARDS (NEW) ============ #}
   <section class="pricing-cards">
-    <!-- Neuro Basic -->
+    {# Neuro Basic #}
     <article class="plan-card">
       <h3 class="plan-name" data-i18n="plan_basic_name">نورو بیسیک</h3>
       <p class="plan-price" data-i18n="plan_basic_price">
@@ -68,12 +29,11 @@
         <li>جلسه گروهی آنلاین توسعه فردی</li>
         <li>چت با منتور فنی و دریافت بازخورد</li>
         <li>وبینار ماهانه والدین</li>
-        
       </ul>
       <button class="plan-cta" data-i18n="nav_apply" onclick="window.location.href='join.html'">ثبت‌نام</button>
     </article>
 
-    <!-- Neuro Plus -->
+    {# Neuro Plus #}
     <article class="plan-card popular">
       <h3 class="plan-name">
         <span data-i18n="plan_standard_name">نورو پلاس</span>
@@ -94,7 +54,7 @@
       <button class="plan-cta" data-i18n="nav_apply" onclick="window.location.href='join.html'">ثبت‌نام</button>
     </article>
 
-    <!-- Neuro Pro -->
+    {# Neuro Pro #}
     <article class="plan-card premium">
       <h3 class="plan-name">
         <span data-i18n="plan_premium_name">نورو پرو</span>
@@ -116,7 +76,7 @@
     </article>
   </section>
 
-  <!-- ============ FEATURE MATRIX ============ -->
+  {# ============ FEATURE MATRIX ============ #}
   <section class="feature-matrix">
     <h2 data-i18n="feature_matrix_title">مقایسهٔ امکانات پلن‌ها</h2>
     <table>
@@ -169,34 +129,30 @@
     </table>
   </section>
 
-  <!-- ============ DISCOUNT STRIP ============ -->
+  {# ============ DISCOUNT STRIP ============ #}
   <div class="discount-strip" data-i18n="discount_strip">
     ثبت‌نام امروز = تخفیف ماه اول تا ۲۵٪
   </div>
 
-  <!-- ============ FAQ ============ -->
+  {# ============ FAQ ============ #}
   <section class="pricing-faq">
     <h2 data-i18n="faq_title">سؤالات متداول</h2>
-
     <details>
       <summary data-i18n="faq_q1">آیا می‌توانم پلن خود را ارتقا دهم؟</summary>
       <p data-i18n="faq_a1">بله، هر زمان می‌توانید با پرداخت مابه‌التفاوت ارتقا دهید.</p>
     </details>
-
     <details>
       <summary data-i18n="faq_q2">تمدید اشتراک چگونه است؟</summary>
       <p data-i18n="faq_a2">اشتراک هر ۳۰ روز تمدید می‌شود مگر لغو کنید.</p>
     </details>
-
     <details>
       <summary data-i18n="faq_q3">اگر راضی نباشم چه؟</summary>
       <p data-i18n="faq_a3">تا ۷ روز پس از خرید می‌توانید کامل مبلغ را پس بگیرید.</p>
     </details>
   </section>
 
-
-  <!-- ============ FINAL CTA (upgraded) ============ -->
-<section class="cta-block">
+  {# ============ FINAL CTA (upgraded) ============ #}
+  <section class="cta-block">
     <div class="cta-container">
       <p class="cta-text" data-i18n="final_cta_text">
         هنوز مردد هستید؟ جلسهٔ معارفه رایگان را امتحان کنید.
@@ -207,19 +163,8 @@
       </button>
     </div>
   </section>
-  
+{% endblock content %}
 
-  <!-- ============ FOOTER (بدون تغییر) ============ -->
-  <footer>
-    <span>© ۲۰۲۵ – کلیهٔ حقوق محفوظ است.</span>
-    <a href="index.html#manifesto">حریم خصوصی</a>
-  </footer>
-
-  <!-- ============ JS (shared) ============ -->
-  <script src="https://cdn.jsdelivr.net/npm/scramble-text@0.0.9/dist/ScrambleText.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/motion@latest/dist/motion.js"></script>
-  <script src="script/glitch.js"></script>
-  <script src="script/translate_pricing.js"></script>
-  <script src="script/script.js"></script>
-</body>
-</html>
+{% block extra_js %}
+  <script src='{% static "js/translate_pricing.js" %}'></script>
+{% endblock extra_js %}

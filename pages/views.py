@@ -101,3 +101,7 @@ class JoinView(generic.View):
 
 class MentoringView(generic.TemplateView):
     template_name = 'pages/mentoring.html'
+
+
+class PricingView(generic.TemplateView):
+    template_name = "pages/pricing.html"

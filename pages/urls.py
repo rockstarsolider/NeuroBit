@@ -16,5 +16,7 @@ urlpatterns = [
 
     path('mentoring/', views.MentoringView.as_view(), name='mentoring'),
 
-    path('apply/', views.JoinView.as_view(), name='apply')
+    path('apply/', views.JoinView.as_view(), name='apply'),
+
+    path("pricing/", views.PricingView.as_view(), name="pricing"),
 ]
