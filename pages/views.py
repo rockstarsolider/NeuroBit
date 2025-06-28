@@ -97,3 +97,7 @@ class JoinView(generic.View):
 
         # Redirect to home page after successful submission
         return redirect(reverse('home'))
+
+
+class MentoringView(generic.TemplateView):
+    template_name = 'pages/mentoring.html'

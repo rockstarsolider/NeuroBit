@@ -1,0 +1,286 @@
+{% extends "_base.html" %}
+{% load static %}
+
+
+{% block extra_style %}
+  <link rel="stylesheet" href='{% static "style/mentoring.css" %}'>
+{% endblock extra_style %}
+
+
+{% block content %}
+    <main>
+        <section class="mentoring_hero">
+          <div class="">
+            <h1 data-i18n="mentoring_hero_title">مسیر حرفه‌ای خود را با یک راهنمای خبره طی کنید</h1>
+            <p data-i18n="mentoring_hero_description">
+              خدمات منتورینگ نوروبیت، حلقه مفقوده آموزش تا اشتغال. ما شما را نه تنها در دانش فنی، بلکه در مهارت‌های نرم نیز همراهی می‌کنیم تا برای ورود به دنیای حرفه‌ای کاملاً آماده شوید.
+            </p>
+            <a href="#services" class="btn-apply fade-in" data-i18n="mentoring_hero_button">آشنایی با خدمات</a>
+          </div>
+        </section>
+      
+        <section id="comparison" class="container section-padding">
+          <h2 class="title_with_line" data-i18n="comparison_title">چرا منتور؟ سفری با راهنما در مقابل سفری تنها</h2>
+          <div class="comparison-grid fade-in">
+            <div class="comparison-card without-mentor">
+              <h3 data-i18n="without_mentor_title">مسیر آموزشی بدون منتور</h3>
+              <ul>
+                <li data-i18n="without_mentor_point1"><span class="icon">❌</span>سردرگمی در انتخاب نقشه راه و منابع</li>
+                <li data-i18n="without_mentor_point2"><span class="icon">❌</span>اتلاف وقت برای آزمون و خطاهای مکرر</li>
+                <li data-i18n="without_mentor_point3"><span class="icon">❌</span>عدم دریافت بازخورد سازنده و تخصصی</li>
+                <li data-i18n="without_mentor_point4"><span class="icon">❌</span>احساس تنهایی و کاهش انگیزه در چالش‌ها</li>
+                <li data-i18n="without_mentor_point5"><span class="icon">❌</span>نبود دید واقعی از نیازهای بازار کار</li>
+              </ul>
+            </div>
+            <div class="comparison-card with-mentor">
+              <h3 data-i18n="with_mentor_title">مسیر آموزشی با منتور نوروبیت</h3>
+              <ul>
+                <li data-i18n="with_mentor_point1"><span class="icon">✅</span>نقشه راه شخصی‌سازی شده و شفاف</li>
+                <li data-i18n="with_mentor_point2"><span class="icon">✅</span>صرفه‌جویی در زمان با تمرکز بر اولویت‌ها</li>
+                <li data-i18n="with_mentor_point3"><span class="icon">✅</span>دریافت بازخورد فوری و رفع اشکال هدفمند</li>
+                <li data-i18n="with_mentor_point4"><span class="icon">✅</span>افزایش انگیزه با حمایت یک همراه باتجربه</li>
+                <li data-i18n="with_mentor_point5"><span class="icon">✅</span>کسب بینش عمیق از صنعت و آماده شدن برای مصاحبه</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      
+        <section id="services" class="section-padding" style="background-color: var(--card-bg-color);">
+          <div class="container">
+            <h2 class="title_with_line" data-i18n="services_title">خدمات منتورینگ ما: متناسب با نیاز شما</h2>
+            <div class="services-container fade-in">
+              <div class="service-card">
+                <div class="service-icon">💬</div>
+                <h3 data-i18n="service_direct_communication">ارتباط مستقیم و پیوسته</h3>
+                <p data-i18n="service_direct_communication_desc">
+                  از طریق پلتفرم‌های پیام‌رسان با منتور خود در ارتباط باشید. سوالات روزمره، چالش‌های کدنویسی و مشکلات خود را به سرعت با او در میان بگذارید و راهنمایی دریافت کنید.
+                </p>
+              </div>
+              <div class="service-card">
+                <div class="service-icon">👤</div>
+                <h3 data-i18n="service_one_to_one_sessions">جلسات آنلاین ۱:۱</h3>
+                <p data-i18n="service_one_to_one_sessions_desc">
+                  جلسات خصوصی ویدیویی برای بررسی عمیق مفاهیم، مرور کد (Code Review)، شبیه‌سازی مصاحبه فنی و برنامه‌ریزی شخصی‌سازی شده مسیر رشد شما برگزار می‌شود.
+                </p>
+              </div>
+              <div class="service-card">
+                <div class="service-icon">👥</div>
+                <h3 data-i18n="service_group_sessions">جلسات گروهی تخصصی</h3>
+                <p data-i18n="service_group_sessions_desc">
+                  در کنار فراگیران هم‌سطح خود و با هدایت منتور، روی پروژه‌های تیمی کار کنید، به بحث و تبادل نظر بپردازید و مهارت‌های کار گروهی خود را تقویت کنید.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      
+        <section id="soft-skills" class="container section-padding">
+          <h2 class="title_with_line" data-i18n="soft_skills_title">فراتر از تکنیکال: پرورش مهارت‌های نرم</h2>
+      
+          <p class="section-subtitle fade-in" data-i18n="soft_skills_subtitle">
+            موفقیت در دنیای تکنولوژی فقط به کدنویسی خلاصه نمی‌شود. منتورهای ما به شما کمک می‌کنند تا مهارت‌های کلیدی زیر را در خود پرورش دهید:
+          </p>
+          <div class="skills-grid fade-in">
+            <div class="skill-badge" data-i18n="skill_communication">مهارت‌های ارتباطی و ارائه</div>
+            <div class="skill-badge" data-i18n="skill_teamwork">کار تیمی</div>
+            <div class="skill-badge" data-i18n="skill_critical_thinking">تفکر نقادانه و حل مسئله</div>
+            <div class="skill-badge" data-i18n="skill_self_learning">یادگیری مستمر و خودآموزی</div>
+            <div class="skill-badge" data-i18n="skill_time_management">مدیریت زمان و بهره‌وری</div>
+            <div class="skill-badge" data-i18n="skill_personal_branding">توسعه فردی و برندسازی شخصی</div>
+          </div>
+        </section>
+      
+        <section id="missing-link" class="section-padding">
+          <div class="container text-center fade-in">
+            <h2 data-i18n="missing_link_title">حلقه مفقوده آموزش حرفه‌ای</h2>
+            <p data-i18n="missing_link_description">
+              ما در نوروبیت معتقدیم که منتورینگ، پلی است که دانش تئوری را به تجربه عملی و آمادگی برای ورود به بازار کار تبدیل می‌کند. این همان بخش ویژه‌ای است که تفاوت یک متخصص معمولی با یک حرفه‌ای برجسته را رقم می‌زند.
+            </p>
+            <a href="join.html" class="btn-apply" data-i18n="missing_link_button">همین حالا شروع کنید</a>
+          </div>
+        </section>
+
+        <section id="mentors">
+            <div class="container">
+          
+              {# عنوان و زیرعنوان ----------------------------------------------#}
+              <h2 class="title_with_line" data-i18n="mentors_title">
+                منتورهای ما: متخصصان مسیر شما
+              </h2>
+          
+              <p class="section-subtitle" data-i18n="mentors_subtitle">
+                تیم منتورهای نوروبیت از توسعه‌دهندگان باتجربه، طراحان محصول و پژوهشگران هوش مصنوعی تشکیل شده که در شرکت‌های پیشرو ایرانی فعالیت کرده‌اند.
+              </p>
+          
+              {# فیلتر موضوعی --------------------------------------------------#}
+              <div class="mentor-filter">
+                <button class="filter-btn active" data-filter="all"      data-i18n="mentor_filter_all">همه</button>
+                <button class="filter-btn"        data-filter="front-end" data-i18n="mentor_filter_fe">فرانت‌اند</button>
+                <button class="filter-btn"        data-filter="back-end"  data-i18n="mentor_filter_be">بک‌اند</button>
+                <button class="filter-btn"        data-filter="ui-ux"     data-i18n="mentor_filter_uiux">UI/UX</button>
+                <button class="filter-btn"        data-filter="game-dev"  data-i18n="mentor_filter_gamedev">توسعه بازی</button>
+                <button class="filter-btn"        data-filter="ai"        data-i18n="mentor_filter_ai">هوش مصنوعی</button>
+              </div>
+          
+              {# شمارش منتورها -------------------------------------------------#}
+              <div class="mentor-count text-center">
+                <strong data-i18n="mentor_count_label">تعداد منتورها:</strong>
+                <span id="mentorCount">12</span>
+              </div>
+          
+              {# لیست منتورها --------------------------------------------------#}
+              <div class="mentors-list">
+          
+                {# کارت منتور ۱ (Front-End / UX) #}
+                <div class="mentor-card" data-category="front-end ui-ux">
+                  <div class="mentor-header">
+                    <img src="assets/neurobit_ceo2.jpg" alt="سارا نادری" class="mentor-photo">
+                    <div class="mentor-info">
+                      <h3 class="mentor-name"  data-i18n="mentor1_name">سارا نادری</h3>
+                      <p  class="mentor-role"  data-i18n="mentor1_role">توسعه‌دهنده فرانت‌اند و طراح تجربه کاربری</p>
+                      <div class="mentor-company">
+                        <img src="assets/jabama2.svg" alt="جاباما" class="company-logo">
+                        <span data-i18n="mentor1_company">جاباما</span>
+                      </div>
+                    </div>
+                  </div>
+          
+                  <div class="mentor-details">
+                    <p class="mentor-bio" data-i18n="mentor1_bio">
+                      با بیش از ۷ سال تجربه در توسعه رابط‌های کاربری واکنش‌گرا، تمرکز اصلی او روی طراحی محصول و ساخت تجربه‌های تعاملی با React و Figma است.
+                    </p>
+          
+                    <ul class="mentor-skills">
+                      <li>React</li>
+                      <li>Figma</li>
+                      <li>TypeScript</li>
+                    </ul>
+          
+                    <div class="mentor-experience">
+                      <span data-i18n="mentor1_exp1">✓ سابقه همکاری با دیجی‌کالا و اسنپ</span>
+                      <span data-i18n="mentor1_exp2">✓ طراحی بیش از ۳۰ ماژول کاربرپسند</span>
+                    </div>
+          
+                    <div class="mentor-social">
+                        <a href="https://linkedin.com/in/..." target="_blank" aria-label="LinkedIn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-linkedin-icon lucide-linkedin"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+                        </a>
+                        <a href="https://github.com/..." target="_blank" aria-label="GitHub">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github-icon lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+                        </a>
+                      </div>
+                  </div>
+                </div>
+          
+                {# کارت منتور ۲ (AI / Back-End) #}
+                <div class="mentor-card" data-category="ai back-end">
+                  <div class="mentor-header">
+                    <img src="assets/neurobit_ceo1.jpg" alt="امیرحسین تقوی" class="mentor-photo">
+                    <div class="mentor-info">
+                      <h3 class="mentor-name" data-i18n="mentor2_name">امیرحسین تقوی</h3>
+                      <p  class="mentor-role" data-i18n="mentor2_role">پژوهشگر یادگیری ماشین و توسعه‌دهنده بک‌اند</p>
+                      <div class="mentor-company">
+                        <img src="assets/digikala.svg" alt="دیجی‌کالا" class="company-logo">
+                        <span data-i18n="mentor2_company">دیجی‌کالا</span>
+                      </div>
+                    </div>
+                  </div>
+          
+                  <div class="mentor-details">
+                    <p class="mentor-bio" data-i18n="mentor2_bio">
+                      متخصص طراحی مدل‌های پیش‌بینی و طبقه‌بندی با بیش از ۵ سال تجربه عملی در پروژه‌های NLP و سیستم‌های پیشنهادگر.
+                    </p>
+          
+                    <ul class="mentor-skills">
+                      <li>Python</li>
+                      <li>TensorFlow</li>
+                      <li>Docker &amp; Kubernetes</li>
+                    </ul>
+          
+                    <div class="mentor-experience">
+                      <span data-i18n="mentor2_exp1">✓ ۴ سال سابقه در تیم داده دیجی‌کالا</span>
+                      <span data-i18n="mentor2_exp2">✓ پیاده‌سازی ۱۰+ مدل رتبه‌بندی و پیشنهادگر</span>
+                    </div>
+          
+                    <div class="mentor-social">
+                        <a href="https://linkedin.com/in/..." target="_blank" aria-label="LinkedIn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-linkedin-icon lucide-linkedin"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+                        </a>
+                        <a href="https://github.com/..." target="_blank" aria-label="GitHub">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github-icon lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+                        </a>
+                      </div>
+                  </div>
+                </div>
+          
+              </div>{# /.mentors-list #}
+            </div>{# /.container #}
+          </section>
+          
+        
+          
+      
+        {# ============ TESTIMONIALS ============ #}
+        <section id="mentoring_testimonials">
+          <h2 class="title_with_line" data-i18n="testimonials_title">تجربیات دانشجویان نوروبیت از سیر آموزشی</h2>
+      
+          <div class="testimonial-cards-wrapper">
+            {# Testimonial Card 1 #}
+            <div class="testimonial-card flipped">
+              <div class="testimonial-content">
+                <div class="quote-icon">“</div>
+                <p data-i18n="testimonial_1">
+                  شرکت در این برنامه به من کمک کرد تا نقشه راه واضحی برای رشد حرفه‌ای پیدا کنم. فرصت همراهی با یک متخصص و بررسی مستمر کارهایم، انگیزه و اعتماد به نفس لازم برای قدم بعدی را به من داد.
+                </p>
+              </div>
+              <div class="testimonial-author">
+                <img src="assets/neurobit_ceo1.jpg" alt="Profile Picture" class="testimonial-image">
+                <div class="testimonial-info">
+                  <strong data-i18n="testimonial_author_1_name">پوریا غیاثی</strong>
+                  <span data-i18n="testimonial_author_1_role">توسعه‌دهنده بک اند</span>
+                </div>
+              </div>
+            </div>
+      
+            {# Testimonial Card 2 #}
+            <div class="testimonial-card rotated">
+              <div class="testimonial-content">
+                <div class="quote-icon">“</div>
+                <p data-i18n="testimonial_2">
+                  در دوره‌های قبل فقط چیزهای زیادی یاد می‌گرفتم، ولی اینجا بود که متوجه شدم چطور اون‌ها رو در عمل به کار ببندم. اشتراک گذاشتن تجربیات و دریافت بازخورد واقعاً نقطه عطف من بود.
+                </p>
+              </div>
+              <div class="testimonial-author">
+                <img src="assets/neurobit_cto.jpg" alt="Profile Picture" class="testimonial-image">
+                <div class="testimonial-info">
+                  <strong data-i18n="testimonial_author_2_name">یاسین گودرزی</strong>
+                  <span data-i18n="testimonial_author_2_role">توسعه دهنده فرانت اند</span>
+                </div>
+              </div>
+            </div>
+      
+            {# Testimonial Card 3 #}
+            <div class="testimonial-card flipped rotated">
+              <div class="testimonial-content">
+                <div class="quote-icon">“</div>
+                <p data-i18n="testimonial_3">
+                  جلسات گروهی و همکاری با دیگران، بخشی از یادگیری من شد. کار روی پروژه‌های واقعی و بازخورد از افراد با تجربه، مرا به یک متخصص واقعی تبدیل کرد.
+                </p>
+              </div>
+              <div class="testimonial-author">
+                <img src="assets/neurobit_cto.jpg" alt="Profile Picture" class="testimonial-image">
+                <div class="testimonial-info">
+                  <strong data-i18n="testimonial_author_3_name">دانیال برزگر</strong>
+                  <span data-i18n="testimonial_author_3_role">طراح رابط کاربری</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+    </main>
+  {% endblock content %}
+
+  {% block extra_js %}
+    <script src='{% static "js/translate_mentoring.js" %}'></script>
+    <script src='{% static "js/mentoring.js" %}'></script>
+  {% endblock extra_js %}
