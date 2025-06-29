@@ -58,7 +58,7 @@
               </div>
               <div class="service-card">
                 <div class="service-icon">👤</div>
-                <h3 data-i18n="service_one_to_one_sessions">جلسات آنلاین ۱:۱</h3>
+                <h3 data-i18n="service_one_to_one_sessions">ارائه و دریافت بازخورد</h3>
                 <p data-i18n="service_one_to_one_sessions_desc">
                   جلسات خصوصی ویدیویی برای بررسی عمیق مفاهیم، مرور کد (Code Review)، شبیه‌سازی مصاحبه فنی و برنامه‌ریزی شخصی‌سازی شده مسیر رشد شما برگزار می‌شود.
                 </p>
@@ -100,7 +100,8 @@
           </div>
         </section>
 
-        <section id="mentors">
+        {# mentors #}
+        {% comment %} <section id="mentors">
             <div class="container">
           
               {# عنوان و زیرعنوان ----------------------------------------------#}
@@ -215,7 +216,7 @@
           
               </div>{# /.mentors-list #}
             </div>{# /.container #}
-          </section>
+        </section> {% endcomment %}
           
         
           
@@ -234,10 +235,10 @@
                 </p>
               </div>
               <div class="testimonial-author">
-                <img src="{% static 'images/neurobit_ceo1.jpg' %}" alt="Profile Picture" class="testimonial-image">
+                <img src="{% static 'images/students/pouria.avif' %}" alt="Profile Picture" class="testimonial-image">
                 <div class="testimonial-info">
                   <strong data-i18n="testimonial_author_1_name">پوریا غیاثی</strong>
-                  <span data-i18n="testimonial_author_1_role">توسعه‌دهنده بک اند</span>
+                  <span data-i18n="testimonial_author_1_role">توسعه‌دهنده فول استک وب</span>
                 </div>
               </div>
             </div>
@@ -251,10 +252,10 @@
                 </p>
               </div>
               <div class="testimonial-author">
-                <img src="{% static 'images/neurobit_cto.jpg' %}" alt="Profile Picture" class="testimonial-image">
+                <img src="{% static 'images/students/danial.avif' %}" alt="Profile Picture" class="testimonial-image">
                 <div class="testimonial-info">
-                  <strong data-i18n="testimonial_author_2_name">یاسین گودرزی</strong>
-                  <span data-i18n="testimonial_author_2_role">توسعه دهنده فرانت اند</span>
+                  <strong data-i18n="testimonial_author_2_name">دانیال برزگر</strong>
+                  <span data-i18n="testimonial_author_2_role">طراح گرافیک</span>
                 </div>
               </div>
             </div>
@@ -264,14 +265,14 @@
               <div class="testimonial-content">
                 <div class="quote-icon">“</div>
                 <p data-i18n="testimonial_3">
-                  جلسات گروهی و همکاری با دیگران، بخشی از یادگیری من شد. کار روی پروژه‌های واقعی و بازخورد از افراد با تجربه، مرا به یک متخصص واقعی تبدیل کرد.
+                  نوروبیت کاری کرد که با علاقه و انگیزه ای بیش از پیش در رشته کامپیتور تحصیل کنم و با کسب مهارت و انجام پروژه های جدی اعتماد به نفسم به عنوان دانشجوی مهندسی کامپیوتر بیشتر بشه.
                 </p>
               </div>
               <div class="testimonial-author">
-                <img src="{% static 'images/neurobit_cto.jpg' %}" alt="Profile Picture" class="testimonial-image">
+                <img src="{% static 'images/students/yasin.jpg' %}" alt="Profile Picture" class="testimonial-image">
                 <div class="testimonial-info">
-                  <strong data-i18n="testimonial_author_3_name">دانیال برزگر</strong>
-                  <span data-i18n="testimonial_author_3_role">طراح رابط کاربری</span>
+                  <strong data-i18n="testimonial_author_3_name">محمدیاسین گودرزی</strong>
+                  <span data-i18n="testimonial_author_3_role">توسعه دهنده فرانت اند وب</span>
                 </div>
               </div>
             </div>

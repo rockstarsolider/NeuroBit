@@ -31,17 +31,17 @@ const translations = {
       with_mentor_point4: "✅ افزایش انگیزه با حمایت یک همراه باتجربه",
       with_mentor_point5: "✅ کسب بینش عمیق از صنعت و آماده شدن برای مصاحبه",
   
-      /* --- SERVICES SECTION --- */
-      services_title: "خدمات منتورینگ ما: متناسب با نیاز شما",
-      service_direct_communication: "ارتباط مستقیم و پیوسته",
-      service_direct_communication_desc: "از طریق پلتفرم‌های پیام‌رسان با منتور خود در ارتباط باشید. سوالات روزمره، چالش‌های کدنویسی و مشکلات خود را به سرعت با او در میان بگذارید و راهنمایی دریافت کنید.",
-      service_one_to_one_sessions: "جلسات آنلاین ۱:۱",
-      service_one_to_one_sessions_desc: "جلسات خصوصی ویدیویی برای بررسی عمیق مفاهیم، مرور کد (Code Review)، شبیه‌سازی مصاحبه فنی و برنامه‌ریزی شخصی‌سازی شده مسیر رشد شما برگزار می‌شود.",
-      service_group_sessions: "جلسات گروهی تخصصی",
-      service_group_sessions_desc: "در کنار فراگیران هم‌سطح خود و با هدایت منتور، روی پروژه‌های تیمی کار کنید، به بحث و تبادل نظر بپردازید و مهارت‌های کار گروهی خود را تقویت کنید.",
-  
-      /* --- SOFT SKILLS SECTION --- */
-      soft_skills_title: "فراتر از تکنیکال: پرورش مهارت‌های نرم",
+    /* --- SERVICES SECTION --- */
+    services_title: "خدمات منتورینگ ما: متناسب با نیاز شما",
+    service_direct_communication: "ارتباط مستقیم و پیوسته",
+    service_direct_communication_desc: "از طریق پلتفرم‌های پیام‌رسان با منتور خود در ارتباط باشید. سوالات روزمره، چالش‌های کدنویسی و مشکلات خود را به سرعت با او در میان بگذارید و راهنمایی دریافت کنید.",
+    service_one_to_one_sessions: "جلسات آنلاین ۱:۱",
+    service_one_to_one_sessions_desc: "جلسات خصوصی آنلاین برای بررسی عمیق مفاهیم، بازبینی کد (Code Review)، شبیه‌سازی مصاحبه فنی و برنامه‌ریزی مسیر رشد شخصی شما. این جلسات در پلن‌ پرو ارائه می‌شود و فرصتی عالی برای دریافت بازخورد مستقیم و تمرین مهارت‌های حرفه‌ای هستند.",
+    service_group_sessions: "جلسات گروهی تخصصی",
+    service_group_sessions_desc: "در کنار فراگیران هم‌سطح خود و با هدایت منتور، روی پروژه‌های تیمی کار کنید، به بحث و تبادل نظر بپردازید و مهارت‌های موثر در کار تیمی، توانایی ارائه در جمع و قدرت شنوندگی و بازخورد پذیری خود را تقویت کنید. این جلسات در پلن های پلاس و پرو ارائه می شود.",  /* --- SOFT SKILLS SECTION --- */
+    
+    /* --- soft skills --- */
+    soft_skills_title: "فراتر از تکنیکال: پرورش مهارت‌های نرم",
       soft_skills_subtitle: "موفقیت در دنیای تکنولوژی فقط به کدنویسی خلاصه نمی‌شود. منتورهای ما به شما کمک می‌کنند تا مهارت‌های کلیدی زیر را در خود پرورش دهید:",
       skill_communication: "مهارت‌های ارتباطی و ارائه",
       skill_teamwork: "کار تیمی",
@@ -131,8 +131,8 @@ const translations = {
       services_title: "Our Mentoring Services: Tailored to Your Needs",
       service_direct_communication: "Direct & Continuous Communication",
       service_direct_communication_desc: "Stay connected with your mentor through messaging platforms. Share daily questions, coding challenges, and problems quickly with them and receive guidance.",
-      service_one_to_one_sessions: "1:1 Online Sessions",
-      service_one_to_one_sessions_desc: "Private video sessions for in-depth concept reviews, code reviews, technical interview simulations, and personalized growth path planning.",
+      service_one_to_one_sessions: "Present and Get Feedback",
+      service_one_to_one_sessions_desc: "Private and Group online sessions designed for deep-diving into concepts, conducting thorough code reviews, simulating technical interviews, and mapping out your personal growth path. Available in our Plus and Pro plans, these sessions provide a prime opportunity for direct feedback and honing your professional skills.",
       service_group_sessions: "Specialized Group Sessions",
       service_group_sessions_desc: "Work on team projects with peers of similar levels under your mentor's guidance, engage in discussions, and strengthen your teamwork skills.",
   
