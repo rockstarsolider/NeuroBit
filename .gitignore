@@ -1,17 +1,19 @@
-venv/
 .idea/
-media/
-
+.vscode/
 *.pyc
 __pycache__/
-migrations/
+.pytest_cache/
+venv/
 
+staticfiles/
+migrations/
+media/
 .env
 db.sqlite3
 
 se.py
 
-static/webpack_output/
 node_modules/
-
+static/webpack_output/
 package-lock.json
+webpack-stats.json
