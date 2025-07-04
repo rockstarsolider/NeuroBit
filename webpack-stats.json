@@ -1,33 +1,33 @@
 {
   "status": "done",
   "assets": {
-    "learning_paths-95ef2f69be920195fc0b.js": {
-      "name": "learning_paths-95ef2f69be920195fc0b.js",
-      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\learning_paths-95ef2f69be920195fc0b.js",
-      "publicPath": "/static/webpack_output/learning_paths-95ef2f69be920195fc0b.js"
+    "learning_paths-f6a2a493065b1b2be6a2.js": {
+      "name": "learning_paths-f6a2a493065b1b2be6a2.js",
+      "path": "C:\\Users\\esmae\\work\\neurobit\\neurobit_working\\static\\webpack_output\\learning_paths-f6a2a493065b1b2be6a2.js",
+      "publicPath": "/static/webpack_output/learning_paths-f6a2a493065b1b2be6a2.js"
     },
-    "learning_paths-95ef2f69be920195fc0b.js.LICENSE.txt": {
-      "name": "learning_paths-95ef2f69be920195fc0b.js.LICENSE.txt",
-      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\learning_paths-95ef2f69be920195fc0b.js.LICENSE.txt",
-      "publicPath": "/static/webpack_output/learning_paths-95ef2f69be920195fc0b.js.LICENSE.txt"
+    "learning_paths-f6a2a493065b1b2be6a2.js.LICENSE.txt": {
+      "name": "learning_paths-f6a2a493065b1b2be6a2.js.LICENSE.txt",
+      "path": "C:\\Users\\esmae\\work\\neurobit\\neurobit_working\\static\\webpack_output\\learning_paths-f6a2a493065b1b2be6a2.js.LICENSE.txt",
+      "publicPath": "/static/webpack_output/learning_paths-f6a2a493065b1b2be6a2.js.LICENSE.txt"
     },
-    "main-d75a348d3b406e6acf55.js": {
-      "name": "main-d75a348d3b406e6acf55.js",
-      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\main-d75a348d3b406e6acf55.js",
-      "publicPath": "/static/webpack_output/main-d75a348d3b406e6acf55.js"
+    "main-c19ed7278d35eca3c7f4.js": {
+      "name": "main-c19ed7278d35eca3c7f4.js",
+      "path": "C:\\Users\\esmae\\work\\neurobit\\neurobit_working\\static\\webpack_output\\main-c19ed7278d35eca3c7f4.js",
+      "publicPath": "/static/webpack_output/main-c19ed7278d35eca3c7f4.js"
     },
-    "main-d75a348d3b406e6acf55.js.LICENSE.txt": {
-      "name": "main-d75a348d3b406e6acf55.js.LICENSE.txt",
-      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\main-d75a348d3b406e6acf55.js.LICENSE.txt",
-      "publicPath": "/static/webpack_output/main-d75a348d3b406e6acf55.js.LICENSE.txt"
+    "main-c19ed7278d35eca3c7f4.js.LICENSE.txt": {
+      "name": "main-c19ed7278d35eca3c7f4.js.LICENSE.txt",
+      "path": "C:\\Users\\esmae\\work\\neurobit\\neurobit_working\\static\\webpack_output\\main-c19ed7278d35eca3c7f4.js.LICENSE.txt",
+      "publicPath": "/static/webpack_output/main-c19ed7278d35eca3c7f4.js.LICENSE.txt"
     }
   },
   "chunks": {
     "learning_paths": [
-      "learning_paths-95ef2f69be920195fc0b.js"
+      "learning_paths-f6a2a493065b1b2be6a2.js"
     ],
     "main": [
-      "main-d75a348d3b406e6acf55.js"
+      "main-c19ed7278d35eca3c7f4.js"
     ]
   },
   "publicPath": "/static/webpack_output/"

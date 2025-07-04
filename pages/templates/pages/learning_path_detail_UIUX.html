@@ -19,8 +19,9 @@
         Research user needs, craft intuitive wireframes, and prototype beautiful
         digital products with industry-standard tools like Figma and Adobe XD.
       </p>
-      <button class="btn-primary" data-i18n="join_program_btn"
-              onclick="window.location.href='join.html'">Join the Program</button>
+      <a href='{% url "apply" %}'>
+            <button class="btn-primary" data-i18n="join_program_btn">Join the Program</button>
+          </a>
     </div>
     <img src="{% static 'images/graphic_path.webp' %}" alt="UI/UX design illustration">
   </section>
@@ -207,8 +208,9 @@
     <p data-i18n="uiux_cta_text">
       Ready to craft delightful experiences that users will love?
     </p>
-    <button class="btn-primary" data-i18n="join_program_btn"
-            onclick="window.location.href='join.html'">Join the Program</button>
+    <a href='{% url "apply" %}'>
+            <button class="btn-primary" data-i18n="join_program_btn">Join the Program</button>
+          </a>
   </section>
   </main>
 

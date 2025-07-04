@@ -20,8 +20,9 @@
           Learn to build engaging 2D, 3D and XR experiences with industry-standard engines,
           craft compelling gameplay loops, and publish cross-platform titles loved by millions.
         </p>
-        <button class="btn-primary" data-i18n="join_program_btn"
-                onclick="window.location.href='join.html'">Join the Program</button>
+        <a href='{% url "apply" %}'>
+            <button class="btn-primary" data-i18n="join_program_btn">Join the Program</button>
+          </a>
       </div>
       <img src="{% static 'images/gamedev_path.webp' %}" alt="Game development illustration">
     </section>
@@ -207,8 +208,9 @@
       <p data-i18n="game_cta_text">
         Ready to build immersive worlds that players will never forget?
       </p>
-      <button class="btn-primary" data-i18n="join_program_btn"
-              onclick="window.location.href='join.html'">Join the Program</button>
+      <a href='{% url "apply" %}'>
+            <button class="btn-primary" data-i18n="join_program_btn">Join the Program</button>
+          </a>
     </section>
   </main>
 
