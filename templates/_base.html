@@ -68,8 +68,8 @@
             <a href="{% url "home" %}#manifesto" class="mobile-link" data-i18n="nav_manifesto">Manifesto</a>
             <a href="{% url "home" %}#process" class="mobile-link" data-i18n="nav_process">Process</a>
             <a href='{% url "courses" %}' class="mobile-link" data-i18n="nav_learning_paths">Learning Paths</a>
-            <a href='{% url "mentoring" %}' data-i18n="nav_learning_paths">Mentorship</a>
-            <a href='{% url "pricing" %}' data-i18n="nav_learning_paths">Prices</a>
+            <a href='{% url "mentoring" %}' class="mobile-link" data-i18n="nav_mentorship">Mentorship</a>
+            <a href='{% url "pricing" %}' class="mobile-link" data-i18n="nav_pricing">Prices</a>
             <a href='{% url "apply" %}'>
                 <button class="btn-apply mobile-apply" data-i18n="nav_apply"
                     onclick="document.getElementById('apply').scrollIntoView({behavior:'smooth'});document.getElementById('mobileMenu').classList.remove('open');">Apply</button>
