@@ -1,4 +1,4 @@
-"""Django 5.2.3"""
+"""Django 5.2.4"""
 
 import os
 from pathlib import Path
