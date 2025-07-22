@@ -6,7 +6,6 @@ __pycache__/
 venv/
 
 staticfiles/
-migrations/
 media/
 .env
 db.sqlite3
@@ -15,5 +14,8 @@ se.py
 
 node_modules/
 static/webpack_output/
+
 package-lock.json
 webpack-stats.json
+
+update_python_packages.py
