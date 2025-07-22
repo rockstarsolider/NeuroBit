@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'webpack_loader',
 
     'pages',
+    'courses',
 ]
 
 # webpack-loader
@@ -196,8 +197,13 @@ UNFOLD = {
                         "link": reverse_lazy("admin:auth_user_changelist"),
                     },
                     {
-                        "title": _("Applications"),
+                        "title": _("Courses"),
                         "icon": "school",
+                        "link": reverse_lazy("admin:app_list", kwargs={'app_label': 'courses'}),
+                    },
+                    {
+                        "title": _("Applications"),
+                        "icon": "upload",
                         "link": reverse_lazy("admin:app_list", kwargs={'app_label': 'pages'}),
                     },
                 ],

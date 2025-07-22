@@ -20,6 +20,10 @@ Neurobit is a training program and web platform focused on helping teenagers and
 - [jdatetime](https://github.com/slashmili/python-jalali) for Persian date handling
 - [django-unfold](https://github.com/unfoldadmin/django-unfold) for the admin UI
 
+## Documentation
+
+- [Courses / LMS Domain](./docs/courses.md) – data model, workflows, and admin setup for the learning subsystem.
+
 ## Requirements
 
 - Python >= 3.12
