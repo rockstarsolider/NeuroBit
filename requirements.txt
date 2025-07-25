@@ -4,6 +4,7 @@ charset-normalizer==3.4.2
 dj-database-url==3.0.1
 Django==5.2.4
 django-debug-toolbar==6.0.0
+django-extensions==4.1
 django-rosetta==0.10.2
 django-unfold==0.63.0
 django-webpack-loader==3.2.1

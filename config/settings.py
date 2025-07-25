@@ -35,6 +35,7 @@ INSTALLED_APPS = [
 
     "debug_toolbar",
     'webpack_loader',
+    "django_extensions",
 
     'pages',
     'courses',
