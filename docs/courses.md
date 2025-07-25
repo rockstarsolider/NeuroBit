@@ -1,221 +1,118 @@
-# 🎓 Courses / LMS Domain
-
-This guide explains how Neurobit models **curricula, learners, progress, submissions, sessions, and billing**—and how you operate all of that in **Django Admin with Unfold + WYSIWYG**.
-
----
-
-## 📑 Table of Contents
-
-1. [Concept Map](#concept-map)  
-2. [Entity Relationship Overview](#entity-relationship-overview)  
-3. [Model Deep Dive & Gotchas](#model-deep-dive--gotchas)  
-4. [Typical Workflows](#typical-workflows)  
-5. [Django Admin (Unfold) Setup](#django-admin-unfold-setup)  
-6. [Handy ORM Queries](#handy-orm-queries)  
-7. [Schema Extensions (Ideas)](#schema-extensions-ideas)  
-8. [Migrations & Constraints](#migrations--constraints)  
-9. [Glossary](#glossary)  
-10. [Admin Power Tips](#admin-power-tips)
+Below is a **concise “admin‑quick‑start” guide** you can drop into `README.md`.
+Follow the order and you’ll never run into missing‑FK errors while entering data.
 
 ---
 
-## 1. Concept Map
+## 0  Prep
 
-| Concept | Description | Core Model(s) |
-|--------|-------------|---------------|
-| **Learner** | Student using the platform | `Learner` |
-| **Mentor / Staff** | Guides & operators | `Mentor`, `Staff` |
-| **Learning Path (LP)** | A curriculum track (e.g. “Full‑Stack Basics”) | `LearningPath` |
-| **Step** | A module or lesson within a path | `EducationalStep` |
-| **Resource / Task** | Materials & assignments inside a step | `Resource`, `Task` |
-| **Enrollment & Groups** | Who is in a path and in which mentor group | `PathEnrollment`, `MentorPathGroup`, `MentorGroupLearner`, `MentorPathGroupRole` |
-| **Progress / Extension** | Per-learner step progress + deadline extensions | `StepProgress`, `StepExtension` |
-| **Submissions / Evaluations** | Task upload & mentor scoring | `TaskSubmission`, `TaskEvaluation` |
-| **Sessions / Attendance** | Meetings (group or 1:1) & who attended | `Session`, `Attendance` |
-| **Subscriptions** | Pricing plans & purchases | `SubscriptionPlan`, `LearnerSubscription` |
-
-> 💡 Everything timestamped? Yup—most models inherit `TimeStampedModel` (auto `created_at` / `updated_at`).
-
----
-
-## 2. Entity Relationship Overview
-
-### Mermaid Diagram
-
-```mermaid
-erDiagram
-
-    Learner ||--o{ PathEnrollment : enrolls
-    LearningPath ||--o{ EducationalStep : has
-    EducationalStep ||--o{ Resource : provides
-    EducationalStep ||--o{ Task : contains
-    Learner ||--o{ StepProgress : tracks
-    StepProgress ||--o{ StepExtension : extends
-    Task ||--o{ TaskSubmission : submitted_by
-    TaskSubmission ||--|| TaskEvaluation : evaluated_by
-    Mentor ||--o{ MentorPathGroupRole : serves_in
-    MentorPathGroup ||--o{ MentorPathGroupRole : has_role
-    PathEnrollment ||--o{ MentorGroupLearner : joins_group
-    MentorPathGroup ||--o{ MentorGroupLearner : contains_learner
-    Session ||--o{ Attendance : records
-    SubscriptionPlan ||--o{ LearnerSubscription : purchased_by
-````
-
-> 🧰 We **avoided composite foreign keys** (Django ORM limitation). For example, `StepExtension` references `StepProgress` directly.
-
----
-
-## 3. Model Deep Dive & Gotchas
-
-### 3.1 `TimeStampedModel`
-
-* `created_at = auto_now_add=True`
-* `updated_at = auto_now=True`
-* Declared `abstract = True`, so no separate table—fields land in each concrete model.
-
-### 3.2 `StepProgress` & `StepExtension`
-
-* `StepProgress` is **unique per (`learner`, `step`)**.
-* `StepExtension` has `progress = ForeignKey(StepProgress)`. Access related learner/step via properties:
-
-  ```python
-  extension.progress.learner
-  extension.progress.step
-  ```
-* Bonus: sorting by `requested_at` is implemented (`ordering = ["-requested_at"]`).
-
-### 3.3 Tasks & Evaluations
-
-* `TaskSubmission` → `TaskEvaluation` is **one-to-one**. If you want multiple evaluations (re-reviews), convert it to a FK and add uniqueness constraints as needed.
-
-### 3.4 Groups & Roles
-
-* `MentorPathGroupRole` stitches mentors to groups with a `PRIMARY`/`ASSISTANT` role field.
-* `MentorGroupLearner` joins learners (via their `PathEnrollment`) to mentor groups.
-
-### 3.5 Sessions
-
-* `Session` can reference:
-
-  * a whole group,
-  * or specific `mentor` + `path_enrollment` for 1:1s,
-  * and optionally a `step`.
-
----
-
-## 4. Typical Workflows
-
-### 4.1 Build a Curriculum
-
-1. Create **Learning Path**.
-2. Add **Educational Steps** (`sequence_no` defines the order).
-3. Attach **Resources** and **Tasks** to each step.
-
-### 4.2 Enroll Learners
-
-1. Create a **PathEnrollment** (learner ↔ path).
-2. (Optional) Put them in a **MentorPathGroup** using **MentorGroupLearner**.
-3. Assign mentors to groups with **MentorPathGroupRole**.
-
-### 4.3 Track Progress
-
-1. Create/Update **StepProgress** when a learner starts a step.
-2. Need more time? Add a **StepExtension**.
-3. On completion, set `completed_at` and `status = DONE`.
-
-### 4.4 Submit & Evaluate
-
-1. Learner uploads a **TaskSubmission**.
-2. Mentor evaluates via **TaskEvaluation** (score + feedback).
-3. Query pending evaluations (`evaluation__isnull=True`) to batch-review.
-
-### 4.5 Run Sessions & Attendance
-
-* Create **Session** records (with link/notes).
-* Add **Attendance** rows per learner.
-
-### 4.6 Bill Learners
-
-* Define **SubscriptionPlan**s.
-* Associate with learner via **LearnerSubscription**, track `status` (`ACTIVE` / `EXPIRED` / `CANCELLED`).
-
----
-
-## 5. Django Admin (Unfold) Setup
-
-* `BaseAdmin` mixin:
-
-  * Readonly timestamps (`created_at`, `updated_at`).
-  * `WysiwygWidget` for **every `TextField`** via `formfield_overrides`.
-
-* Useful inlines in `admin.py`:
-
-  * `ResourceInline`, `TaskInline` under `EducationalStep`
-  * `StepExtensionInline` under `StepProgress`
-  * `TaskEvaluationInline` under `TaskSubmission`
-  * Group/role inlines inside `MentorPathGroup`
-
-> ✨ **Tip:** Use `autocomplete_fields` for heavy FKs and `list_filter` with deep lookups like `"step__path"` to slice data fast.
-
----
-
-## 6. Handy ORM Queries
-
-```python
-# Steps of a path, in order
-EducationalStep.objects.filter(path=lp).order_by("sequence_no")
-
-# A learner's progress in a specific path
-StepProgress.objects.filter(learner=learner, step__path=lp)
-
-# Pending evaluations
-TaskSubmission.objects.filter(evaluation__isnull=True)
-
-# Mentor's sessions in the next 7 days
-from django.utils import timezone
-now = timezone.now()
-Session.objects.filter(
-    mentor=mentor,
-    starts_at__date__gte=now.date(),
-    starts_at__date__lte=(now + timezone.timedelta(days=7)).date(),
-)
+```bash
+python manage.py createsuperuser   # if you haven’t already
+python manage.py runserver
 ```
 
----
-
-## 7. Schema Extensions (Ideas)
-
-* **Multiple Evaluation Rounds**: Replace `OneToOneField` with FK + unique constraint on (`task_submission`, `mentor`, maybe `round_no`).
-* **Rubrics**: Add `TaskCriterion` (per task) + `CriterionScore` (per evaluation).
-* **Tagging Resources**: Add `Tag` and a M2M to `Resource`.
-* **Badges/Achievements**: Track learner milestones with a separate model.
+Log in at `http://127.0.0.1:8000/admin/` with your superuser.
+Everything below happens in the Django‑Unfold admin UI.
 
 ---
 
-## 8. Migrations & Constraints
+## 1  One‑time lookup tables (no dependencies)
 
-* Always run `python manage.py makemigrations && migrate` after changes.
-* Django **does not support composite foreign keys**. If you truly need them, use raw SQL via `migrations.RunSQL`—but beware portability.
-
----
-
-## 9. Glossary
-
-* **LP** – Learning Path
-* **Step** – `EducationalStep` instance
-* **Progress** – `StepProgress` row for a learner-step pair
-* **Extension** – Extra days granted (`StepExtension`)
-* **Session** – Scheduled meeting/lesson; can be group or 1:1
+| Model                 | What to add                                   | Why first?                    |
+| --------------------- | --------------------------------------------- | ----------------------------- |
+| **Feature**           | e.g. *“Weekly 1‑on‑1”*, *“24 h support”*      | Needed when you define plans. |
+| **Subscription Plan** | *Basic / Plus / Pro* (+ price & duration)     | Linked later to learners.     |
+| **Session Type**      | *private / public / meta…* (+ FA name/length) | Used by session templates.    |
 
 ---
 
-## 10. Admin Power Tips
+## 2  Build the curriculum
 
-* **Bulk Actions**: e.g., mark selected `StepProgress` as `DONE`.
-* **Readonly Extras**: Add fields like `signup_date` to `readonly_fields`.
-* **List Display Links**: Control clickable columns with `list_display_links`.
-* **Performance**: Add indexes on frequently filtered fields (Django 3.2+ supports `indexes = [...]` in `Meta`).
+1. **Learning Path**
+2. Inside the path → add **Educational Steps**
+   *While editing the path you already see the inline form.*
+3. Inside each step → add **Tasks** and **Resources**
+   *(click the step; both inlines are ready)*
+
+> ✅ At this point the “course skeleton” is complete.
 
 ---
 
-> *“Ship it clean, keep it DRY, and let Unfold make it pretty.”*
+## 3  Add your staff & students
+
+| Order | Model       | Notes                               |
+| ----- | ----------- | ----------------------------------- |
+| 1     | **Mentor**  | Phone, specialties JSON, hire date. |
+| 2     | **Learner** | Email must be unique.               |
+
+---
+
+## 4  Enroll learners & bind mentors
+
+1. **Learner Enrolment**
+   *Pick learner + learning path + enroll date.*
+2. In the enrolment page’s inline → create a **Mentor Assignment**
+   *Start date today; leave end date blank.*
+
+---
+
+## 5  Schedule sessions
+
+1. **Session Template**
+   *Choose the mentor assignment, learning path & session type; select weekday and Meet link.*
+2. Inside the template (or directly in **Session Occurrence**) add calendar entries.
+   *Occurrences carry actual dates & times; participants can be added later.*
+
+---
+
+## 6  Track progress
+
+*Optional—skip until the learner reaches a step.*
+
+| Model               | Typical moment                                 |
+| ------------------- | ---------------------------------------------- |
+| **Step Progress**   | When the learner starts a step (set due date). |
+| **Step Extension**  | If they request more time.                     |
+| **Task Submission** | When they upload work (files/links).           |
+| **Task Evaluation** | Mentor gives a 1‑5 score & feedback.           |
+| **Social Post**     | Log Rocket.Chat / LinkedIn proof‑of‑work.      |
+
+All these live under their respective parent objects as inlines, so navigation is quick.
+
+---
+
+## 7  Handle subscriptions
+
+1. From the learner’s enrolment page → add a **Learner Subscribe Plan**
+   *Pick the previously created Subscription Plan, set discount if any.*
+2. If they freeze their account → open that subscription and add a **Freeze** inline row.
+
+---
+
+## 8  Quick cheat‑sheet (dependencies graph)
+
+```text
+Feature ─┐
+         ├─> SubscriptionPlan ─┐
+         │                     ├─> LearnerSubscribePlan ──┐
+SessionType ─┐                 │                         │
+             ├─> SessionTemplate ─> SessionOccurrence ─> SessionParticipant
+LearningPath ─> EducationalStep ─> Task / Resource
+                                 │
+                   LearnerEnrolment ─> StepProgress ─> TaskSubmission
+                   │          │                       │
+                   │          └─> MentorAssignment    └─> TaskEvaluation
+                   └─> LearnerSubscribePlan (see 7)
+```
+
+Read the arrows as “needs”. If you stick to the top‑to‑bottom order you’ll never hit a blank FK drop‑down.
+
+---
+
+### Tips & tricks
+
+* **Search boxes everywhere** – every model that appears as `autocomplete_fields` supports fast typing rather than long select lists.
+* **WYSIWYG editor** – any long text (descriptions, bios, notes) opens Unfold’s rich‑text editor.
+* **Inline counts** – list pages show how many children (e.g., steps in a path) at a glance.
+* Feel free to deactivate or delete lookup rows later—referential integrity keeps existing data safe.
+
+Happy data‑seeding!

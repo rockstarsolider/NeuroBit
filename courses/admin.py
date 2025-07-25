@@ -1,272 +1,318 @@
-# admin.py
+# core/admin.py  – Django 5.2.4 + django‑unfold
 from django.contrib import admin
 from django.db import models
-
 from unfold.admin import ModelAdmin, TabularInline, StackedInline
 from unfold.contrib.forms.widgets import WysiwygWidget
 
 from . import models as m
 
-
-# ---------- Mixins / Base ----------
-
-class TextWysiwygMixin:
-    """Force WysiwygWidget on all TextFields."""
-    formfield_overrides = {
-        models.TextField: {"widget": WysiwygWidget},
-    }
+# --------------------------------------------------------------------------- #
+#  Shared helpers
+# --------------------------------------------------------------------------- #
+RICH_TEXT = {models.TextField: {"widget": WysiwygWidget}}
 
 
-class TimeStampedReadOnlyMixin:
-    """Make created_at / updated_at read-only if present."""
-    def get_readonly_fields(self, request, obj=None):
-        ro = list(super().get_readonly_fields(request, obj))
-        fields = {f.name for f in self.model._meta.get_fields() if hasattr(f, "attname")}
-        for f in ("created_at", "updated_at"):
-            if f in fields and f not in ro:
-                ro.append(f)
-        return ro
+class TimeStampedInline(TabularInline):
+    extra = 0
+    readonly_fields = ("created_at",)
 
 
-class BaseAdmin(TimeStampedReadOnlyMixin, TextWysiwygMixin, ModelAdmin):
-    pass
-
-
-# ---------- Inlines ----------
-
-class MentorSpecialtyInline(TabularInline):
-    model = m.MentorSpecialty
-    extra = 1
-    formfield_overrides = TextWysiwygMixin.formfield_overrides
-
-
-class ResourceInline(TabularInline):
-    model = m.Resource
-    extra = 1
-    formfield_overrides = TextWysiwygMixin.formfield_overrides
-
-
+# --------------------------------------------------------------------------- #
+#  Inlines that must exist *before* parent admins reference them
+# --------------------------------------------------------------------------- #
 class TaskInline(TabularInline):
+    """Tasks belong to an EducationalStep (FK: step)."""
     model = m.Task
-    extra = 1
-    formfield_overrides = TextWysiwygMixin.formfield_overrides
-
-
-class MentorGroupRoleInline(TabularInline):
-    model = m.MentorPathGroupRole
-    extra = 1
-    formfield_overrides = TextWysiwygMixin.formfield_overrides
-
-
-class MentorGroupLearnerInline(TabularInline):
-    model = m.MentorGroupLearner
-    extra = 1
-    formfield_overrides = TextWysiwygMixin.formfield_overrides
-
-
-class AttendanceInline(TabularInline):
-    model = m.Attendance
-    extra = 1
-    formfield_overrides = TextWysiwygMixin.formfield_overrides
-
-
-class TaskEvaluationInline(StackedInline):
-    model = m.TaskEvaluation
     extra = 0
-    can_delete = False
-    formfield_overrides = TextWysiwygMixin.formfield_overrides
+    fields = ("title", "order_in_step", "is_required")
+    formfield_overrides = RICH_TEXT
 
 
-class StepExtensionInline(TabularInline):
-    """Extensions shown on a StepProgress page."""
-    model = m.StepExtension
+class ResourceInline(TimeStampedInline):
+    model = m.Resource
+    fields = ("title", "type", "url_or_location", "description")
+    formfield_overrides = RICH_TEXT
+
+
+# --------------------------------------------------------------------------- #
+#  Curriculum & resources
+# --------------------------------------------------------------------------- #
+class EducationalStepInline(StackedInline):
+    model = m.EducationalStep
+    show_change_link = True
     extra = 0
-    formfield_overrides = TextWysiwygMixin.formfield_overrides
-
-
-# ---------- Admin Registrations ----------
-
-@admin.register(m.Learner)
-class LearnerAdmin(BaseAdmin):
-    list_display = ("first_name", "last_name", "email", "status", "signup_date", "created_at")
-    search_fields = ("first_name", "last_name", "email")
-    list_filter = ("status", "gender", "signup_date")
-
-
-@admin.register(m.Mentor)
-class MentorAdmin(BaseAdmin):
-    list_display = ("first_name", "last_name", "email", "status", "hire_date")
-    search_fields = ("first_name", "last_name", "email")
-    list_filter = ("status",)
-    inlines = [MentorSpecialtyInline]
-
-
-@admin.register(m.Specialty)
-class SpecialtyAdmin(BaseAdmin):
-    list_display = ("name",)
-    search_fields = ("name",)
-
-
-@admin.register(m.MentorSpecialty)
-class MentorSpecialtyAdmin(BaseAdmin):
-    list_display = ("mentor", "specialty")
-    search_fields = ("mentor__first_name", "mentor__last_name", "specialty__name")
-
-
-@admin.register(m.Staff)
-class StaffAdmin(BaseAdmin):
-    list_display = ("email", "role_code", "status")
-    search_fields = ("email", "role_code")
-    list_filter = ("status",)
+    formfield_overrides = RICH_TEXT
+    fields = (
+        "sequence_no",
+        "title",
+        "description",
+        ("expected_duration_days", "is_mandatory"),
+    )
 
 
 @admin.register(m.LearningPath)
-class LearningPathAdmin(BaseAdmin):
-    list_display = ("name", "is_active", "created_at", "updated_at")
-    search_fields = ("name",)
+class LearningPathAdmin(ModelAdmin):
+    list_display = ("name", "is_active", "created_at")
     list_filter = ("is_active",)
+    search_fields = ("name", "description")
+    inlines = (EducationalStepInline,)
+    formfield_overrides = RICH_TEXT
 
 
 @admin.register(m.EducationalStep)
-class EducationalStepAdmin(BaseAdmin):
-    list_display = ("path", "sequence_no", "title", "is_mandatory")
-    list_filter = ("path", "is_mandatory")
-    search_fields = ("title", "path__name")
-    inlines = [ResourceInline, TaskInline]
+class EducationalStepAdmin(ModelAdmin):
+    list_display = ("__str__", "expected_duration_days", "is_mandatory", "created_at")
+    list_filter = ("learning_path", "is_mandatory")
+    autocomplete_fields = ("learning_path",)
+    search_fields = ("title", "description")
+    inlines = (TaskInline, ResourceInline)
+    formfield_overrides = RICH_TEXT
+    ordering = ("learning_path", "sequence_no")
 
 
 @admin.register(m.Resource)
-class ResourceAdmin(BaseAdmin):
-    list_display = ("title", "step", "resource_type", "created_at")
-    list_filter = ("resource_type", "step__path")
-    search_fields = ("title", "description")
+class ResourceAdmin(ModelAdmin):
+    list_display = ("title", "type", "step", "created_at")
+    list_filter = ("type", "step__learning_path")
+    search_fields = ("title", "url_or_location", "description")
+    autocomplete_fields = ("step",)
+    formfield_overrides = RICH_TEXT
 
 
-@admin.register(m.Task)
-class TaskAdmin(BaseAdmin):
-    list_display = ("title", "step", "order_in_step", "is_required")
-    list_filter = ("is_required", "step__path")
-    search_fields = ("title", "description")
+# --------------------------------------------------------------------------- #
+#  People
+# --------------------------------------------------------------------------- #
+@admin.register(m.Learner)
+class LearnerAdmin(ModelAdmin):
+    list_display = ("first_name", "last_name", "email", "country", "status", "signup_date")
+    list_filter = ("status", "country")
+    search_fields = ("first_name", "last_name", "email", "phone")
+    readonly_fields = ("signup_date",)
+    formfield_overrides = RICH_TEXT
 
 
-@admin.register(m.PathEnrollment)
-class PathEnrollmentAdmin(BaseAdmin):
-    list_display = ("learner", "path", "status", "start_date", "end_date")
-    list_filter = ("status", "path")
-    search_fields = ("learner__first_name", "learner__last_name", "path__name")
+@admin.register(m.Mentor)
+class MentorAdmin(ModelAdmin):
+    list_display = ("first_name", "last_name", "email", "hire_date", "status")
+    list_filter = ("status",)
+    search_fields = ("first_name", "last_name", "email", "specialties")
+    formfield_overrides = RICH_TEXT
 
 
-@admin.register(m.MentorPathGroup)
-class MentorPathGroupAdmin(BaseAdmin):
-    list_display = ("group_name", "path", "start_date", "end_date")
-    list_filter = ("path",)
-    search_fields = ("group_name", "path__name")
-    inlines = [MentorGroupRoleInline, MentorGroupLearnerInline]
+# --------------------------------------------------------------------------- #
+#  Enrolment & mentoring
+# --------------------------------------------------------------------------- #
+class MentorAssignmentInline(TabularInline):
+    model = m.MentorAssignment
+    extra = 0
+    autocomplete_fields = ("mentor",)
+    fields = ("mentor", "start_date", "end_date", "reason_for_change")
 
 
-@admin.register(m.MentorPathGroupRole)
-class MentorPathGroupRoleAdmin(BaseAdmin):
-    list_display = ("mentor_path_group", "mentor", "role")
-    list_filter = ("role", "mentor_path_group__path")
-    search_fields = ("mentor__first_name", "mentor__last_name", "mentor_path_group__group_name")
+@admin.register(m.LearnerEnrolment)
+class LearnerEnrolmentAdmin(ModelAdmin):
+    list_display = ("learner", "learning_path", "enroll_date", "unenroll_date")
+    list_filter = ("learning_path",)
+    search_fields = (
+        "learner__first_name",
+        "learner__last_name",
+        "learner__email",
+        "learning_path__name",
+    )
+    autocomplete_fields = ("learner", "learning_path")
+    inlines = (MentorAssignmentInline,)
 
 
-@admin.register(m.MentorGroupLearner)
-class MentorGroupLearnerAdmin(BaseAdmin):
-    list_display = ("mentor_path_group", "path_enrollment", "start_date", "end_date")
-    search_fields = ("mentor_path_group__group_name",
-                     "path_enrollment__learner__first_name",
-                     "path_enrollment__learner__last_name")
+@admin.register(m.MentorAssignment)
+class MentorAssignmentAdmin(ModelAdmin):
+    list_display = ("enrolment", "mentor", "start_date", "end_date")
+    list_filter = ("mentor",)
+    autocomplete_fields = ("enrolment", "mentor")
+    search_fields = (
+        "enrolment__learner__email",
+        "mentor__email",
+        "mentor__first_name",
+        "mentor__last_name",
+    )
+    formfield_overrides = RICH_TEXT
+
+
+# --------------------------------------------------------------------------- #
+#  Sessions
+# --------------------------------------------------------------------------- #
+class SessionOccurrenceInline(TabularInline):
+    model = m.SessionOccurrence
+    extra = 0
+    fields = (
+        ("planned_date", "planned_start_time", "planned_end_time"),
+        ("status", "recorded_meet_link"),
+    )
+    autocomplete_fields = ("template",)
+    formfield_overrides = RICH_TEXT
+
+
+@admin.register(m.SessionType)
+class SessionTypeAdmin(ModelAdmin):
+    list_display = ("code", "name_fa", "duration_minutes", "max_participants")
+    search_fields = ("code", "name_fa")
+    formfield_overrides = RICH_TEXT
+
+
+class SessionTemplateInline(TabularInline):
+    model = m.SessionTemplate
+    extra = 0
+    autocomplete_fields = ("session_type", "learning_path")
+    fields = (
+        "session_type",
+        "weekday",
+        "active_from",
+        "status",
+        "google_meet_link",
+    )
+
+
+@admin.register(m.SessionTemplate)
+class SessionTemplateAdmin(ModelAdmin):
+    list_display = ("learning_path", "mentor_assignment", "session_type", "weekday", "status")
+    list_filter = ("weekday", "status", "learning_path")
+    autocomplete_fields = ("learning_path", "mentor_assignment", "session_type")
+    search_fields = (
+        "learning_path__name",
+        "mentor_assignment__mentor__first_name",
+        "mentor_assignment__mentor__last_name",
+    )
+    inlines = (SessionOccurrenceInline,)
+    formfield_overrides = RICH_TEXT
+
+
+@admin.register(m.SessionOccurrence)
+class SessionOccurrenceAdmin(ModelAdmin):
+    list_display = ("template", "planned_date", "planned_start_time", "status")
+    list_filter = ("status", "template__learning_path")
+    autocomplete_fields = ("template",)
+    search_fields = ("template__learning_path__name",)
+    inlines = (
+        type(
+            "ParticipantInline",
+            (TabularInline,),
+            {
+                "model": m.SessionParticipant,
+                "extra": 0,
+                "autocomplete_fields": ("learner",),
+                "fields": ("learner", "attendance_status", "guest_name"),
+            },
+        ),
+    )
+    formfield_overrides = RICH_TEXT
+
+
+# --------------------------------------------------------------------------- #
+#  Progress & tasks
+# --------------------------------------------------------------------------- #
+class StepExtensionInline(TabularInline):
+    model = m.StepExtension
+    extra = 0
+    fields = ("extended_by_days", "requested_at", "approved_by_mentor", "reason")
+    formfield_overrides = RICH_TEXT
+    readonly_fields = ("requested_at",)
 
 
 @admin.register(m.StepProgress)
-class StepProgressAdmin(BaseAdmin):
-    list_display = ("learner", "step", "status", "started_at", "completed_at", "created_at")
-    list_filter = ("status", "step__path")
-    search_fields = ("learner__first_name", "learner__last_name", "step__title")
-    inlines = [StepExtensionInline]
+class StepProgressAdmin(ModelAdmin):
+    list_display = ("enrolment", "step", "initial_due_date", "skipped")
+    list_filter = ("skipped", "step__learning_path")
+    autocomplete_fields = ("enrolment", "step")
+    search_fields = (
+        "enrolment__learner__first_name",
+        "enrolment__learner__last_name",
+        "step__title",
+        "step__learning_path__name",
+    )
+    inlines = (StepExtensionInline,)
+    formfield_overrides = RICH_TEXT
 
 
-@admin.register(m.StepExtension)
-class StepExtensionAdmin(BaseAdmin):
-    # Show learner/step via callables since model stores only progress FK
-    def learner(self, obj):
-        return obj.progress.learner
-    learner.admin_order_field = "progress__learner__first_name"
+@admin.register(m.Task)
+class TaskAdmin(ModelAdmin):
+    list_display = ("title", "step", "order_in_step", "is_required")
+    list_filter = ("step__learning_path", "is_required")
+    autocomplete_fields = ("step",)
+    formfield_overrides = RICH_TEXT
 
-    def step(self, obj):
-        return obj.progress.step
-    step.admin_order_field = "progress__step__title"
 
-    list_display = ("progress", "learner", "step", "extended_by_days",
-                    "approved_by_mentor", "requested_at")
-    list_filter = ("approved_by_mentor", "progress__step__path")
-    search_fields = ("progress__learner__first_name",
-                     "progress__learner__last_name",
-                     "progress__step__title",
-                     "reason")
+class TaskEvaluationInline(TabularInline):
+    model = m.TaskEvaluation
+    extra = 0
+    autocomplete_fields = ("mentor",)
+    fields = ("mentor", "score_numeric", "feedback_text", "evaluated_at")
+    readonly_fields = ("evaluated_at",)
+    formfield_overrides = RICH_TEXT
 
 
 @admin.register(m.TaskSubmission)
-class TaskSubmissionAdmin(BaseAdmin):
-    list_display = ("task", "learner", "submitted_at")
-    search_fields = ("task__title", "learner__first_name", "learner__last_name", "comment")
-    inlines = [TaskEvaluationInline]
-
-
-@admin.register(m.TaskEvaluation)
-class TaskEvaluationAdmin(BaseAdmin):
-    list_display = ("task_submission", "mentor", "score", "evaluated_at")
-    list_filter = ("score",)
-    search_fields = ("mentor__first_name", "mentor__last_name",
-                     "task_submission__task__title", "feedback")
-
-
-@admin.register(m.VideoSubmission)
-class VideoSubmissionAdmin(BaseAdmin):
-    list_display = ("learner", "step", "submitted_at", "duration_seconds")
-    list_filter = ("step__path",)
-    search_fields = ("learner__first_name", "learner__last_name", "step__title", "notes")
+class TaskSubmissionAdmin(ModelAdmin):
+    list_display = ("step_progress", "submitted_at")
+    autocomplete_fields = ("step_progress",)
+    inlines = (TaskEvaluationInline,)
+    formfield_overrides = RICH_TEXT
+    readonly_fields = ("submitted_at",)
 
 
 @admin.register(m.SocialPost)
-class SocialPostAdmin(BaseAdmin):
-    list_display = ("learner", "platform", "url", "posted_at", "step")
-    list_filter = ("platform", "step__path")
-    search_fields = ("url", "learner__first_name", "learner__last_name")
+class SocialPostAdmin(ModelAdmin):
+    list_display = ("platform", "url", "posted_at")
+    list_filter = ("platform",)
+    search_fields = ("url",)
+    autocomplete_fields = ("step_progress",)
+    readonly_fields = ("posted_at",)
 
 
-@admin.register(m.MeetingType)
-class MeetingTypeAdmin(BaseAdmin):
-    list_display = ("name",)
-    search_fields = ("name",)
-
-
-@admin.register(m.Session)
-class SessionAdmin(BaseAdmin):
-    list_display = ("meeting_type", "starts_at", "ends_at", "mentor", "mentor_path_group")
-    list_filter = ("meeting_type", "mentor_path_group__path", "mentor")
-    search_fields = ("notes", "link")
-    inlines = [AttendanceInline]
-
-
-@admin.register(m.Attendance)
-class AttendanceAdmin(BaseAdmin):
-    list_display = ("session", "learner", "status", "recorded_at")
-    list_filter = ("status", "session__meeting_type")
-    search_fields = ("learner__first_name", "learner__last_name", "session__meeting_type__name")
+# --------------------------------------------------------------------------- #
+#  Subscription plans
+# --------------------------------------------------------------------------- #
+class PlanFeatureInline(TabularInline):
+    model = m.PlanFeature
+    extra = 0
+    autocomplete_fields = ("feature",)
+    formfield_overrides = RICH_TEXT
 
 
 @admin.register(m.SubscriptionPlan)
-class SubscriptionPlanAdmin(BaseAdmin):
-    list_display = ("name", "price_amount", "currency_code", "duration_months", "is_active")
-    list_filter = ("is_active",)
+class SubscriptionPlanAdmin(ModelAdmin):
+    list_display = ("name", "price_amount", "duration_in_days", "is_active")
+    list_filter = ("is_active", "duration_in_days")
     search_fields = ("name", "description")
+    inlines = (PlanFeatureInline,)
+    formfield_overrides = RICH_TEXT
 
 
-@admin.register(m.LearnerSubscription)
-class LearnerSubscriptionAdmin(BaseAdmin):
-    list_display = ("learner", "subscription_plan", "status", "start_date", "end_date",
-                    "price_paid", "currency_code")
+@admin.register(m.Feature)
+class FeatureAdmin(ModelAdmin):
+    list_display = ("name",)
+    search_fields = ("name",)
+    formfield_overrides = RICH_TEXT
+
+
+class FreezeInline(TabularInline):
+    model = m.LearnerSubscribePlanFreeze
+    extra = 0
+    fields = ("start_date", "duration")
+
+
+@admin.register(m.LearnerSubscribePlan)
+class LearnerSubscribePlanAdmin(ModelAdmin):
+    list_display = (
+        "learner_enrolment",
+        "subscription_plan",
+        "start_date",
+        "duration_in_days",
+        "status",
+    )
     list_filter = ("status", "subscription_plan")
-    search_fields = ("learner__first_name", "learner__last_name", "subscription_plan__name")
+    autocomplete_fields = ("subscription_plan", "learner_enrolment")
+    search_fields = (
+        "learner_enrolment__learner__first_name",
+        "learner_enrolment__learner__last_name",
+        "subscription_plan__name",
+    )
+    inlines = (FreezeInline,)
