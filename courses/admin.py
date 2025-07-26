@@ -6,11 +6,11 @@ from django.utils.html import format_html
 from datetime import datetime, time as dtime, date as dtdate, timezone as dttz
 
 from unfold.admin import ModelAdmin, TabularInline, StackedInline
-from unfold.contrib.forms.widgets import WysiwygWidget
+from unfold.contrib.forms.widgets import WysiwygWidget, ArrayWidget
 from unfold.decorators import display
 
-from .templatetags.custom_translation_tags import translate_number
-from .templatetags.persian_calendar_convertor import convert_to_persian_calendar, format_persian_datetime
+from pages.templatetags.custom_translation_tags import translate_number
+from pages.templatetags.persian_calendar_convertor import convert_to_persian_calendar, format_persian_datetime
 
 from . import models as m
 
@@ -46,7 +46,10 @@ def jalali_display(attr_name="created_at", *, label=None):
 
 
 RICH_TEXT = {models.TextField: {"widget": WysiwygWidget}}
-
+FORM_OVERRIDES = {
+    **RICH_TEXT,
+    models.JSONField: {"widget": ArrayWidget},  # show ArrayWidget for JSON lists
+}
 
 class TimeStampedInline(TabularInline):
     extra = 0
@@ -106,12 +109,6 @@ class EducationalStepAdmin(ModelAdmin):
     ordering = ("learning_path", "sequence_no")
     created_at_jalali = jalali_display()
 
-    # @display(description="Created at")
-    # def created_at_(self, obj):
-    #     return format_html(
-    #         f"<b dir='rtl'>{translate_number(format_persian_datetime(convert_to_persian_calendar(obj.created_at)))}</b>"
-    #         )
-
     @display(description="Expected duration days", label=True)
     def expected_duration_days_(self, obj):
         return obj.expected_duration_days
@@ -149,11 +146,34 @@ class LearnerAdmin(ModelAdmin):
     formfield_overrides = RICH_TEXT
 
 
+@admin.register(m.Specialty)
+class SpecialtyAdmin(ModelAdmin):
+    list_display = ("name", "code", "is_active")
+    list_filter = ("is_active",)
+    search_fields = ("name", "code")
+    list_editable = ("is_active",)
+
+
 @admin.register(m.Mentor)
 class MentorAdmin(ModelAdmin):
-    list_display = ("first_name", "last_name", "email", "hire_date", "status")
-    list_filter = ("status",)
-    search_fields = ("first_name", "last_name", "email", "specialties")
+    hire_j = jalali_display("hire_date", label="Hire Date")
+
+    @display(header=True, description="Mentor")
+    def heading(self, obj):
+        initials = f"{obj.first_name[0]}{obj.last_name[0]}"
+        return [f"{obj.first_name} {obj.last_name}", obj.email, initials]
+
+    status_badge = display(label={True: "success", False: "warning"})(lambda s, o: o.status)
+
+    list_display = (
+        "heading",
+        "phone",
+        "hire_j",
+        "status_badge",
+    )
+    list_filter = ("status", "specialties")
+    search_fields = ("first_name", "last_name", "email")
+    autocomplete_fields = ("specialties",)
     formfield_overrides = RICH_TEXT
 
 
