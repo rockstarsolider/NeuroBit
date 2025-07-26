@@ -1,14 +1,50 @@
 # core/admin.py  – Django 5.2.4 + django‑unfold
 from django.contrib import admin
 from django.db import models
+from django.contrib.humanize.templatetags.humanize import intcomma
+from django.utils.html import format_html
+from datetime import datetime, time as dtime, date as dtdate, timezone as dttz
+
 from unfold.admin import ModelAdmin, TabularInline, StackedInline
 from unfold.contrib.forms.widgets import WysiwygWidget
+from unfold.decorators import display
+
+from .templatetags.custom_translation_tags import translate_number
+from .templatetags.persian_calendar_convertor import convert_to_persian_calendar, format_persian_datetime
 
 from . import models as m
+
 
 # --------------------------------------------------------------------------- #
 #  Shared helpers
 # --------------------------------------------------------------------------- #
+def jalali_display(attr_name="created_at", *, label=None):
+    """
+    Factory that returns a @display‑decorated function converting
+    both DateTime *and* Date objects to Persian date‑time strings.
+    Usage:
+        created_at_j = jalali_display()                        # default field
+        birthday_j   = jalali_display("date_of_birth", label="Birthday")
+    """
+    label = label or attr_name.replace("_", " ").title()
+
+    @display(description=label)
+    def _func(self, obj):
+        value = getattr(obj, attr_name, None)
+        if not value:
+            return "-"
+
+        # If it's a plain date, make it aware (datetime, 00:00, UTC)
+        if isinstance(value, dtdate) and not isinstance(value, datetime):
+            value = datetime.combine(value, dtime.min, tzinfo=dttz.utc)
+
+        persian = format_persian_datetime(convert_to_persian_calendar(value))
+        return format_html("<b dir='rtl'>{}</b>", translate_number(persian))
+
+    _func.__name__ = f"{attr_name}_jalali"
+    return _func
+
+
 RICH_TEXT = {models.TextField: {"widget": WysiwygWidget}}
 
 
@@ -61,13 +97,34 @@ class LearningPathAdmin(ModelAdmin):
 
 @admin.register(m.EducationalStep)
 class EducationalStepAdmin(ModelAdmin):
-    list_display = ("__str__", "expected_duration_days", "is_mandatory", "created_at")
+    list_display = ("__str__", "expected_duration_days_", "is_mandatory_", "created_at_jalali")
     list_filter = ("learning_path", "is_mandatory")
     autocomplete_fields = ("learning_path",)
     search_fields = ("title", "description")
     inlines = (TaskInline, ResourceInline)
     formfield_overrides = RICH_TEXT
     ordering = ("learning_path", "sequence_no")
+    created_at_jalali = jalali_display()
+
+    # @display(description="Created at")
+    # def created_at_(self, obj):
+    #     return format_html(
+    #         f"<b dir='rtl'>{translate_number(format_persian_datetime(convert_to_persian_calendar(obj.created_at)))}</b>"
+    #         )
+
+    @display(description="Expected duration days", label=True)
+    def expected_duration_days_(self, obj):
+        return obj.expected_duration_days
+
+    @display(
+            description="status", 
+            label={
+                True: "danger",
+                False: "info",
+            }
+        )
+    def is_mandatory_(self, obj):
+        return obj.is_mandatory, "Mandatory" if obj.is_mandatory else "Optional"
 
 
 @admin.register(m.Resource)
@@ -84,7 +141,8 @@ class ResourceAdmin(ModelAdmin):
 # --------------------------------------------------------------------------- #
 @admin.register(m.Learner)
 class LearnerAdmin(ModelAdmin):
-    list_display = ("first_name", "last_name", "email", "country", "status", "signup_date")
+    signup_date_jalali = jalali_display("signup_date", label="Signup")
+    list_display = ("first_name", "last_name", "email", "country", "status", "signup_date_jalali")
     list_filter = ("status", "country")
     search_fields = ("first_name", "last_name", "email", "phone")
     readonly_fields = ("signup_date",)
@@ -279,11 +337,36 @@ class PlanFeatureInline(TabularInline):
 
 @admin.register(m.SubscriptionPlan)
 class SubscriptionPlanAdmin(ModelAdmin):
-    list_display = ("name", "price_amount", "duration_in_days", "is_active")
+    list_display = ("name", "price_amount_commas", "duration_in_days_", "is_active_")
     list_filter = ("is_active", "duration_in_days")
     search_fields = ("name", "description")
     inlines = (PlanFeatureInline,)
     formfield_overrides = RICH_TEXT
+
+    @display(description="Duration(days)", label=True)
+    def duration_in_days_(self, obj):
+        return obj.duration_in_days
+
+    @display(
+        description="Status",
+        label={
+            True: "success",
+            False: "danger",
+        },
+    )
+    def is_active_(self, obj):
+        return obj.is_active, "Active" if obj.is_active else "Deactive"
+
+    @display(description="Price(Toman)")
+    def price_amount_commas(self, obj):
+        """
+        Show 99,999.00 instead of 99999.00
+        Works for Decimal as well as int.
+        """
+        # keep two decimals (00 if none) and pass the integer part to intcomma
+        value = obj.price_amount
+        integer_part, _, frac_part = f"{value:.0f}".partition(".")
+        return f"{intcomma(int(integer_part))}"
 
 
 @admin.register(m.Feature)
@@ -305,7 +388,6 @@ class LearnerSubscribePlanAdmin(ModelAdmin):
         "learner_enrolment",
         "subscription_plan",
         "start_date",
-        "duration_in_days",
         "status",
     )
     list_filter = ("status", "subscription_plan")

@@ -84,15 +84,11 @@ class Learner(models.Model):
     last_name = models.CharField(max_length=50)
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=20, blank=True)
-    dob = models.DateField(null=True, blank=True)
-    gender = models.CharField(
-        max_length=12, choices=Gender.choices, default=Gender.UNDISCLOSED
-    )
+    date_of_birth = models.DateField(null=True, blank=True)
+    gender = models.CharField(max_length=12, choices=Gender.choices, default=Gender.UNDISCLOSED)
     country = models.CharField(max_length=2, help_text="ISO‑3166‑1 alpha‑2 code")
     signup_date = models.DateTimeField(default=timezone.now, db_index=True)
-    status = models.CharField(
-        max_length=8, choices=ActiveStatus.choices, default=ActiveStatus.ACTIVE
-    )
+    status = models.CharField(max_length=8, choices=ActiveStatus.choices, default=ActiveStatus.ACTIVE)
     notes = models.TextField(blank=True)
 
     class Meta:
@@ -111,9 +107,7 @@ class Mentor(models.Model):
     bio = models.TextField(blank=True)
     specialties = models.JSONField(default=list, blank=True)
     hire_date = models.DateField()
-    status = models.CharField(
-        max_length=8, choices=ActiveStatus.choices, default=ActiveStatus.ACTIVE
-    )
+    status = models.CharField(max_length=8, choices=ActiveStatus.choices, default=ActiveStatus.ACTIVE)
 
     class Meta:
         ordering = ("last_name", "first_name")
@@ -139,9 +133,7 @@ class LearningPath(models.Model):
 
 
 class EducationalStep(models.Model):
-    learning_path = models.ForeignKey(
-        LearningPath, on_delete=models.CASCADE, related_name="steps"
-    )
+    learning_path = models.ForeignKey(LearningPath, on_delete=models.CASCADE, related_name="steps")
     sequence_no = models.PositiveSmallIntegerField()
     title = models.CharField(max_length=120)
     description = models.TextField(blank=True)
@@ -158,9 +150,7 @@ class EducationalStep(models.Model):
 
 
 class Resource(models.Model):
-    step = models.ForeignKey(
-        EducationalStep, on_delete=models.CASCADE, related_name="resources"
-    )
+    step = models.ForeignKey(EducationalStep, on_delete=models.CASCADE, related_name="resources")
     title = models.CharField(max_length=120)
     type = models.CharField(max_length=12, choices=ResourceType.choices)
     url_or_location = models.CharField(max_length=500)
@@ -175,12 +165,8 @@ class Resource(models.Model):
 #  Enrolment & mentoring
 # --------------------------------------------------------------------------- #
 class LearnerEnrolment(models.Model):
-    learner = models.ForeignKey(
-        Learner, on_delete=models.CASCADE, related_name="enrolments"
-    )
-    learning_path = models.ForeignKey(
-        LearningPath, on_delete=models.CASCADE, related_name="enrolments"
-    )
+    learner = models.ForeignKey(Learner, on_delete=models.CASCADE, related_name="enrolments")
+    learning_path = models.ForeignKey(LearningPath, on_delete=models.CASCADE, related_name="enrolments")
     enroll_date = models.DateField(default=timezone.now)
     unenroll_date = models.DateField(null=True, blank=True)
 
@@ -232,14 +218,20 @@ class SessionType(models.Model):
 
 class SessionTemplate(models.Model):
     mentor_assignment = models.ForeignKey(
-        MentorAssignment, on_delete=models.CASCADE, related_name="session_templates"
-    )
+        MentorAssignment, 
+        on_delete=models.CASCADE, 
+        null=True, 
+        blank=True, 
+        related_name="session_templates"
+        )
     learning_path = models.ForeignKey(
-        LearningPath, on_delete=models.CASCADE, related_name="session_templates"
-    )
-    session_type = models.ForeignKey(
-        SessionType, on_delete=models.CASCADE, related_name="templates"
-    )
+        LearningPath, 
+        on_delete=models.CASCADE, 
+        null=True, 
+        blank=True, 
+        related_name="session_templates"
+        )
+    session_type = models.ForeignKey(SessionType, on_delete=models.CASCADE, related_name="templates")
     weekday = models.IntegerField(choices=Weekday.choices)
     active_from = models.DateField(default=timezone.now)
     status = models.CharField(
@@ -317,7 +309,7 @@ class StepProgress(models.Model):
     )
     initial_due_date = models.DateField()
     initial_promise_days = models.PositiveSmallIntegerField()
-    skipped = models.BooleanField(default=False)
+    skipped = models.BooleanField(default=False, help_text='If you make skip to True then the initial_promise_days MUST be 0!')
 
     class Meta:
         unique_together = ("enrolment", "step")
@@ -432,7 +424,13 @@ class SubscriptionPlan(models.Model):
     description = models.TextField(blank=True)
     price_amount = models.DecimalField(max_digits=10, decimal_places=2)
     duration_in_days = models.PositiveSmallIntegerField(
-        choices=((30, "30 days"), (90, "90 days"), (120, "120 days"))
+        choices=(
+            (30, "30 days"), 
+            (90, "90 days"), 
+            (120, "120 days"),
+            (270, "120 days"),
+            (360, "120 days"),
+        )
     )
     is_active = models.BooleanField(default=True)
 
@@ -474,21 +472,14 @@ class PlanFeature(models.Model):
 
 
 class LearnerSubscribePlan(models.Model):
-    subscription_plan = models.ForeignKey(
-        SubscriptionPlan, on_delete=models.CASCADE, related_name="learner_plans"
-    )
-    learner_enrolment = models.ForeignKey(
-        LearnerEnrolment, on_delete=models.CASCADE, related_name="subscribe_plans"
-    )
+    subscription_plan = models.ForeignKey(SubscriptionPlan, on_delete=models.CASCADE, related_name="learner_plans")
+    learner_enrolment = models.ForeignKey(LearnerEnrolment, on_delete=models.CASCADE, related_name="subscribe_plans")
     start_date = models.DateField(default=timezone.now)
     discount = models.DecimalField(
         max_digits=5,
         decimal_places=2,
         help_text="% discount (e.g., 10.00 = 10%)",
         default=0,
-    )
-    duration_in_days = models.PositiveSmallIntegerField(
-        choices=((30, "30 days"), (90, "90 days"), (120, "120 days"))
     )
     status = models.CharField(
         max_length=8,
@@ -505,9 +496,7 @@ class LearnerSubscribePlan(models.Model):
 
 
 class LearnerSubscribePlanFreeze(models.Model):
-    subscribe_plan = models.ForeignKey(
-        LearnerSubscribePlan, on_delete=models.CASCADE, related_name="freezes"
-    )
+    subscribe_plan = models.ForeignKey(LearnerSubscribePlan, on_delete=models.CASCADE, related_name="freezes")
     start_date = models.DateField()
     duration = models.PositiveSmallIntegerField(help_text="Freeze duration in days")
 
