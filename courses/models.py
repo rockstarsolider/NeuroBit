@@ -1,30 +1,37 @@
-# core/models.py  – Django 5.2.4
+# courses/models.py ― Django 5.2.x
 #
-# A faithful, uncluttered implementation of the data‑model you described.
-# • No external packages required.
-# • Uses Django’s TextChoices / IntegerChoices for all enums.
-# • Adds the minimum sensible constraints (unique_together, check, indexes).
-# • Every FK has an explicit `related_name` for clear, self‑documenting queries.
-# • Field names are snake_case and line‑wrapped ≤ 88 cols (PEP 8).
 
-from django.core.validators import MaxValueValidator, MinValueValidator
+# ➋  Enumerations                         │  keep logic tidy
+# ➌  Core actors  (Learner, Mentor, …)    │
+# ➍  Curriculum   (LearningPath, Step …)  │
+# ➎  Enrolment / Mentoring                │
+# ➏  Sessions & attendance                │
+# ➐  Progress & task workflow             │
+# ➑  Subscription plans                   │
+# ➒  Mentor‑group sessions  ← new block   │  **added to match ERD**
+
+
+from django.core.validators import (
+    RegexValidator, MinValueValidator, MaxValueValidator
+)
 from django.db import models
 from django.utils import timezone
+from django.conf import settings
 
 
-# --------------------------------------------------------------------------- #
-#  Enumerations
-# --------------------------------------------------------------------------- #
+# ────────────────────────────────────────────────────────────────
+# ➋  ENUMS
+# ────────────────────────────────────────────────────────────────
 class ActiveStatus(models.TextChoices):
     ACTIVE = "active", "Active"
     INACTIVE = "inactive", "Inactive"
 
 
-class Gender(models.TextChoices):
-    MALE = "male", "Male"
-    FEMALE = "female", "Female"
-    OTHER = "other", "Other"
-    UNDISCLOSED = "na", "Prefer not to say"
+class LearnerEnrolmentStatus(models.TextChoices):
+    ACTIVE = "active", "Active"
+    GRADUATED = "graduated", "Graduated"
+    DROPPED = "dropped", "Dropped"
+    RESERVED = "reserved", "Reserved"
 
 
 class ResourceType(models.TextChoices):
@@ -37,8 +44,8 @@ class ResourceType(models.TextChoices):
 class SessionCode(models.TextChoices):
     PRIVATE = "private", "Private"
     PUBLIC = "public", "Public"
-    META_PUBLIC = "meta_public", "Meta Public"
-    META_PRIVATE = "meta_private", "Meta Private"
+    META_PUBLIC = "meta_public", "Meta‑Public"
+    META_PRIVATE = "meta_private", "Meta‑Private"
 
 
 class SessionTemplateStatus(models.TextChoices):
@@ -76,33 +83,10 @@ class SubscribePlanStatus(models.TextChoices):
     FROZEN = "freeze", "Frozen"
 
 
-# --------------------------------------------------------------------------- #
-#  Core actors
-# --------------------------------------------------------------------------- #
-class Learner(models.Model):
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
-    email = models.EmailField(unique=True)
-    phone = models.CharField(max_length=20, blank=True)
-    date_of_birth = models.DateField(null=True, blank=True)
-    gender = models.CharField(max_length=12, choices=Gender.choices, default=Gender.UNDISCLOSED)
-    country = models.CharField(max_length=2, help_text="ISO‑3166‑1 alpha‑2 code")
-    signup_date = models.DateTimeField(default=timezone.now, db_index=True)
-    status = models.CharField(max_length=8, choices=ActiveStatus.choices, default=ActiveStatus.ACTIVE)
-    notes = models.TextField(blank=True)
-
-    class Meta:
-        ordering = ("-signup_date",)
-        verbose_name_plural = "Learners"
-
-    def __str__(self) -> str:
-        return f"{self.first_name} {self.last_name}"
-
-
+# ────────────────────────────────────────────────────────────────
+# ➌  CORE ACTORS
+# ────────────────────────────────────────────────────────────────
 class Specialty(models.Model):
-    """
-    A single expertise tag (e.g. 'Backend', 'Data‑Science').
-    """
     code = models.SlugField(max_length=50, unique=True)
     name = models.CharField(max_length=100)
     is_active = models.BooleanField(default=True)
@@ -110,30 +94,51 @@ class Specialty(models.Model):
     class Meta:
         ordering = ("name",)
 
-    def __str__(self) -> str:
+    def __str__(self):
         return self.name
 
 
 class Mentor(models.Model):
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
-    email = models.EmailField(unique=True)
-    phone = models.CharField(max_length=20, blank=True)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL,
+                                on_delete=models.CASCADE,
+                                related_name="mentor_profile")
+    address = models.TextField(blank=True)
     bio = models.TextField(blank=True)
-    specialties = models.ManyToManyField(Specialty, blank=True, related_name="mentors")
-    hire_date = models.DateField()
-    status = models.CharField(max_length=8, choices=ActiveStatus.choices, default=ActiveStatus.ACTIVE)
+    specialties = models.ManyToManyField(Specialty,
+                                         blank=True,
+                                         related_name="mentors")
+    hire_date = models.DateField(null=True, blank=True)
+    status = models.CharField(max_length=8,
+                              choices=ActiveStatus.choices,
+                              default=ActiveStatus.ACTIVE)
 
     class Meta:
-        ordering = ("last_name", "first_name")
+        ordering = ("user__last_name", "user__first_name")
 
-    def __str__(self) -> str:
-        return f"{self.first_name} {self.last_name}"
+    def __str__(self):
+        return self.user.get_full_name()
 
 
-# --------------------------------------------------------------------------- #
-#  Curriculum & resources
-# --------------------------------------------------------------------------- #
+class Learner(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL,
+                                on_delete=models.CASCADE,
+                                related_name="learner_profile")
+    status = models.CharField(max_length=8,
+                              choices=ActiveStatus.choices,
+                              default=ActiveStatus.ACTIVE)
+    notes = models.TextField(blank=True)
+    signup_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("-signup_date",)
+
+    def __str__(self):
+        return self.user.get_full_name()
+
+
+# ────────────────────────────────────────────────────────────────
+# ➍  CURRICULUM
+# ────────────────────────────────────────────────────────────────
 class LearningPath(models.Model):
     name = models.CharField(max_length=120, unique=True)
     description = models.TextField(blank=True)
@@ -143,82 +148,95 @@ class LearningPath(models.Model):
     class Meta:
         ordering = ("name",)
 
-    def __str__(self) -> str:
+    def __str__(self):
         return self.name
 
 
 class EducationalStep(models.Model):
-    learning_path = models.ForeignKey(LearningPath, on_delete=models.CASCADE, related_name="steps")
+    learning_path = models.ForeignKey(LearningPath,
+                                      on_delete=models.CASCADE,
+                                      related_name="steps")
     sequence_no = models.PositiveSmallIntegerField()
     title = models.CharField(max_length=120)
     description = models.TextField(blank=True)
     expected_duration_days = models.PositiveSmallIntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
     is_mandatory = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ("learning_path", "sequence_no")
         unique_together = ("learning_path", "sequence_no")
 
-    def __str__(self) -> str:
-        return f"{self.learning_path.name} | {self.sequence_no}. {self.title}"
+    def __str__(self):
+        return f"{self.learning_path} | {self.sequence_no}. {self.title}"
 
 
 class Resource(models.Model):
-    step = models.ForeignKey(EducationalStep, on_delete=models.CASCADE, related_name="resources")
+    step = models.ForeignKey(EducationalStep,
+                             on_delete=models.CASCADE,
+                             related_name="resources")
     title = models.CharField(max_length=120)
-    type = models.CharField(max_length=12, choices=ResourceType.choices)
+    type = models.CharField(max_length=12,
+                            choices=ResourceType.choices)
     url_or_location = models.CharField(max_length=500)
     description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self) -> str:
+    def __str__(self):
         return f"{self.title} ({self.get_type_display()})"
 
 
-# --------------------------------------------------------------------------- #
-#  Enrolment & mentoring
-# --------------------------------------------------------------------------- #
+# ────────────────────────────────────────────────────────────────
+# ➎  ENROLMENT & MENTORING
+# ────────────────────────────────────────────────────────────────
 class LearnerEnrolment(models.Model):
-    learner = models.ForeignKey(Learner, on_delete=models.CASCADE, related_name="enrolments")
-    learning_path = models.ForeignKey(LearningPath, on_delete=models.CASCADE, related_name="enrolments")
+    learner = models.ForeignKey(Learner,
+                                on_delete=models.CASCADE,
+                                related_name="enrolments")
+    learning_path = models.ForeignKey(LearningPath,
+                                      on_delete=models.CASCADE,
+                                      related_name="enrolments")
     enroll_date = models.DateField(default=timezone.now)
     unenroll_date = models.DateField(null=True, blank=True)
+    status = models.CharField(max_length=9,
+                              choices=LearnerEnrolmentStatus.choices,
+                              default=LearnerEnrolmentStatus.ACTIVE)
 
     class Meta:
         unique_together = ("learner", "learning_path")
-        indexes = [
-            models.Index(fields=("learning_path", "enroll_date")),
-        ]
+        indexes = [models.Index(fields=("learning_path", "enroll_date"))]
 
-    def __str__(self) -> str:
+    def __str__(self):
         return f"{self.learner} → {self.learning_path}"
 
 
 class MentorAssignment(models.Model):
-    enrolment = models.ForeignKey(
-        LearnerEnrolment, on_delete=models.CASCADE, related_name="mentor_assignments"
-    )
-    mentor = models.ForeignKey(
-        Mentor, on_delete=models.CASCADE, related_name="assignments"
-    )
+    enrolment = models.ForeignKey(LearnerEnrolment,
+                                  on_delete=models.CASCADE,
+                                  related_name="mentor_assignments")
+    mentor = models.ForeignKey(Mentor,
+                               on_delete=models.CASCADE,
+                               related_name="assignments")
     start_date = models.DateField(default=timezone.now)
     end_date = models.DateField(null=True, blank=True)
     reason_for_change = models.TextField(blank=True)
+    code_review_pro_session_datetime = models.DateTimeField(blank=True)
 
     class Meta:
         ordering = ("-start_date",)
         unique_together = ("enrolment", "mentor", "start_date")
 
-    def __str__(self) -> str:
+    def __str__(self):
         return f"{self.enrolment} ↔ {self.mentor}"
 
 
-# --------------------------------------------------------------------------- #
-#  Session scheduling
-# --------------------------------------------------------------------------- #
+# ────────────────────────────────────────────────────────────────
+# ➏  SESSION SCHEDULING
+# ────────────────────────────────────────────────────────────────
 class SessionType(models.Model):
-    code = models.CharField(max_length=12, choices=SessionCode.choices, unique=True)
+    code = models.CharField(max_length=12,
+                            choices=SessionCode.choices,
+                            unique=True)
     name_fa = models.CharField(max_length=32)
     duration_minutes = models.PositiveSmallIntegerField()
     max_participants = models.PositiveSmallIntegerField(null=True, blank=True)
@@ -227,59 +245,48 @@ class SessionType(models.Model):
     class Meta:
         ordering = ("code",)
 
-    def __str__(self) -> str:
+    def __str__(self):
         return self.get_code_display()
 
 
 class SessionTemplate(models.Model):
-    mentor_assignment = models.ForeignKey(
-        MentorAssignment, 
-        on_delete=models.CASCADE, 
-        null=True, 
-        blank=True, 
-        related_name="session_templates"
-        )
-    learning_path = models.ForeignKey(
-        LearningPath, 
-        on_delete=models.CASCADE, 
-        null=True, 
-        blank=True, 
-        related_name="session_templates"
-        )
-    session_type = models.ForeignKey(SessionType, on_delete=models.CASCADE, related_name="templates")
+    mentor_assignment = models.ForeignKey(MentorAssignment,
+                                          on_delete=models.CASCADE,
+                                          null=True, blank=True,
+                                          related_name="session_templates")
+    learning_path = models.ForeignKey(LearningPath,
+                                      on_delete=models.CASCADE,
+                                      null=True, blank=True,
+                                      related_name="session_templates")
+    session_type = models.ForeignKey(SessionType,
+                                     on_delete=models.CASCADE,
+                                     related_name="templates")
     weekday = models.IntegerField(choices=Weekday.choices)
     active_from = models.DateField(default=timezone.now)
-    status = models.CharField(
-        max_length=8,
-        choices=SessionTemplateStatus.choices,
-        default=SessionTemplateStatus.ACTIVE,
-    )
+    status = models.CharField(max_length=8,
+                              choices=SessionTemplateStatus.choices,
+                              default=SessionTemplateStatus.ACTIVE)
     google_meet_link = models.URLField(max_length=500)
 
     class Meta:
         ordering = ("weekday", "active_from")
 
-    def __str__(self) -> str:
-        return (
-            f"{self.learning_path} – {self.get_weekday_display()} – "
-            f"{self.session_type.get_code_display()}"
-        )
+    def __str__(self):
+        return f"{self.learning_path} – {self.get_weekday_display()} – {self.session_type}"
 
 
 class SessionOccurrence(models.Model):
-    template = models.ForeignKey(
-        SessionTemplate, on_delete=models.CASCADE, related_name="occurrences"
-    )
+    template = models.ForeignKey(SessionTemplate,
+                                 on_delete=models.CASCADE,
+                                 related_name="occurrences")
     planned_date = models.DateField()
     planned_start_time = models.TimeField()
     planned_end_time = models.TimeField()
     actual_start_time = models.TimeField(null=True, blank=True)
     actual_end_time = models.TimeField(null=True, blank=True)
-    status = models.CharField(
-        max_length=10,
-        choices=SessionOccurrenceStatus.choices,
-        default=SessionOccurrenceStatus.SCHEDULED,
-    )
+    status = models.CharField(max_length=10,
+                              choices=SessionOccurrenceStatus.choices,
+                              default=SessionOccurrenceStatus.SCHEDULED)
     recorded_meet_link = models.URLField(max_length=500, blank=True)
     notes = models.TextField(blank=True)
 
@@ -287,57 +294,56 @@ class SessionOccurrence(models.Model):
         ordering = ("-planned_date", "planned_start_time")
         unique_together = ("template", "planned_date", "planned_start_time")
 
-    def __str__(self) -> str:
+    def __str__(self):
         return f"{self.template} – {self.planned_date}"
 
 
 class SessionParticipant(models.Model):
-    learner = models.ForeignKey(
-        Learner, on_delete=models.CASCADE, related_name="session_participations"
-    )
-    occurrence = models.ForeignKey(
-        SessionOccurrence, on_delete=models.CASCADE, related_name="participants"
-    )
+    learner = models.ForeignKey(Learner,
+                                on_delete=models.CASCADE,
+                                related_name="session_participations")
+    occurrence = models.ForeignKey(SessionOccurrence,
+                                   on_delete=models.CASCADE,
+                                   related_name="participants")
     guest_name = models.CharField(max_length=120, blank=True)
-    attendance_status = models.CharField(
-        max_length=8,
-        choices=AttendanceStatus.choices,
-        default=AttendanceStatus.ABSENT,
-    )
+    attendance_status = models.CharField(max_length=8,
+                                         choices=AttendanceStatus.choices,
+                                         default=AttendanceStatus.ABSENT)
 
     class Meta:
         unique_together = ("learner", "occurrence")
 
-    def __str__(self) -> str:
+    def __str__(self):
         return f"{self.learner} @ {self.occurrence}"
 
 
-# --------------------------------------------------------------------------- #
-#  Progress & tasks
-# --------------------------------------------------------------------------- #
+# ────────────────────────────────────────────────────────────────
+# ➐  PROGRESS & TASKS
+# ────────────────────────────────────────────────────────────────
 class StepProgress(models.Model):
-    enrolment = models.ForeignKey(
-        LearnerEnrolment, on_delete=models.CASCADE, related_name="step_progresses"
-    )
-    step = models.ForeignKey(
-        EducationalStep, on_delete=models.CASCADE, related_name="progresses"
-    )
+    enrolment = models.ForeignKey(LearnerEnrolment,
+                                  on_delete=models.CASCADE,
+                                  related_name="step_progresses")
+    step = models.ForeignKey(EducationalStep,
+                             on_delete=models.CASCADE,
+                             related_name="progresses")
     initial_due_date = models.DateField()
     initial_promise_days = models.PositiveSmallIntegerField()
-    skipped = models.BooleanField(default=False, help_text='If you make skip to True then the initial_promise_days MUST be 0!')
+    skipped = models.BooleanField(default=False,
+                                  help_text="If True, promise_days must be 0")
 
     class Meta:
         unique_together = ("enrolment", "step")
         ordering = ("initial_due_date",)
 
-    def __str__(self) -> str:
+    def __str__(self):
         return f"{self.enrolment} | {self.step}"
 
 
 class StepExtension(models.Model):
-    step_progress = models.ForeignKey(
-        StepProgress, on_delete=models.CASCADE, related_name="extensions"
-    )
+    step_progress = models.ForeignKey(StepProgress,
+                                      on_delete=models.CASCADE,
+                                      related_name="extensions")
     extended_by_days = models.PositiveSmallIntegerField()
     requested_at = models.DateTimeField(default=timezone.now)
     approved_by_mentor = models.BooleanField(default=False)
@@ -346,12 +352,14 @@ class StepExtension(models.Model):
     class Meta:
         ordering = ("-requested_at",)
 
-    def __str__(self) -> str:
+    def __str__(self):
         return f"{self.extended_by_days} days for {self.step_progress}"
 
 
 class Task(models.Model):
-    step = models.ForeignKey(EducationalStep, on_delete=models.CASCADE, related_name="tasks")
+    step = models.ForeignKey(EducationalStep,
+                             on_delete=models.CASCADE,
+                             related_name="tasks")
     title = models.CharField(max_length=120)
     description = models.TextField(blank=True)
     order_in_step = models.PositiveSmallIntegerField()
@@ -361,25 +369,23 @@ class Task(models.Model):
         unique_together = ("step", "order_in_step")
         ordering = ("step", "order_in_step")
 
-    def __str__(self) -> str:
+    def __str__(self):
         return f"{self.step} – {self.title}"
 
 
 def submissions_upload_to(instance, filename) -> str:  # noqa: D401
-    """Upload path:  task_submissions/<step_progress_id>/<filename>"""
     return f"task_submissions/{instance.step_progress_id}/{filename}"
 
 
 class TaskSubmission(models.Model):
-    step_progress = models.ForeignKey(
-        StepProgress, on_delete=models.CASCADE, related_name="submissions"
-    )
+    step_progress = models.ForeignKey(StepProgress,
+                                      on_delete=models.CASCADE,
+                                      related_name="submissions")
     submitted_at = models.DateTimeField(default=timezone.now)
     artifact_url = models.URLField(max_length=500, blank=True)
     file = models.FileField(upload_to=submissions_upload_to, blank=True)
-    report_video_file = models.FileField(
-        upload_to=submissions_upload_to, blank=True, help_text="Optional video"
-    )
+    report_video_file = models.FileField(upload_to=submissions_upload_to,
+                                         blank=True)
     report_video_link = models.URLField(max_length=500, blank=True)
     repository = models.URLField(max_length=500, blank=True)
     comment = models.TextField(blank=True)
@@ -387,15 +393,17 @@ class TaskSubmission(models.Model):
     class Meta:
         ordering = ("-submitted_at",)
 
-    def __str__(self) -> str:
-        return f"Submission #{self.pk} – {self.step_progress}"
+    def __str__(self):
+        return f"Submission #{self.pk} – {self.step_progress}"
 
 
 class TaskEvaluation(models.Model):
-    submission = models.ForeignKey(
-        TaskSubmission, on_delete=models.CASCADE, related_name="evaluations"
-    )
-    mentor = models.ForeignKey(Mentor, on_delete=models.CASCADE, related_name="evaluations")
+    submission = models.ForeignKey(TaskSubmission,
+                                   on_delete=models.CASCADE,
+                                   related_name="evaluations")
+    mentor = models.ForeignKey(Mentor,
+                               on_delete=models.CASCADE,
+                               related_name="evaluations")
     score_numeric = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)]
     )
@@ -407,19 +415,20 @@ class TaskEvaluation(models.Model):
         ordering = ("-evaluated_at",)
         constraints = [
             models.CheckConstraint(
-                check=models.Q(score_numeric__gte=1, score_numeric__lte=5),
+                check=models.Q(score_numeric__gte=1,
+                               score_numeric__lte=5),
                 name="valid_score_range",
             )
         ]
 
-    def __str__(self) -> str:
+    def __str__(self):
         return f"{self.score_numeric}/5 by {self.mentor}"
 
 
 class SocialPost(models.Model):
-    step_progress = models.ForeignKey(
-        StepProgress, on_delete=models.CASCADE, related_name="social_posts"
-    )
+    step_progress = models.ForeignKey(StepProgress,
+                                      on_delete=models.CASCADE,
+                                      related_name="social_posts")
     platform = models.CharField(max_length=32)
     url = models.URLField(max_length=500)
     posted_at = models.DateTimeField()
@@ -427,39 +436,13 @@ class SocialPost(models.Model):
     class Meta:
         ordering = ("-posted_at",)
 
-    def __str__(self) -> str:
+    def __str__(self):
         return f"{self.platform} – {self.url}"
 
 
-# --------------------------------------------------------------------------- #
-#  Subscription plans
-# --------------------------------------------------------------------------- #
-class SubscriptionPlan(models.Model):
-    name = models.CharField(max_length=20, unique=True)
-    description = models.TextField(blank=True)
-    price_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    duration_in_days = models.PositiveSmallIntegerField(
-        choices=(
-            (30, "30 days"), 
-            (90, "90 days"), 
-            (120, "120 days"),
-            (270, "120 days"),
-            (360, "120 days"),
-        )
-    )
-    is_active = models.BooleanField(default=True)
-
-    features = models.ManyToManyField(
-        "Feature", through="PlanFeature", related_name="plans"
-    )
-
-    class Meta:
-        ordering = ("name",)
-
-    def __str__(self) -> str:
-        return self.name
-
-
+# ────────────────────────────────────────────────────────────────
+# ➑  SUBSCRIPTION PLANS
+# ────────────────────────────────────────────────────────────────
 class Feature(models.Model):
     name = models.CharField(max_length=50, unique=True)
     description = models.TextField(blank=True)
@@ -467,56 +450,115 @@ class Feature(models.Model):
     class Meta:
         ordering = ("name",)
 
-    def __str__(self) -> str:
+    def __str__(self):
+        return self.name
+
+
+class SubscriptionPlan(models.Model):
+    name = models.CharField(max_length=20, unique=True)
+    description = models.TextField(blank=True)
+    price_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    duration_in_days = models.PositiveSmallIntegerField(choices=[
+        (30, "30 days"), (90, "90 days"), (120, "120 days"),
+        (270, "270 days"), (360, "360 days")
+    ])
+    is_active = models.BooleanField(default=True)
+    features = models.ManyToManyField(Feature,
+                                      through="PlanFeature",
+                                      related_name="plans")
+
+    class Meta:
+        ordering = ("name",)
+
+    def __str__(self):
         return self.name
 
 
 class PlanFeature(models.Model):
-    plan = models.ForeignKey(
-        SubscriptionPlan, on_delete=models.CASCADE, related_name="plan_features"
-    )
-    feature = models.ForeignKey(
-        Feature, on_delete=models.CASCADE, related_name="feature_plans"
-    )
+    plan = models.ForeignKey(SubscriptionPlan,
+                             on_delete=models.CASCADE,
+                             related_name="plan_features")
+    feature = models.ForeignKey(Feature,
+                                on_delete=models.CASCADE,
+                                related_name="feature_plans")
 
     class Meta:
         unique_together = ("plan", "feature")
 
-    def __str__(self) -> str:
+    def __str__(self):
         return f"{self.plan} ↔ {self.feature}"
 
 
 class LearnerSubscribePlan(models.Model):
     subscription_plan = models.ForeignKey(SubscriptionPlan, on_delete=models.CASCADE, related_name="learner_plans")
-    learner_enrolment = models.ForeignKey(LearnerEnrolment, on_delete=models.CASCADE, related_name="subscribe_plans")
+    learner_enrolment = models.ForeignKey(LearnerEnrolment,
+                                          on_delete=models.CASCADE,
+                                          related_name="subscribe_plans")
     start_date = models.DateField(default=timezone.now)
-    discount = models.DecimalField(
-        max_digits=5,
-        decimal_places=2,
-        help_text="% discount (e.g., 10.00 = 10%)",
-        default=0,
-    )
-    status = models.CharField(
-        max_length=8,
-        choices=SubscribePlanStatus.choices,
-        default=SubscribePlanStatus.ACTIVE,
-    )
+    discount = models.DecimalField(max_digits=5, decimal_places=2, default=0,
+                                   help_text="% discount (e.g. 10.00 = 10%)")
+    status = models.CharField(max_length=8,
+                              choices=SubscribePlanStatus.choices,
+                              default=SubscribePlanStatus.ACTIVE)
 
     class Meta:
         ordering = ("-start_date",)
         unique_together = ("subscription_plan", "learner_enrolment", "start_date")
 
-    def __str__(self) -> str:
+    def __str__(self):
         return f"{self.learner_enrolment} | {self.subscription_plan}"
 
 
 class LearnerSubscribePlanFreeze(models.Model):
-    subscribe_plan = models.ForeignKey(LearnerSubscribePlan, on_delete=models.CASCADE, related_name="freezes")
+    subscribe_plan = models.ForeignKey(LearnerSubscribePlan,
+                                       on_delete=models.CASCADE,
+                                       related_name="freezes")
     start_date = models.DateField()
-    duration = models.PositiveSmallIntegerField(help_text="Freeze duration in days")
+    duration = models.PositiveSmallIntegerField(
+        help_text="Freeze duration in days")
 
     class Meta:
         ordering = ("-start_date",)
 
-    def __str__(self) -> str:
-        return f"Freeze {self.duration} d from {self.start_date} on {self.subscribe_plan}"
+    def __str__(self):
+        return f"Freeze {self.duration} d from {self.start_date}"
+
+
+# ────────────────────────────────────────────────────────────────
+# ➒  MENTOR‑GROUP SESSIONS  ← **NEW (missing in old file)**
+# ────────────────────────────────────────────────────────────────
+class MentorGroupSession(models.Model):
+    """
+    A themed group session that multiple learners can attend.
+    One mentor leads each session.
+    """
+    mentor = models.ForeignKey(Mentor,
+                               on_delete=models.CASCADE,
+                               related_name="group_sessions")
+    title = models.CharField(max_length=120)
+    description = models.TextField(blank=True)
+    start_datetime = models.DateTimeField()
+    end_datetime = models.DateTimeField()
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ("-start_datetime",)
+
+    def __str__(self):
+        return f"{self.title} – {self.start_datetime:%Y‑%m‑%d}"
+
+
+class MentorGroupSessionParticipant(models.Model):
+    session = models.ForeignKey(MentorGroupSession,
+                                on_delete=models.CASCADE,
+                                related_name="participants")
+    learner = models.ForeignKey(Learner,
+                                on_delete=models.CASCADE,
+                                related_name="group_sessions")
+    joined_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("session", "learner")
+
+    def __str__(self):
+        return f"{self.learner} in {self.session}"

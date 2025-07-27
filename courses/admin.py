@@ -1,4 +1,4 @@
-# core/admin.py – Django 5.2.4 + Unfold
+# courses/admin.py – Django 5.2 + Unfold 0.24 + django‑import‑export 4.x
 from __future__ import annotations
 
 from datetime import date as _dt_date, datetime as _dt_dt, time as _dt_time, timezone as _dt_tz
@@ -8,8 +8,11 @@ from django.contrib.humanize.templatetags.humanize import intcomma
 from django.db import models
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
+
+from import_export.admin import ImportExportModelAdmin
 from unfold.admin import ModelAdmin, StackedInline, TabularInline
 from unfold.contrib.forms.widgets import ArrayWidget, WysiwygWidget
+from unfold.contrib.import_export.forms import ExportForm, ImportForm
 from unfold.decorators import display
 
 from pages.templatetags.custom_translation_tags import translate_number
@@ -20,9 +23,9 @@ from pages.templatetags.persian_calendar_convertor import (
 
 from . import models as m
 
-# ════════════════════════════════════════════════════════════════════════════
+# ────────────────────────────────────────────────────────────────
 #  Helpers
-# ════════════════════════════════════════════════════════════════════════════
+# ────────────────────────────────────────────────────────────────
 def jalali_display(attr: str = "created_at", *, label: str | None = None):
     label = label or attr.replace("_", " ").title()
 
@@ -44,12 +47,11 @@ def bool_badge(
     attr: str,
     *,
     description: str = "Status",
-    true_text: str = "Active",
-    false_text: str = "Inactive",
+    true_text: str = "Yes",
+    false_text: str = "No",
     true_color: str = "success",
     false_color: str = "danger",
 ):
-    """Badge generator for Boolean fields."""
     @display(description=description, label={True: true_color, False: false_color})
     def _func(self, obj):
         val = getattr(obj, attr)
@@ -59,16 +61,7 @@ def bool_badge(
     return _func
 
 
-def choice_badge(
-    attr: str,
-    *,
-    mapping: dict[str, tuple[str, str]],  # value -> (text, color)
-    description: str = "Status",
-):
-    """
-    Badge generator for CharFields.
-    mapping={"active": ("Active", "success"), "inactive": ("Inactive", "danger")}
-    """
+def choice_badge(attr: str, *, mapping: dict[str, tuple[str, str]], description: str = "Status"):
     label_map = {k: v[1] for k, v in mapping.items()}
 
     @display(description=description, label=label_map)
@@ -81,18 +74,27 @@ def choice_badge(
     return _func
 
 
-# ════════════════════════════════════════════════════════════════════════════
-#  Global widgets
-# ════════════════════════════════════════════════════════════════════════════
+# ────────────────────────────────────────────────────────────────
+#  Global widgets & Import‑Export base
+# ────────────────────────────────────────────────────────────────
 RICH_TEXT = {models.TextField: {"widget": WysiwygWidget}}
-FORM_OVERRIDES = {
-    **RICH_TEXT,
-    models.JSONField: {"widget": ArrayWidget},
-}
+FORM_OVERRIDES = {**RICH_TEXT, models.JSONField: {"widget": ArrayWidget}}
 
-# ════════════════════════════════════════════════════════════════════════════
-#  Inlines (unchanged content)
-# ════════════════════════════════════════════════════════════════════════════
+
+class BaseIEAdmin(ModelAdmin, ImportExportModelAdmin):
+    """
+    Every concrete admin below inherits from this mixin:
+    * Unfold styling (ModelAdmin)
+    * django‑import‑export bulk export/import
+    """
+    import_form_class = ImportForm
+    export_form_class = ExportForm
+    show_full_result_count = False  # speed up large changelists
+
+
+# ────────────────────────────────────────────────────────────────
+#  Inlines (unchanged)
+# ────────────────────────────────────────────────────────────────
 class TimeStampedInline(TabularInline):
     extra = 0
     readonly_fields = ("created_at",)
@@ -101,8 +103,17 @@ class TimeStampedInline(TabularInline):
 class TaskInline(TabularInline):
     model = m.Task
     extra = 0
-    fields = ("title", "order_in_step", "is_required")
+    fields = ("title", "order_in_step", "is_required_badge")
+    readonly_fields = ("is_required_badge",)
     formfield_overrides = RICH_TEXT
+
+    is_required_badge = bool_badge(
+        "is_required",
+        true_text="Required",
+        false_text="Optional",
+        true_color="danger",
+        false_color="info",
+    )
 
 
 class ResourceInline(TimeStampedInline):
@@ -111,31 +122,51 @@ class ResourceInline(TimeStampedInline):
     formfield_overrides = RICH_TEXT
 
 
-# ════════════════════════════════════════════════════════════════════════════
+# ────────────────────────────────────────────────────────────────
 #  Curriculum
-# ════════════════════════════════════════════════════════════════════════════
+# ────────────────────────────────────────────────────────────────
 class EducationalStepInline(StackedInline):
     model = m.EducationalStep
     extra = 0
     show_change_link = True
     formfield_overrides = RICH_TEXT
-    fields = ("sequence_no", "title", "description", ("expected_duration_days", "is_mandatory"))
+    fields = ("sequence_no", "title", "description", ("expected_duration_days", "is_mandatory_badge"))
+    readonly_fields = ("is_mandatory_badge",)
+
+    is_mandatory_badge = bool_badge(
+        "is_mandatory",
+        true_text="Mandatory",
+        false_text="Optional",
+        true_color="danger",
+        false_color="info",
+    )
 
 
 @admin.register(m.LearningPath)
-class LearningPathAdmin(ModelAdmin):
+class LearningPathAdmin(BaseIEAdmin):
     is_active_badge = bool_badge("is_active")
     created_j = jalali_display()
+
     list_display = ("name", "is_active_badge", "created_j")
     list_filter = ("is_active",)
     search_fields = ("name", "description")
     inlines = (EducationalStepInline,)
     formfield_overrides = RICH_TEXT
 
+    # bulk actions
+    @admin.action(description="Mark selected paths as active")
+    def make_active(self, request, qs):
+        qs.update(is_active=True)
+
+    @admin.action(description="Mark selected paths as inactive")
+    def make_inactive(self, request, qs):
+        qs.update(is_active=False)
+
+    actions = ("make_active", "make_inactive")
+
 
 @admin.register(m.EducationalStep)
-class EducationalStepAdmin(ModelAdmin):
-    search_fields = "title", "description"
+class EducationalStepAdmin(BaseIEAdmin):
     created_j = jalali_display()
     is_mandatory_badge = bool_badge(
         "is_mandatory",
@@ -143,23 +174,19 @@ class EducationalStepAdmin(ModelAdmin):
         false_text="Optional",
         true_color="danger",
         false_color="info",
-        description="Status",
     )
-    list_display = (
-        "__str__",
-        "expected_duration_days",
-        "is_mandatory_badge",
-        "created_j",
-    )
+
+    list_display = ("__str__", "expected_duration_days", "is_mandatory_badge", "created_j")
     list_filter = ("learning_path", "is_mandatory")
     autocomplete_fields = ("learning_path",)
     inlines = (TaskInline, ResourceInline)
     ordering = ("learning_path", "sequence_no")
     formfield_overrides = RICH_TEXT
+    search_fields = ("title", "description")
 
 
 @admin.register(m.Resource)
-class ResourceAdmin(ModelAdmin):
+class ResourceAdmin(BaseIEAdmin):
     created_j = jalali_display()
     list_display = ("title", "type", "step", "created_j")
     list_filter = ("type", "step__learning_path")
@@ -168,69 +195,90 @@ class ResourceAdmin(ModelAdmin):
     formfield_overrides = RICH_TEXT
 
 
-# ════════════════════════════════════════════════════════════════════════════
+# ────────────────────────────────────────────────────────────────
 #  People
-# ════════════════════════════════════════════════════════════════════════════
+# ────────────────────────────────────────────────────────────────
 @admin.register(m.Learner)
-class LearnerAdmin(ModelAdmin):
+class LearnerAdmin(BaseIEAdmin):
     signup_j = jalali_display("signup_date", label="Signup")
     status_badge = choice_badge(
         "status",
-        mapping={
-            "active": ("Active", "success"),
-            "inactive": ("Inactive", "danger"),
-        },
+        mapping={"active": ("Active", "success"), "inactive": ("Inactive", "danger")},
     )
-    list_display = (
-        "first_name",
-        "last_name",
-        "email",
-        "country",
-        "status_badge",
-        "signup_j",
+
+    # 1️⃣  city_column replaces raw "city"
+    list_display = ("user_fullname", "email", "city_column", "status_badge", "signup_j")
+
+    # 2️⃣  use related lookup for filtering
+    list_filter = ("status", "user__city")
+
+    search_fields = (
+        "user__first_name",
+        "user__last_name",
+        "user__email",
+        "user__phone_number",
     )
-    list_filter = ("status", "country")
-    search_fields = ("first_name", "last_name", "email")
     readonly_fields = ("signup_date",)
     formfield_overrides = RICH_TEXT
+    autocomplete_fields = ("user",)
+
+    @display(description=_("Name"), ordering="user__first_name")
+    def user_fullname(self, obj):
+        return obj.user.get_full_name()
+
+    @display(description=_("Email"), ordering="user__email")
+    def email(self, obj):
+        return obj.user.email
+
+    @display(description=_("City"), ordering="user__city")  # 1️⃣ new helper
+    def city_column(self, obj):
+        return obj.user.city
 
 
+# ────────────────────────────────────────────────────────────────
+#  Specialty
+# ────────────────────────────────────────────────────────────────
 @admin.register(m.Specialty)
-class SpecialtyAdmin(ModelAdmin):
+class SpecialtyAdmin(BaseIEAdmin):
     is_active_badge = bool_badge("is_active")
-    list_display = ("name", "code", "is_active_badge", "is_active")
+
+    # 3️⃣  include real field so list_editable works
+    list_display = ("name", "code", "is_active", "is_active_badge")
+    list_editable = ("is_active",)
+
     list_filter = ("is_active",)
     search_fields = ("name", "code")
-    list_editable = ("is_active",)
     formfield_overrides = RICH_TEXT
 
 
 @admin.register(m.Mentor)
-class MentorAdmin(ModelAdmin):
+class MentorAdmin(BaseIEAdmin):
     hire_j = jalali_display("hire_date", label="Hire Date")
     status_badge = choice_badge(
         "status",
-        mapping={
-            "active": ("Active", "success"),
-            "inactive": ("Inactive", "danger"),
-        },
+        mapping={"active": ("Active", "success"), "inactive": ("Inactive", "danger")},
     )
 
     @display(header=True, description="Mentor")
     def heading(self, obj):
-        initials = f"{obj.first_name[0]}{obj.last_name[0]}"
-        return [f"{obj.first_name} {obj.last_name}", obj.email, initials]
+        initials = "".join(filter(None, (obj.user.first_name[:1], obj.user.last_name[:1])))
+        return [obj.user.get_full_name(), obj.user.email, initials]
 
     list_display = ("heading", "phone", "hire_j", "status_badge")
     list_filter = ("status", "specialties")
     autocomplete_fields = ("specialties",)
-    search_fields = ("first_name", "last_name", "email")
+    search_fields = ("user__first_name", "user__last_name", "user__email")
     formfield_overrides = RICH_TEXT
 
+    # phone column
+    @display(description=_("Phone"), ordering="user__phone_number")
+    def phone(self, obj):
+        return obj.user.phone_number
 
-# ════════════════════════════════════════════════════════════════════════════
-#  Enrolment & mentoring (unchanged except formfield_overrides)
-# ════════════════════════════════════════════════════════════════════════════
+
+# ────────────────────────────────────────────────────────────────
+#  Enrolment & mentoring
+# ────────────────────────────────────────────────────────────────
 class MentorAssignmentInline(TabularInline):
     model = m.MentorAssignment
     extra = 0
@@ -239,84 +287,78 @@ class MentorAssignmentInline(TabularInline):
 
 
 @admin.register(m.LearnerEnrolment)
-class LearnerEnrolmentAdmin(ModelAdmin):
+class LearnerEnrolmentAdmin(BaseIEAdmin):
     list_display = ("learner", "learning_path", "enroll_date", "unenroll_date")
     autocomplete_fields = ("learner", "learning_path")
     list_filter = ("learning_path",)
-    search_fields = ("learner__email", "learning_path__name")
+    search_fields = ("learner__user__email", "learning_path__name")
     inlines = (MentorAssignmentInline,)
     formfield_overrides = RICH_TEXT
 
 
 @admin.register(m.MentorAssignment)
-class MentorAssignmentAdmin(ModelAdmin):
+class MentorAssignmentAdmin(BaseIEAdmin):
     list_display = ("enrolment", "mentor", "start_date", "end_date")
     autocomplete_fields = ("enrolment", "mentor")
     list_filter = ("mentor",)
     formfield_overrides = RICH_TEXT
     search_fields = (
-       "mentor__first_name",
-       "mentor__last_name",
-       "mentor__email",
-       "enrolment__learner__email",
-   )
+        "mentor__user__first_name",
+        "mentor__user__last_name",
+        "mentor__user__email",
+        "enrolment__learner__user__email",
+    )
 
 
-# ════════════════════════════════════════════════════════════════════════════
+# ────────────────────────────────────────────────────────────────
 #  Sessions
-# ════════════════════════════════════════════════════════════════════════════
+# ────────────────────────────────────────────────────────────────
 class SessionOccurrenceInline(TabularInline):
     model = m.SessionOccurrence
     extra = 0
     autocomplete_fields = ("template",)
-    fields = ("planned_date", "planned_start_time", "planned_end_time", "status")
+    fields = ("planned_date", "planned_start_time", "planned_end_time", "status_badge")
+    readonly_fields = ("status_badge",)
     formfield_overrides = RICH_TEXT
+
+    status_badge = choice_badge(
+        "status",
+        mapping={
+            "scheduled": ("Scheduled", "info"),
+            "held": ("Held", "success"),
+            "canceled": ("Canceled", "danger"),
+        },
+    )
 
 
 @admin.register(m.SessionType)
-class SessionTypeAdmin(ModelAdmin):
+class SessionTypeAdmin(BaseIEAdmin):
     list_display = ("code", "name_fa", "duration_minutes", "max_participants")
     search_fields = ("code", "name_fa")
     formfield_overrides = RICH_TEXT
 
 
-class SessionTemplateInline(TabularInline):
-    model = m.SessionTemplate
-    extra = 0
-    autocomplete_fields = ("session_type", "learning_path")
-    fields = ("session_type", "weekday", "active_from", "status", "google_meet_link")
-
-
 @admin.register(m.SessionTemplate)
-class SessionTemplateAdmin(ModelAdmin):
-    search_fields = (
-       "learning_path__name",
-       "mentor_assignment__mentor__first_name",
-       "mentor_assignment__mentor__last_name",
-       "mentor_assignment__mentor__email",
-    )
+class SessionTemplateAdmin(BaseIEAdmin):
     status_badge = choice_badge(
         "status",
-        mapping={
-            "active": ("Active", "success"),
-            "expired": ("Expired", "danger"),
-        },
+        mapping={"active": ("Active", "success"), "expired": ("Expired", "danger")},
     )
-    list_display = (
-        "learning_path",
-        "mentor_assignment",
-        "session_type",
-        "weekday",
-        "status_badge",
-    )
+    list_display = ("learning_path", "mentor_assignment", "session_type", "weekday", "status_badge")
     list_filter = ("weekday", "status", "learning_path")
     autocomplete_fields = ("learning_path", "mentor_assignment", "session_type")
     inlines = (SessionOccurrenceInline,)
     formfield_overrides = RICH_TEXT
+    search_fields = (
+        "learning_path__name",
+        "mentor_assignment__mentor__user__first_name",
+        "mentor_assignment__mentor__user__last_name",
+        "mentor_assignment__mentor__user__email",
+    )
 
 
 @admin.register(m.SessionOccurrence)
-class SessionOccurrenceAdmin(ModelAdmin):
+class SessionOccurrenceAdmin(BaseIEAdmin):
     status_badge = choice_badge(
         "status",
         mapping={
@@ -331,9 +373,9 @@ class SessionOccurrenceAdmin(ModelAdmin):
     formfield_overrides = RICH_TEXT
 
 
-# ════════════════════════════════════════════════════════════════════════════
-#  Progress & tasks  (unchanged list logic)
-# ════════════════════════════════════════════════════════════════════════════
+# ────────────────────────────────────────────────────────────────
+#  Progress & tasks
+# ────────────────────────────────────────────────────────────────
 class StepExtensionInline(TabularInline):
     model = m.StepExtension
     extra = 0
@@ -343,7 +385,7 @@ class StepExtensionInline(TabularInline):
 
 
 @admin.register(m.StepProgress)
-class StepProgressAdmin(ModelAdmin):
+class StepProgressAdmin(BaseIEAdmin):
     skipped_badge = bool_badge("skipped", true_text="Skipped", false_text="On Track")
     list_display = ("enrolment", "step", "initial_due_date", "skipped_badge")
     autocomplete_fields = ("enrolment", "step")
@@ -351,18 +393,26 @@ class StepProgressAdmin(ModelAdmin):
     inlines = (StepExtensionInline,)
     formfield_overrides = RICH_TEXT
     search_fields = (
-       "enrolment__learner__email",
-       "step__title",
-       "step__learning_path__name",
+        "enrolment__learner__user__email",
+        "step__title",
+        "step__learning_path__name",
     )
 
 
 @admin.register(m.Task)
-class TaskAdmin(ModelAdmin):
-    list_display = ("title", "step", "order_in_step", "is_required")
+class TaskAdmin(BaseIEAdmin):
+    is_required_badge = bool_badge(
+        "is_required",
+        true_text="Required",
+        false_text="Optional",
+        true_color="danger",
+        false_color="info",
+    )
+    list_display = ("title", "step", "order_in_step", "is_required_badge")
     list_filter = ("is_required", "step__learning_path")
     autocomplete_fields = ("step",)
     formfield_overrides = RICH_TEXT
+    search_fields = ("title", "step__title", "step__learning_path__name")
 
 
 class TaskEvaluationInline(TabularInline):
@@ -375,17 +425,18 @@ class TaskEvaluationInline(TabularInline):
 
 
 @admin.register(m.TaskSubmission)
-class TaskSubmissionAdmin(ModelAdmin):
+class TaskSubmissionAdmin(BaseIEAdmin):
     submitted_j = jalali_display("submitted_at", label="Submitted")
     list_display = ("step_progress", "submitted_j")
     autocomplete_fields = ("step_progress",)
     inlines = (TaskEvaluationInline,)
     readonly_fields = ("submitted_at",)
     formfield_overrides = RICH_TEXT
+    search_fields = ("step_progress__step__title",)
 
 
 @admin.register(m.SocialPost)
-class SocialPostAdmin(ModelAdmin):
+class SocialPostAdmin(BaseIEAdmin):
     posted_j = jalali_display("posted_at", label="Posted")
     list_display = ("platform", "url", "posted_j")
     list_filter = ("platform",)
@@ -395,9 +446,9 @@ class SocialPostAdmin(ModelAdmin):
     formfield_overrides = RICH_TEXT
 
 
-# ════════════════════════════════════════════════════════════════════════════
+# ────────────────────────────────────────────────────────────────
 #  Subscription plans
-# ════════════════════════════════════════════════════════════════════════════
+# ────────────────────────────────────────────────────────────────
 class PlanFeatureInline(TabularInline):
     model = m.PlanFeature
     extra = 0
@@ -406,7 +457,7 @@ class PlanFeatureInline(TabularInline):
 
 
 @admin.register(m.SubscriptionPlan)
-class SubscriptionPlanAdmin(ModelAdmin):
+class SubscriptionPlanAdmin(BaseIEAdmin):
     is_active_badge = bool_badge("is_active")
     price_display = display(description="Price")(lambda _, o: intcomma(int(o.price_amount)))
     duration_display = display(description="Duration (d)")(lambda _, o: o.duration_in_days)
@@ -417,9 +468,19 @@ class SubscriptionPlanAdmin(ModelAdmin):
     inlines = (PlanFeatureInline,)
     formfield_overrides = RICH_TEXT
 
+    actions = ("make_active", "make_inactive")
+
+    @admin.action(description="Activate selected plans")
+    def make_active(self, _, qs):
+        qs.update(is_active=True)
+
+    @admin.action(description="Deactivate selected plans")
+    def make_inactive(self, _, qs):
+        qs.update(is_active=False)
+
 
 @admin.register(m.Feature)
-class FeatureAdmin(ModelAdmin):
+class FeatureAdmin(BaseIEAdmin):
     list_display = ("name",)
     search_fields = ("name",)
     formfield_overrides = RICH_TEXT
@@ -433,7 +494,7 @@ class FreezeInline(TabularInline):
 
 
 @admin.register(m.LearnerSubscribePlan)
-class LearnerSubscribePlanAdmin(ModelAdmin):
+class LearnerSubscribePlanAdmin(BaseIEAdmin):
     status_badge = choice_badge(
         "status",
         mapping={
@@ -446,13 +507,40 @@ class LearnerSubscribePlanAdmin(ModelAdmin):
     )
     start_j = jalali_display("start_date", label="Start")
 
-    list_display = (
-        "learner_enrolment",
-        "subscription_plan",
-        "start_j",
-        "status_badge",
-    )
+    list_display = ("learner_enrolment", "subscription_plan", "start_j", "status_badge")
     list_filter = ("status", "subscription_plan")
     autocomplete_fields = ("subscription_plan", "learner_enrolment")
     inlines = (FreezeInline,)
     formfield_overrides = RICH_TEXT
+
+
+# ────────────────────────────────────────────────────────────────
+#  Mentor‑group sessions  (NEW block)
+# ────────────────────────────────────────────────────────────────
+class MentorGroupSessionParticipantInline(TabularInline):
+    model = m.MentorGroupSessionParticipant
+    extra = 0
+    autocomplete_fields = ("learner",)
+    readonly_fields = ("joined_at",)
+    fields = ("learner", "joined_at")
+
+
+@admin.register(m.MentorGroupSession)
+class MentorGroupSessionAdmin(BaseIEAdmin):
+    is_active_badge = bool_badge("is_active")
+    list_display = ("title", "mentor", "start_datetime", "end_datetime", "is_active_badge")
+    list_filter = ("is_active", "mentor")
+    search_fields = ("title", "mentor__user__first_name", "mentor__user__last_name", "mentor__user__email")
+    autocomplete_fields = ("mentor",)
+    inlines = (MentorGroupSessionParticipantInline,)
+    formfield_overrides = RICH_TEXT
+
+    actions = ("make_active", "make_inactive")
+
+    @admin.action(description="Activate selected sessions")
+    def make_active(self, _, qs):
+        qs.update(is_active=True)
+
+    @admin.action(description="Deactivate selected sessions")
+    def make_inactive(self, _, qs):
+        qs.update(is_active=False)

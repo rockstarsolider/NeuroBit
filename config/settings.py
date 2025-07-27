@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "import_export",
 
+    'core',
     'pages',
     'courses',
 ]
@@ -171,7 +172,7 @@ UNFOLD = {
     "SITE_SUBHEADER": "AliEsmaeilzadeh",
     "SITE_SYMBOL": "settings",
     "LOGIN": {
-        "image": lambda request: static(r"static_src/images/neurobit_main_logo.webp"),
+        "image": lambda request: static(r"images/neurobit_main_logo.webp"),
         # "redirect_after": lambda request: reverse_lazy("admin:APP_MODEL_changelist"),
     },
     "SIDEBAR": {
@@ -196,7 +197,7 @@ UNFOLD = {
                     {
                         "title": _("Users"),
                         "icon": "people",
-                        "link": reverse_lazy("admin:auth_user_changelist"),
+                        "link": reverse_lazy("admin:core_customuser_changelist"),
                     },
                     {
                         "title": _("Courses"),
@@ -213,3 +214,5 @@ UNFOLD = {
         ],
     },
 }
+
+AUTH_USER_MODEL = 'core.CustomUser'

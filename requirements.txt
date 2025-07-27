@@ -1,10 +1,12 @@
 asgiref==3.9.1
 certifi==2025.7.14
 charset-normalizer==3.4.2
+diff-match-patch==20241021
 dj-database-url==3.0.1
 Django==5.2.4
 django-debug-toolbar==6.0.0
 django-extensions==4.1
+django-import-export==4.3.9
 django-rosetta==0.10.2
 django-unfold==0.63.0
 django-webpack-loader==3.2.1
@@ -13,6 +15,7 @@ jalali_core==1.0.0
 jdatetime==5.2.0
 markdown-it-py==3.0.0
 mdurl==0.1.2
+pillow==11.3.0
 polib==1.2.0
 psycopg2-binary==2.9.10
 Pygments==2.19.2
@@ -21,6 +24,7 @@ pytz==2025.2
 requests==2.32.4
 rich==14.1.0
 sqlparse==0.5.3
+tablib==3.8.0
 typing_extensions==4.14.1
 tzdata==2025.2
 urllib3==2.5.0
