@@ -62,17 +62,21 @@ def bool_badge(
 
 
 def choice_badge(attr: str, *, mapping: dict[str, tuple[str, str]], description: str = "Status"):
-    label_map = {k: v[1] for k, v in mapping.items()}
+    """
+    mapping = {
+        "raw_value": ("Display text", "unfold‑colour"),   # e.g. "success", "danger", "warning", "info", "secondary"
+    }
+    """
+    label_map = {k: v[1] for k, v in mapping.items()}  # colour map
 
     @display(description=description, label=label_map)
     def _func(self, obj):
-        val = getattr(obj, attr)
-        text, _color = mapping.get(val, (val, "info"))
-        return val, text
+        raw = getattr(obj, attr)
+        text, _ = mapping.get(raw, (raw, "info"))
+        return raw, text  # (value, caption)
 
     _func.__name__ = f"{attr}_badge"
     return _func
-
 
 # ────────────────────────────────────────────────────────────────
 #  Global widgets & Import‑Export base
@@ -144,7 +148,13 @@ class EducationalStepInline(StackedInline):
 
 @admin.register(m.LearningPath)
 class LearningPathAdmin(BaseIEAdmin):
-    is_active_badge = bool_badge("is_active")
+    is_active_badge = bool_badge(
+        "is_active",
+        true_text="Active",
+        false_text="Inactive",
+        true_color="success",
+        false_color="danger",
+    )
     created_j = jalali_display()
 
     list_display = ("name", "is_active_badge", "created_j")
@@ -240,7 +250,13 @@ class LearnerAdmin(BaseIEAdmin):
 # ────────────────────────────────────────────────────────────────
 @admin.register(m.Specialty)
 class SpecialtyAdmin(BaseIEAdmin):
-    is_active_badge = bool_badge("is_active")
+    is_active_badge = bool_badge(
+        "is_active",
+        true_text="Active",
+        false_text="Inactive",
+        true_color="success",
+        false_color="danger",
+    )
 
     # 3️⃣  include real field so list_editable works
     list_display = ("name", "code", "is_active", "is_active_badge")
@@ -288,9 +304,18 @@ class MentorAssignmentInline(TabularInline):
 
 @admin.register(m.LearnerEnrolment)
 class LearnerEnrolmentAdmin(BaseIEAdmin):
-    list_display = ("learner", "learning_path", "enroll_date", "unenroll_date")
+    status_badge = choice_badge(
+        "status",
+        mapping={
+            "active":    ("Active",    "success"),
+            "graduated": ("Graduated", "primary"),
+            "dropped":   ("Dropped",   "danger"),
+            "reserved":  ("Reserved",  "warning"),
+        },
+    )
+    list_display  = ("learner", "learning_path", "enroll_date", "unenroll_date", "status_badge")
+    list_filter   = ("status", "learning_path")
     autocomplete_fields = ("learner", "learning_path")
-    list_filter = ("learning_path",)
     search_fields = ("learner__user__email", "learning_path__name")
     inlines = (MentorAssignmentInline,)
     formfield_overrides = RICH_TEXT
@@ -357,6 +382,26 @@ class SessionTemplateAdmin(BaseIEAdmin):
     )
 
 
+class SessionParticipantInline(TabularInline):
+    model = m.SessionParticipant
+    extra = 0
+    autocomplete_fields = ("learner",)
+
+    # badge callable attached **inside** the class ↓
+    attendance_badge = choice_badge(
+        "attendance_status",
+        mapping={
+            "present": ("Present", "success"),
+            "absent":  ("Absent",  "danger"),
+            "late":    ("Late",    "warning"),
+        },
+    )
+
+    readonly_fields = ("attendance_badge",)
+    fields = ("learner", "guest_name", "attendance_badge")
+
+
+
 @admin.register(m.SessionOccurrence)
 class SessionOccurrenceAdmin(BaseIEAdmin):
     status_badge = choice_badge(
@@ -370,6 +415,7 @@ class SessionOccurrenceAdmin(BaseIEAdmin):
     list_display = ("template", "planned_date", "planned_start_time", "status_badge")
     list_filter = ("status", "template__learning_path")
     autocomplete_fields = ("template",)
+    inlines = (SessionParticipantInline,)
     formfield_overrides = RICH_TEXT
 
 
@@ -379,9 +425,20 @@ class SessionOccurrenceAdmin(BaseIEAdmin):
 class StepExtensionInline(TabularInline):
     model = m.StepExtension
     extra = 0
-    readonly_fields = ("requested_at",)
+    autocomplete_fields = ()
     formfield_overrides = RICH_TEXT
-    fields = ("extended_by_days", "requested_at", "approved_by_mentor", "reason")
+
+    # badge callable attached **inside** the class ↓
+    approved_badge = bool_badge(
+        "approved_by_mentor",
+        true_text="Approved",
+        false_text="Pending",
+        true_color="success",
+        false_color="warning",
+    )
+
+    readonly_fields = ("requested_at", "approved_badge")
+    fields = ("extended_by_days", "requested_at", "approved_badge", "reason")
 
 
 @admin.register(m.StepProgress)
@@ -458,7 +515,13 @@ class PlanFeatureInline(TabularInline):
 
 @admin.register(m.SubscriptionPlan)
 class SubscriptionPlanAdmin(BaseIEAdmin):
-    is_active_badge = bool_badge("is_active")
+    is_active_badge = bool_badge(
+        "is_active",
+        true_text="Active",
+        false_text="Inactive",
+        true_color="success",
+        false_color="danger",
+    )
     price_display = display(description="Price")(lambda _, o: intcomma(int(o.price_amount)))
     duration_display = display(description="Duration (d)")(lambda _, o: o.duration_in_days)
 
@@ -498,17 +561,16 @@ class LearnerSubscribePlanAdmin(BaseIEAdmin):
     status_badge = choice_badge(
         "status",
         mapping={
-            "active": ("Active", "success"),
-            "expired": ("Expired", "danger"),
-            "canceled": ("Canceled", "danger"),
-            "reserved": ("Reserved", "info"),
-            "freeze": ("Frozen", "info"),
+            "active":   ("Active",   "success"),   # green
+            "freeze":   ("Frozen",   "secondary"), # grey
+            "reserved": ("Reserved", "warning"),   # orange
+            "expired":  ("Expired",  "danger"),    # red
+            "canceled": ("Canceled", "danger"),    # red
         },
     )
     start_j = jalali_display("start_date", label="Start")
-
     list_display = ("learner_enrolment", "subscription_plan", "start_j", "status_badge")
-    list_filter = ("status", "subscription_plan")
+    list_filter  = ("status", "subscription_plan")
     autocomplete_fields = ("subscription_plan", "learner_enrolment")
     inlines = (FreezeInline,)
     formfield_overrides = RICH_TEXT
@@ -527,7 +589,13 @@ class MentorGroupSessionParticipantInline(TabularInline):
 
 @admin.register(m.MentorGroupSession)
 class MentorGroupSessionAdmin(BaseIEAdmin):
-    is_active_badge = bool_badge("is_active")
+    is_active_badge = bool_badge(
+        "is_active",
+        true_text="Active",
+        false_text="Inactive",
+        true_color="success",
+        false_color="danger",
+    )
     list_display = ("title", "mentor", "start_datetime", "end_datetime", "is_active_badge")
     list_filter = ("is_active", "mentor")
     search_fields = ("title", "mentor__user__first_name", "mentor__user__last_name", "mentor__user__email")
