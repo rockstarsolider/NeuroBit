@@ -13,6 +13,10 @@ phone_re = RegexValidator(
     message="Enter a valid phone number (e.g. +989336628244 or 09336628244).",
 )
 
+class GenderChoices(models.TextChoices):
+    MALE = "M", "Male"
+    FEMALE = "F", "Female"
+    OTHER = "O", "Other / Prefer not to say"
 
 class CustomUser(AbstractUser):
     """
@@ -26,13 +30,7 @@ class CustomUser(AbstractUser):
     home_number  = models.CharField(max_length=10, blank=True)
     city         = models.CharField(max_length=64)
     birthdate    = models.DateField(null=True, blank=True)
-
-    GENDER_CHOICES = [
-        ("M", "Male"),
-        ("F", "Female"),
-        ("O", "Other / Prefer not to say"),
-    ]
-    gender       = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True)
+    gender = models.CharField(max_length=1, choices=GenderChoices, default=GenderChoices.MALE, blank=True)
 
     # no need for a custom manager unless you want extra helpers
 

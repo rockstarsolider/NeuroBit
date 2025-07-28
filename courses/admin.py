@@ -107,17 +107,8 @@ class TimeStampedInline(TabularInline):
 class TaskInline(TabularInline):
     model = m.Task
     extra = 0
-    fields = ("title", "order_in_step", "is_required_badge")
-    readonly_fields = ("is_required_badge",)
+    fields = ("title", "order_in_step", "is_required")   # ← editable
     formfield_overrides = RICH_TEXT
-
-    is_required_badge = bool_badge(
-        "is_required",
-        true_text="Required",
-        false_text="Optional",
-        true_color="danger",
-        false_color="info",
-    )
 
 
 class ResourceInline(TimeStampedInline):
@@ -129,21 +120,27 @@ class ResourceInline(TimeStampedInline):
 # ────────────────────────────────────────────────────────────────
 #  Curriculum
 # ────────────────────────────────────────────────────────────────
-class EducationalStepInline(StackedInline):
+class EducationalStepInline(TabularInline):
+    """
+    Compact table inside Learning Path admin.
+    Only the planning columns are editable here.
+    Use the “edit” link to open the full Educational Step form.
+    """
     model = m.EducationalStep
     extra = 0
-    show_change_link = True
-    formfield_overrides = RICH_TEXT
-    fields = ("sequence_no", "title", "description", ("expected_duration_days", "is_mandatory_badge"))
-    readonly_fields = ("is_mandatory_badge",)
+    show_change_link = True          # adds a small 🔗 icon
+    ordering = ("sequence_no",)
 
-    is_mandatory_badge = bool_badge(
-        "is_mandatory",
-        true_text="Mandatory",
-        false_text="Optional",
-        true_color="danger",
-        false_color="info",
+    # Editable columns
+    fields = (
+        "sequence_no",
+        "title",
+        "expected_duration_days",
+        "is_mandatory",              # checkbox
     )
+
+    # No rich‑text widget in this inline
+    formfield_overrides = {}
 
 
 @admin.register(m.LearningPath)
@@ -301,6 +298,11 @@ class MentorAssignmentInline(TabularInline):
     autocomplete_fields = ("mentor",)
     fields = ("mentor", "start_date", "end_date", "reason_for_change")
 
+    # Show “reason_for_change” only when an end_date is selected
+    conditional_fields = {
+        "reason_for_change": "end_date != ''",
+    }
+
 
 @admin.register(m.LearnerEnrolment)
 class LearnerEnrolmentAdmin(BaseIEAdmin):
@@ -342,18 +344,8 @@ class SessionOccurrenceInline(TabularInline):
     model = m.SessionOccurrence
     extra = 0
     autocomplete_fields = ("template",)
-    fields = ("planned_date", "planned_start_time", "planned_end_time", "status_badge")
-    readonly_fields = ("status_badge",)
+    fields = ("planned_date", "planned_start_time", "planned_end_time", "status")
     formfield_overrides = RICH_TEXT
-
-    status_badge = choice_badge(
-        "status",
-        mapping={
-            "scheduled": ("Scheduled", "info"),
-            "held": ("Held", "success"),
-            "canceled": ("Canceled", "danger"),
-        },
-    )
 
 
 @admin.register(m.SessionType)
@@ -386,19 +378,7 @@ class SessionParticipantInline(TabularInline):
     model = m.SessionParticipant
     extra = 0
     autocomplete_fields = ("learner",)
-
-    # badge callable attached **inside** the class ↓
-    attendance_badge = choice_badge(
-        "attendance_status",
-        mapping={
-            "present": ("Present", "success"),
-            "absent":  ("Absent",  "danger"),
-            "late":    ("Late",    "warning"),
-        },
-    )
-
-    readonly_fields = ("attendance_badge",)
-    fields = ("learner", "guest_name", "attendance_badge")
+    fields = ("learner", "guest_name", "attendance_status")   # editable
 
 
 
@@ -425,35 +405,38 @@ class SessionOccurrenceAdmin(BaseIEAdmin):
 class StepExtensionInline(TabularInline):
     model = m.StepExtension
     extra = 0
-    autocomplete_fields = ()
+    readonly_fields = ("requested_at",)                  # badge removed
+    fields = ("extended_by_days", "requested_at", "approved_by_mentor", "reason")
     formfield_overrides = RICH_TEXT
 
-    # badge callable attached **inside** the class ↓
-    approved_badge = bool_badge(
-        "approved_by_mentor",
-        true_text="Approved",
-        false_text="Pending",
-        true_color="success",
-        false_color="warning",
-    )
-
-    readonly_fields = ("requested_at", "approved_badge")
-    fields = ("extended_by_days", "requested_at", "approved_badge", "reason")
+    # Conditional: show “reason” while approval is pending
+    conditional_fields = {
+        "reason": "approved_by_mentor == false",
+    }
 
 
+# ────────────────────────────────────────────────────────────────
+#  Progress & tasks
+# ────────────────────────────────────────────────────────────────
 @admin.register(m.StepProgress)
 class StepProgressAdmin(BaseIEAdmin):
     skipped_badge = bool_badge("skipped", true_text="Skipped", false_text="On Track")
+
     list_display = ("enrolment", "step", "initial_due_date", "skipped_badge")
     autocomplete_fields = ("enrolment", "step")
     list_filter = ("skipped", "step__learning_path")
-    inlines = (StepExtensionInline,)
-    formfield_overrides = RICH_TEXT
     search_fields = (
         "enrolment__learner__user__email",
         "step__title",
         "step__learning_path__name",
     )
+    inlines = (StepExtensionInline,)
+    formfield_overrides = RICH_TEXT
+
+    # Hide “initial_promise_days” when the step is marked as skipped
+    conditional_fields = {
+        "initial_promise_days": "skipped == false",
+    }
 
 
 @admin.register(m.Task)

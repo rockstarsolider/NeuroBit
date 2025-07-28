@@ -120,9 +120,7 @@ class Mentor(models.Model):
 
 
 class Learner(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL,
-                                on_delete=models.CASCADE,
-                                related_name="learner_profile")
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="learner_profile")
     status = models.CharField(max_length=8,
                               choices=ActiveStatus.choices,
                               default=ActiveStatus.ACTIVE)
@@ -190,17 +188,15 @@ class Resource(models.Model):
 # ➎  ENROLMENT & MENTORING
 # ────────────────────────────────────────────────────────────────
 class LearnerEnrolment(models.Model):
-    learner = models.ForeignKey(Learner,
-                                on_delete=models.CASCADE,
-                                related_name="enrolments")
-    learning_path = models.ForeignKey(LearningPath,
-                                      on_delete=models.CASCADE,
-                                      related_name="enrolments")
+    learner = models.ForeignKey(Learner, on_delete=models.CASCADE, related_name="enrolments")
+    learning_path = models.ForeignKey(LearningPath, on_delete=models.CASCADE,related_name="enrolments")
     enroll_date = models.DateField(default=timezone.now)
     unenroll_date = models.DateField(null=True, blank=True)
-    status = models.CharField(max_length=9,
-                              choices=LearnerEnrolmentStatus.choices,
-                              default=LearnerEnrolmentStatus.ACTIVE)
+    status = models.CharField(
+        max_length=9,
+        choices=LearnerEnrolmentStatus.choices,
+        default=LearnerEnrolmentStatus.ACTIVE
+        )
 
     class Meta:
         unique_together = ("learner", "learning_path")
@@ -321,16 +317,11 @@ class SessionParticipant(models.Model):
 # ➐  PROGRESS & TASKS
 # ────────────────────────────────────────────────────────────────
 class StepProgress(models.Model):
-    enrolment = models.ForeignKey(LearnerEnrolment,
-                                  on_delete=models.CASCADE,
-                                  related_name="step_progresses")
-    step = models.ForeignKey(EducationalStep,
-                             on_delete=models.CASCADE,
-                             related_name="progresses")
+    enrolment = models.ForeignKey(LearnerEnrolment, on_delete=models.CASCADE, related_name="step_progresses")
+    step = models.ForeignKey(EducationalStep, on_delete=models.CASCADE, related_name="progresses")
+    skipped = models.BooleanField(default=False, help_text="If True, promise_days must be 0")
     initial_due_date = models.DateField()
     initial_promise_days = models.PositiveSmallIntegerField()
-    skipped = models.BooleanField(default=False,
-                                  help_text="If True, promise_days must be 0")
 
     class Meta:
         unique_together = ("enrolment", "step")

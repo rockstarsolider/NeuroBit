@@ -210,6 +210,33 @@ UNFOLD = {
                         "icon": "upload",
                         "link": reverse_lazy("admin:app_list", kwargs={'app_label': 'pages'}),
                     },
+
+                    # Can you separate this chunck ? 
+                    {
+                        "title": _("Learning paths"),
+                        "icon": "route",
+                        "link": reverse_lazy("admin:courses_learningpath_changelist"),
+                    },
+                    {
+                        "title": _("Learner enrolments"),
+                        "icon": "person_add",
+                        "link": reverse_lazy("admin:courses_learnerenrolment_changelist"),
+                    },
+                    {
+                        "title": _("Educational steps"),
+                        "icon": "stairs",
+                        "link": reverse_lazy("admin:courses_educationalstep_changelist"),
+                    },
+                    {
+                        "title": _("Step progress"),
+                        "icon": "assignment_turned_in",
+                        "link": reverse_lazy("admin:courses_stepprogress_changelist"),
+                    },
+                    {
+                        "title": _("Mentors"),
+                        "icon": "psychology",
+                        "link": reverse_lazy("admin:courses_mentor_changelist"),
+                    },
                 ],
             },
         ],

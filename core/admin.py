@@ -124,9 +124,9 @@ class CustomUserAdmin(DjangoUserAdmin, ModelAdmin, ImportExportModelAdmin):
             return format_html('<img src="{}" class="rounded-full w-8 h-8">', obj.image.url)
         return "—"
 
-    active_badge = bool_badge("is_active", true_text="Active", false_text="Inactive")
-    staff_badge  = bool_badge("is_staff",  true_text="Staff",  false_text="—", true_color="primary")
-    super_badge  = bool_badge("is_superuser", true_text="Super", false_text="—", true_color="warning")
+    active_badge = bool_badge("is_active", true_text="YES", false_text="NO", true_color="success")
+    staff_badge  = bool_badge("is_staff",  true_text="YES",  false_text="NO", true_color="success")
+    super_badge  = bool_badge("is_superuser", true_text="YES", false_text="NO", true_color="success")
     gender_badge = choice_badge(
         "gender",
         mapping={"M": ("Male", "info"), "F": ("Female", "danger"), "O": ("Other", "secondary")},
@@ -145,7 +145,7 @@ class CustomUserAdmin(DjangoUserAdmin, ModelAdmin, ImportExportModelAdmin):
 
     # fieldsets (change form)
     fieldsets = (
-        (None, {"fields": ("username", "email", "phone_number", "national_id", "password")}),
+        (None, {"fields": ("image", "username", "first_name", "last_name", "gender", "email", "phone_number", "national_id", "password")}),
         (_("Permissions"), {"fields": ("is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
         (_("Important dates"), {"fields": ("last_login", "date_joined")}),
     )
@@ -155,7 +155,8 @@ class CustomUserAdmin(DjangoUserAdmin, ModelAdmin, ImportExportModelAdmin):
         (None, {
             "classes": ("wide",),
             "fields": (
-                "username", "email", "phone_number", "national_id",
+                "image",
+                "username", "first_name", "last_name", "email", "phone_number", "national_id",
                 "password1", "password2",
                 "is_staff", "is_active",
             ),
