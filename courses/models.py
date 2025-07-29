@@ -132,7 +132,8 @@ class Learner(models.Model):
     father_phone = models.CharField(max_length=15, validators=[phone_re], blank=True)
     status = models.CharField(max_length=8, choices=ActiveStatus.choices, default=ActiveStatus.ACTIVE)
     notes = models.TextField(blank=True, help_text="Any data about the learner.")
-    
+    signup_date = models.DateTimeField(auto_now_add=True)
+
     class Meta:
         ordering = ("-signup_date",)
 
@@ -325,11 +326,11 @@ class StepProgress(models.Model):
     task_completion_date = models.DateTimeField(blank=True)
 
     class Meta:
-        unique_together = ("enrolment", "step")
-        ordering = ("initial_due_date",)
+        unique_together = ("mentor_assignment", "educational_step")
+        ordering = ("initial_promise_date",)
 
     def __str__(self):
-        return f"{self.enrolment} | {self.step}"
+        return f"{self.mentor_assignment} | {self.educational_step}"
 
 
 class StepProgressSession(models.Model):
@@ -461,10 +462,7 @@ class SubscriptionPlan(models.Model):
 
 class PlanFeature(models.Model):
     plan = models.ForeignKey(SubscriptionPlan, on_delete=models.CASCADE, related_name="plan_features")
-    feature = models.ManyToManyField(Feature, on_delete=models.CASCADE, related_name="feature_plans")
-
-    class Meta:
-        unique_together = ("plan", "feature")
+    feature = models.ManyToManyField(Feature, related_name="feature_plans")
 
     def __str__(self):
         return f"{self.plan} ↔ {self.feature}"
@@ -517,7 +515,7 @@ class MentorGroupSession(models.Model):
     google_meet_link = models.URLField(blank=True)
 
     class Meta:
-        ordering = ("-start_datetime",)
+        ordering = ("-suppused_day", "-suppoused_time")
 
     def __str__(self):
         return f"{self.title} – {self.start_datetime:%Y‑%m‑%d}"

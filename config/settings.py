@@ -168,9 +168,9 @@ UNFOLD = {
             "link": reverse_lazy("home"),
         },
     ],
-    "SITE_TITLE": "AliEsmaeilzadeh",
+    "SITE_TITLE": "Neurobit",
     "SITE_HEADER": "Admin Panel",
-    "SITE_SUBHEADER": "AliEsmaeilzadeh",
+    "SITE_SUBHEADER": "Neurobit",
     "SITE_SYMBOL": "settings",
     "LOGIN": {
         "image": lambda request: static(r"images/neurobit_main_logo.webp"),
@@ -182,18 +182,13 @@ UNFOLD = {
         "navigation": [
             {
                 "title": _("Navigation"),
-                "separator": True,  # Top border
-                "collapsible": False,  # Collapsible group of links
+                "separator": True,
+                "collapsible": True,
                 "items": [
                     {
                         "title": _("Dashboard"),
                         "icon": "dashboard",  # Supported icon set: https://fonts.google.com/icons
                         "link": reverse_lazy("admin:index"),
-                    },
-                    {   
-                        "title": _("info"),
-                        "label": "Dashboard",
-                        "link": "/admin/dashboard/",
                     },
                     {
                         "title": _("Users"),
@@ -201,17 +196,27 @@ UNFOLD = {
                         "link": reverse_lazy("admin:core_customuser_changelist"),
                     },
                     {
+                        "title": _("Mentors"),
+                        "icon": "support_agent",
+                        "link": reverse_lazy("admin:courses_mentor_changelist"),
+                    },
+                    {
+                        "title": _("Learners"),
+                        "icon": "support_agent",
+                        "link": reverse_lazy("admin:courses_learner_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": _("Courses"),
+                "separator": True,
+                "collapsible": True,
+                "items": [
+                    {
                         "title": _("Courses"),
                         "icon": "school",
                         "link": reverse_lazy("admin:app_list", kwargs={'app_label': 'courses'}),
                     },
-                    {
-                        "title": _("Applications"),
-                        "icon": "upload",
-                        "link": reverse_lazy("admin:app_list", kwargs={'app_label': 'pages'}),
-                    },
-
-                    # Can you separate this chunck ? 
                     {
                         "title": _("Learning paths"),
                         "icon": "route",
@@ -233,11 +238,11 @@ UNFOLD = {
                         "link": reverse_lazy("admin:courses_stepprogress_changelist"),
                     },
                     {
-                        "title": _("Mentors"),
-                        "icon": "psychology",
-                        "link": reverse_lazy("admin:courses_mentor_changelist"),
+                        "title": _("Applications"),
+                        "icon": "upload",
+                        "link": reverse_lazy("admin:app_list", kwargs={'app_label': 'pages'}),
                     },
-                ],
+                ]
             },
         ],
     },

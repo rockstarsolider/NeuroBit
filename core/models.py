@@ -2,7 +2,7 @@
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from utility import phone_re, user_directory_path
+from .utility import phone_re, user_directory_path
 
 
 class GenderChoices(models.TextChoices):
