@@ -2,16 +2,8 @@
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.core.validators import RegexValidator
+from utility import phone_re, user_directory_path
 
-
-def user_directory_path(instance, filename):
-    return f'users/images/user_{instance.first_name}-{instance.last_name}/{filename}'
-
-phone_re = RegexValidator(
-    regex=r"^(?:\+?\d{1,3})?[0]?\d{9,14}$",
-    message="Enter a valid phone number (e.g. +989336628244 or 09336628244).",
-)
 
 class GenderChoices(models.TextChoices):
     MALE = "M", "Male"

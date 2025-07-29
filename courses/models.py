@@ -18,10 +18,19 @@ from django.db import models
 from django.utils import timezone
 from django.conf import settings
 
+from core.utility import phone_re
+
 
 # ────────────────────────────────────────────────────────────────
 # ➋  ENUMS
 # ────────────────────────────────────────────────────────────────
+class SubscriptionDurations(models.IntegerChoices):
+    ONE_MONTHS = 30, "30 days"
+    THREE_MONTHS = 90, "90 days"
+    SIX_MONTHS = 180, "180 days"
+    NINE_MONTHS = 270, "270 days"
+    TWELVE_MONTHS = 360, "360 days"
+
 class ActiveStatus(models.TextChoices):
     ACTIVE = "active", "Active"
     INACTIVE = "inactive", "Inactive"
@@ -36,8 +45,12 @@ class LearnerEnrolmentStatus(models.TextChoices):
 
 class ResourceType(models.TextChoices):
     VIDEO = "video", "Video"
+    DOC = "doc", "Document"
+    BOOK = "book", "Book"
+    COURSE = "course", "Course"
+    PLAYLIST = "playlist", "Playlist"
     ARTICLE = "article", "Article"
-    REPO = "repo", "Repository"
+    GITHUB_REPOSITORY = "repository", "Repository"
     OTHER = "other", "Other"
 
 
@@ -99,18 +112,12 @@ class Specialty(models.Model):
 
 
 class Mentor(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL,
-                                on_delete=models.CASCADE,
-                                related_name="mentor_profile")
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="mentor_profile")
     address = models.TextField(blank=True)
     bio = models.TextField(blank=True)
-    specialties = models.ManyToManyField(Specialty,
-                                         blank=True,
-                                         related_name="mentors")
+    specialties = models.ManyToManyField(Specialty, blank=True, related_name="mentors")
     hire_date = models.DateField(null=True, blank=True)
-    status = models.CharField(max_length=8,
-                              choices=ActiveStatus.choices,
-                              default=ActiveStatus.ACTIVE)
+    status = models.CharField(max_length=8, choices=ActiveStatus.choices, default=ActiveStatus.ACTIVE)
 
     class Meta:
         ordering = ("user__last_name", "user__first_name")
@@ -121,12 +128,11 @@ class Mentor(models.Model):
 
 class Learner(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="learner_profile")
-    status = models.CharField(max_length=8,
-                              choices=ActiveStatus.choices,
-                              default=ActiveStatus.ACTIVE)
-    notes = models.TextField(blank=True)
-    signup_date = models.DateTimeField(auto_now_add=True)
-
+    mother_phone = models.CharField(max_length=15, validators=[phone_re], blank=True)
+    father_phone = models.CharField(max_length=15, validators=[phone_re], blank=True)
+    status = models.CharField(max_length=8, choices=ActiveStatus.choices, default=ActiveStatus.ACTIVE)
+    notes = models.TextField(blank=True, help_text="Any data about the learner.")
+    
     class Meta:
         ordering = ("-signup_date",)
 
@@ -139,7 +145,7 @@ class Learner(models.Model):
 # ────────────────────────────────────────────────────────────────
 class LearningPath(models.Model):
     name = models.CharField(max_length=120, unique=True)
-    description = models.TextField(blank=True)
+    description = models.TextField(max_length=7000, blank=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -151,12 +157,10 @@ class LearningPath(models.Model):
 
 
 class EducationalStep(models.Model):
-    learning_path = models.ForeignKey(LearningPath,
-                                      on_delete=models.CASCADE,
-                                      related_name="steps")
+    learning_path = models.ForeignKey(LearningPath, on_delete=models.CASCADE, related_name="steps")
     sequence_no = models.PositiveSmallIntegerField()
     title = models.CharField(max_length=120)
-    description = models.TextField(blank=True)
+    description = models.TextField(max_length=7000, blank=True)
     expected_duration_days = models.PositiveSmallIntegerField()
     is_mandatory = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -169,14 +173,11 @@ class EducationalStep(models.Model):
         return f"{self.learning_path} | {self.sequence_no}. {self.title}"
 
 
-class Resource(models.Model):
-    step = models.ForeignKey(EducationalStep,
-                             on_delete=models.CASCADE,
-                             related_name="resources")
+class Resources(models.Model):
+    step = models.ForeignKey(EducationalStep, on_delete=models.CASCADE, related_name="resources")
     title = models.CharField(max_length=120)
-    type = models.CharField(max_length=12,
-                            choices=ResourceType.choices)
-    url_or_location = models.CharField(max_length=500)
+    type = models.CharField(max_length=12, choices=ResourceType.choices)
+    address = models.URLField(blank=True)
     description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -190,9 +191,9 @@ class Resource(models.Model):
 class LearnerEnrolment(models.Model):
     learner = models.ForeignKey(Learner, on_delete=models.CASCADE, related_name="enrolments")
     learning_path = models.ForeignKey(LearningPath, on_delete=models.CASCADE,related_name="enrolments")
-    enroll_date = models.DateField(default=timezone.now)
-    unenroll_date = models.DateField(null=True, blank=True)
-    status = models.CharField(
+    enroll_date = models.DateTimeField(auto_now_add=True)
+    unenroll_date = models.DateTimeField(null=True, blank=True)
+    status = models.CharField( 
         max_length=9,
         choices=LearnerEnrolmentStatus.choices,
         default=LearnerEnrolmentStatus.ACTIVE
@@ -207,16 +208,14 @@ class LearnerEnrolment(models.Model):
 
 
 class MentorAssignment(models.Model):
-    enrolment = models.ForeignKey(LearnerEnrolment,
-                                  on_delete=models.CASCADE,
-                                  related_name="mentor_assignments")
-    mentor = models.ForeignKey(Mentor,
-                               on_delete=models.CASCADE,
-                               related_name="assignments")
+    enrolment = models.ForeignKey(LearnerEnrolment, on_delete=models.CASCADE, related_name="mentor_assignments")
+    mentor = models.ForeignKey(Mentor, on_delete=models.CASCADE, related_name="assignments")
     start_date = models.DateField(default=timezone.now)
     end_date = models.DateField(null=True, blank=True)
     reason_for_change = models.TextField(blank=True)
     code_review_pro_session_datetime = models.DateTimeField(blank=True)
+    code_review_session_day = models.PositiveSmallIntegerField(choices=Weekday, default=Weekday.SAT)
+    code_review_session_time = models.TimeField(default=timezone.now)
 
     class Meta:
         ordering = ("-start_date",)
@@ -317,11 +316,13 @@ class SessionParticipant(models.Model):
 # ➐  PROGRESS & TASKS
 # ────────────────────────────────────────────────────────────────
 class StepProgress(models.Model):
-    enrolment = models.ForeignKey(LearnerEnrolment, on_delete=models.CASCADE, related_name="step_progresses")
-    step = models.ForeignKey(EducationalStep, on_delete=models.CASCADE, related_name="progresses")
+    mentor_assignment = models.ForeignKey(MentorAssignment, on_delete=models.CASCADE, related_name="step_progresses")
+    educational_step = models.ForeignKey(EducationalStep, on_delete=models.CASCADE, related_name="step_progresses")
     skipped = models.BooleanField(default=False, help_text="If True, promise_days must be 0")
-    initial_due_date = models.DateField()
-    initial_promise_days = models.PositiveSmallIntegerField()
+    initial_promise_date = models.DateTimeField(auto_now_add=True)
+    initial_promise_days = models.PositiveSmallIntegerField(default=1)
+    repromise_count = models.PositiveSmallIntegerField(default=0)
+    task_completion_date = models.DateTimeField(blank=True)
 
     class Meta:
         unique_together = ("enrolment", "step")
@@ -331,11 +332,18 @@ class StepProgress(models.Model):
         return f"{self.enrolment} | {self.step}"
 
 
+class StepProgressSession(models.Model):
+    step_progress = models.ForeignKey(StepProgress, on_delete=models.CASCADE, related_name="step_progress_sessions")
+    session_type = models.ForeignKey(SessionType, on_delete=models.CASCADE, related_name="step_progress_sessions")
+    datetime = models.DateTimeField(auto_now=True)
+    present = models.BooleanField(default=True)
+    description = models.TextField(blank=True)
+    recorded_meet_link = models.URLField()
+
+
 class StepExtension(models.Model):
-    step_progress = models.ForeignKey(StepProgress,
-                                      on_delete=models.CASCADE,
-                                      related_name="extensions")
-    extended_by_days = models.PositiveSmallIntegerField()
+    step_progress = models.ForeignKey(StepProgress, on_delete=models.CASCADE, related_name="extensions")
+    extended_by_days = models.PositiveSmallIntegerField(default=0)
     requested_at = models.DateTimeField(default=timezone.now)
     approved_by_mentor = models.BooleanField(default=False)
     reason = models.TextField(blank=True)
@@ -348,9 +356,7 @@ class StepExtension(models.Model):
 
 
 class Task(models.Model):
-    step = models.ForeignKey(EducationalStep,
-                             on_delete=models.CASCADE,
-                             related_name="tasks")
+    step = models.ForeignKey(EducationalStep, on_delete=models.CASCADE, related_name="tasks")
     title = models.CharField(max_length=120)
     description = models.TextField(blank=True)
     order_in_step = models.PositiveSmallIntegerField()
@@ -369,14 +375,12 @@ def submissions_upload_to(instance, filename) -> str:  # noqa: D401
 
 
 class TaskSubmission(models.Model):
-    step_progress = models.ForeignKey(StepProgress,
-                                      on_delete=models.CASCADE,
-                                      related_name="submissions")
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="submissions")
+    step_progress = models.ForeignKey(StepProgress, on_delete=models.CASCADE, related_name="submissions")
     submitted_at = models.DateTimeField(default=timezone.now)
     artifact_url = models.URLField(max_length=500, blank=True)
     file = models.FileField(upload_to=submissions_upload_to, blank=True)
-    report_video_file = models.FileField(upload_to=submissions_upload_to,
-                                         blank=True)
+    report_video_file = models.FileField(upload_to=submissions_upload_to, blank=True)
     report_video_link = models.URLField(max_length=500, blank=True)
     repository = models.URLField(max_length=500, blank=True)
     comment = models.TextField(blank=True)
@@ -389,12 +393,8 @@ class TaskSubmission(models.Model):
 
 
 class TaskEvaluation(models.Model):
-    submission = models.ForeignKey(TaskSubmission,
-                                   on_delete=models.CASCADE,
-                                   related_name="evaluations")
-    mentor = models.ForeignKey(Mentor,
-                               on_delete=models.CASCADE,
-                               related_name="evaluations")
+    submission = models.ForeignKey(TaskSubmission, on_delete=models.CASCADE, related_name="evaluations")
+    mentor = models.ForeignKey(Mentor, on_delete=models.CASCADE, related_name="evaluations")
     score_numeric = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)]
     )
@@ -417,12 +417,12 @@ class TaskEvaluation(models.Model):
 
 
 class SocialPost(models.Model):
-    step_progress = models.ForeignKey(StepProgress,
-                                      on_delete=models.CASCADE,
-                                      related_name="social_posts")
+    Learner = models.ForeignKey(Learner, on_delete=models.CASCADE, related_name="social_posts")
+    step_progress = models.ForeignKey(StepProgress, on_delete=models.CASCADE, related_name="social_posts")
     platform = models.CharField(max_length=32)
     url = models.URLField(max_length=500)
     posted_at = models.DateTimeField()
+    description = models.TextField(max_length=7000)
 
     class Meta:
         ordering = ("-posted_at",)
@@ -446,17 +446,11 @@ class Feature(models.Model):
 
 
 class SubscriptionPlan(models.Model):
-    name = models.CharField(max_length=20, unique=True)
+    name = models.CharField(max_length=20, unique=True, help_text="(Basic/Plus/Pro)")
     description = models.TextField(blank=True)
-    price_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    duration_in_days = models.PositiveSmallIntegerField(choices=[
-        (30, "30 days"), (90, "90 days"), (120, "120 days"),
-        (270, "270 days"), (360, "360 days")
-    ])
+    price_amount = models.PositiveIntegerField()
+    duration_in_days = models.PositiveSmallIntegerField(choices=SubscriptionDurations, default=SubscriptionDurations.ONE_MONTHS)
     is_active = models.BooleanField(default=True)
-    features = models.ManyToManyField(Feature,
-                                      through="PlanFeature",
-                                      related_name="plans")
 
     class Meta:
         ordering = ("name",)
@@ -466,12 +460,8 @@ class SubscriptionPlan(models.Model):
 
 
 class PlanFeature(models.Model):
-    plan = models.ForeignKey(SubscriptionPlan,
-                             on_delete=models.CASCADE,
-                             related_name="plan_features")
-    feature = models.ForeignKey(Feature,
-                                on_delete=models.CASCADE,
-                                related_name="feature_plans")
+    plan = models.ForeignKey(SubscriptionPlan, on_delete=models.CASCADE, related_name="plan_features")
+    feature = models.ManyToManyField(Feature, on_delete=models.CASCADE, related_name="feature_plans")
 
     class Meta:
         unique_together = ("plan", "feature")
@@ -481,16 +471,15 @@ class PlanFeature(models.Model):
 
 
 class LearnerSubscribePlan(models.Model):
-    subscription_plan = models.ForeignKey(SubscriptionPlan, on_delete=models.CASCADE, related_name="learner_plans")
-    learner_enrolment = models.ForeignKey(LearnerEnrolment,
-                                          on_delete=models.CASCADE,
-                                          related_name="subscribe_plans")
-    start_date = models.DateField(default=timezone.now)
-    discount = models.DecimalField(max_digits=5, decimal_places=2, default=0,
-                                   help_text="% discount (e.g. 10.00 = 10%)")
-    status = models.CharField(max_length=8,
-                              choices=SubscribePlanStatus.choices,
-                              default=SubscribePlanStatus.ACTIVE)
+    learner_enrolment = models.ForeignKey(LearnerEnrolment, on_delete=models.CASCADE, related_name="learner_subscribe_plans")
+    subscription_plan = models.ForeignKey(SubscriptionPlan, on_delete=models.CASCADE, related_name="learner_subscribe_plans")
+    start_date = models.DateTimeField(auto_now_add=True)
+    discount = models.PositiveSmallIntegerField(
+        default=0, 
+        validators=[MaxValueValidator(100, r"100% discount is the highest valid amount!")],
+        help_text=r"% discount (e.g. 10 => 10%)"
+        )
+    status = models.CharField(max_length=8, choices=SubscribePlanStatus.choices, default=SubscribePlanStatus.ACTIVE)
 
     class Meta:
         ordering = ("-start_date",)
@@ -501,12 +490,9 @@ class LearnerSubscribePlan(models.Model):
 
 
 class LearnerSubscribePlanFreeze(models.Model):
-    subscribe_plan = models.ForeignKey(LearnerSubscribePlan,
-                                       on_delete=models.CASCADE,
-                                       related_name="freezes")
-    start_date = models.DateField()
-    duration = models.PositiveSmallIntegerField(
-        help_text="Freeze duration in days")
+    subscribe_plan = models.ForeignKey(LearnerSubscribePlan, on_delete=models.CASCADE, related_name="freezes")
+    duration = models.PositiveSmallIntegerField(help_text="Freeze duration in days")
+    start_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ("-start_date",)
@@ -523,14 +509,12 @@ class MentorGroupSession(models.Model):
     A themed group session that multiple learners can attend.
     One mentor leads each session.
     """
-    mentor = models.ForeignKey(Mentor,
-                               on_delete=models.CASCADE,
-                               related_name="group_sessions")
-    title = models.CharField(max_length=120)
-    description = models.TextField(blank=True)
-    start_datetime = models.DateTimeField()
-    end_datetime = models.DateTimeField()
-    is_active = models.BooleanField(default=True)
+    mentor = models.ForeignKey(Mentor, on_delete=models.CASCADE, related_name="group_sessions")
+    learning_path = models.ForeignKey(LearningPath, on_delete=models.CASCADE, related_name="group_sessions")
+    session_type = models.ForeignKey(SessionType, on_delete=models.CASCADE, related_name="group_sessions")
+    suppused_day = models.PositiveSmallIntegerField(choices=Weekday, default=Weekday.SAT)
+    suppoused_time = models.TimeField(blank=True)
+    google_meet_link = models.URLField(blank=True)
 
     class Meta:
         ordering = ("-start_datetime",)
@@ -539,14 +523,19 @@ class MentorGroupSession(models.Model):
         return f"{self.title} – {self.start_datetime:%Y‑%m‑%d}"
 
 
+class MentorGroupSessionOcuurence(models.Model):
+    mentor_group_session = models.ForeignKey(MentorGroupSession, on_delete=models.CASCADE, related_name="mentor_group_sessions")
+    occurence_datetime = models.DateTimeField(blank=False)
+    change_the_datetime = models.BinaryField(default=False)
+    reason_for_change = models.TextField(max_length=5000)
+    google_meet_record = models.URLField(blank=False)
+
+
 class MentorGroupSessionParticipant(models.Model):
-    session = models.ForeignKey(MentorGroupSession,
-                                on_delete=models.CASCADE,
-                                related_name="participants")
-    learner = models.ForeignKey(Learner,
-                                on_delete=models.CASCADE,
-                                related_name="group_sessions")
-    joined_at = models.DateTimeField(auto_now_add=True)
+    session = models.ForeignKey(MentorGroupSession,on_delete=models.CASCADE, related_name="participants")
+    learner = models.ForeignKey(Learner, on_delete=models.CASCADE, related_name="group_sessions")
+    present = models.BooleanField(default=True)
+    joined_at = models.TimeField(blank=True)
 
     class Meta:
         unique_together = ("session", "learner")
