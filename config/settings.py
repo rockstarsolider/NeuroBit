@@ -202,7 +202,7 @@ UNFOLD = {
                     },
                     {
                         "title": _("Learners"),
-                        "icon": "support_agent",
+                        "icon": "child_care",
                         "link": reverse_lazy("admin:courses_learner_changelist"),
                     },
                 ],
