@@ -155,6 +155,7 @@ CRISPY_TEMPLATE_PACK = "unfold_crispy"
 CRISPY_ALLOWED_TEMPLATE_PACKS = ["unfold_crispy"]
 # unfold
 UNFOLD = {
+    # "TABS": "config.admin.tabs_callback",
     # "SHOW_LANGUAGES": True,
     "SITE_DROPDOWN": [
         {
@@ -218,25 +219,42 @@ UNFOLD = {
                         "link": reverse_lazy("admin:app_list", kwargs={'app_label': 'courses'}),
                     },
                     {
-                        "title": _("Learning paths"),
-                        "icon": "route",
-                        "link": reverse_lazy("admin:courses_learningpath_changelist"),
+                        "title": _("LearnerSubscribePlan"),
+                        "icon": "currency_exchange",
+                        "link": reverse_lazy("admin:courses_learnersubscribeplan_changelist"),
                     },
                     {
-                        "title": _("Learner enrolments"),
-                        "icon": "person_add",
-                        "link": reverse_lazy("admin:courses_learnerenrolment_changelist"),
+                        "title": _("Mentor Assignment"),
+                        "icon": "group_add",
+                        "link": reverse_lazy("admin:courses_mentorassignment_changelist"),
                     },
                     {
-                        "title": _("Educational steps"),
-                        "icon": "stairs",
+                        "title": _("Educational Steps"),
+                        "icon": "format_list_numbered",
                         "link": reverse_lazy("admin:courses_educationalstep_changelist"),
                     },
                     {
-                        "title": _("Step progress"),
-                        "icon": "assignment_turned_in",
-                        "link": reverse_lazy("admin:courses_stepprogress_changelist"),
+                        "title": _("Task Evaluation"),
+                        "icon": "verified",
+                        "link": reverse_lazy("admin:courses_taskevaluation_changelist"),
                     },
+                    {
+                        "title": _("Social Post"),
+                        "icon": "article_person",
+                        "link": reverse_lazy("admin:courses_socialpost_changelist"),
+                    },
+                    {
+                        "title": _("MentorGroupSessionParticipant"),
+                        "icon": "adaptive_audio_mic",
+                        "link": reverse_lazy("admin:courses_mentorgroupsessionparticipant_changelist"),
+                    },
+                ]
+            },
+            {
+                "title": _("Applications"),
+                "separator": True,
+                "collapsible": True,
+                "items": [
                     {
                         "title": _("Applications"),
                         "icon": "upload",

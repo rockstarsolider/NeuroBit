@@ -18,7 +18,7 @@ class CustomUser(AbstractUser):
     """
     phone_number = models.CharField(max_length=15, validators=[phone_re], blank=True)
     image        = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
-    national_id  = models.CharField(max_length=30, unique=True)
+    national_id  = models.CharField(max_length=30, unique=True, blank=True, null=True)
     home_number  = models.CharField(max_length=10, blank=True)
     city         = models.CharField(max_length=64)
     birthdate    = models.DateField(null=True, blank=True)

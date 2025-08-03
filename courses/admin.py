@@ -10,6 +10,7 @@ from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from import_export.admin import ImportExportModelAdmin
+
 from unfold.admin import ModelAdmin, TabularInline, StackedInline
 from unfold.contrib.forms.widgets import WysiwygWidget, ArrayWidget
 from unfold.contrib.import_export.forms import ImportForm, ExportForm
@@ -115,7 +116,7 @@ class LearningPathAdmin(BaseAdmin):
     list_display = ("name", "active_badge", "created_j")
     list_filter = ("is_active",)
     search_fields = ("name",)
-    inlines = (EducationalStepInline,)
+    # inlines = (EducationalStepInline,)
 
 
 @admin.register(m.EducationalStep)
@@ -226,63 +227,6 @@ class MentorAssignmentAdmin(BaseAdmin):
         "enrolment__learner__user__email",
     )
 
-
-# ════════════════════════════════════════════════════════════════
-#  SESSIONS
-# ════════════════════════════════════════════════════════════════
-class SessionOccurrenceInline(TabularInline):
-    model = m.SessionOccurrence
-    extra = 0
-    fields = ("planned_date", "planned_start_time", "planned_end_time", "status")
-    autocomplete_fields = ("template",)
-
-
-@admin.register(m.SessionType)
-class SessionTypeAdmin(BaseAdmin):
-    list_display = ("code", "name_fa", "duration_minutes", "max_participants")
-    search_fields = ("code", "name_fa")
-
-
-@admin.register(m.SessionTemplate)
-class SessionTemplateAdmin(BaseAdmin):
-    status_badge = choice_badge(
-        "status", mapping={"active": ("Active", "success"), "expired": ("Expired", "danger")}
-    )
-    list_display = ("learning_path", "mentor_assignment", "weekday", "status_badge")
-    list_filter = ("weekday", "status", "learning_path")
-    autocomplete_fields = ("learning_path", "mentor_assignment", "session_type")
-    inlines = (SessionOccurrenceInline,)
-    search_fields = (
-        "mentor_assignment__mentor__user__first_name",
-        "mentor_assignment__mentor__user__last_name",
-        "learning_path__name",
-    )
-
-
-class SessionParticipantInline(TabularInline):
-    model = m.SessionParticipant
-    extra = 0
-    autocomplete_fields = ("learner",)
-    fields = ("learner", "guest_name", "attendance_status")
-
-
-@admin.register(m.SessionOccurrence)
-class SessionOccurrenceAdmin(BaseAdmin):
-    status_badge = choice_badge(
-        "status",
-        mapping={
-            "scheduled": ("Scheduled", "info"),
-            "held": ("Held", "success"),
-            "canceled": ("Canceled", "danger"),
-        },
-    )
-    list_display = ("template", "planned_date", "planned_start_time", "status_badge")
-    list_filter = ("status", "template__learning_path")
-    autocomplete_fields = ("template",)
-    inlines = (SessionParticipantInline,)
-    search_fields = ("template__learning_path__name",)
-
-
 # ════════════════════════════════════════════════════════════════
 #  PROGRESS & TASKS
 # ════════════════════════════════════════════════════════════════
@@ -302,13 +246,41 @@ class TaskSubmissionInline(TabularInline):
     autocomplete_fields = ("task", "step_progress")
 
 
+@admin.register(m.SessionType)
+class SessionTypeAdmin(BaseAdmin):
+    list_display = ("code", "name_fa", "duration_minutes", "max_participants")
+    search_fields = ("code", "name_fa")
+
+
+@admin.register(m.StepProgressSession)
+class StepProgressSessionAdmin(BaseAdmin):
+    list_display = (
+        "step_progress",
+        "session_type",
+        "datetime",
+        "present",
+        "description",
+        "recorded_meet_link",
+    )
+    autocomplete_fields = ("step_progress", "session_type",)
+    # list_select_related = ("step_progress", "session_type",)
+    search_fields = (
+        "step_progress",
+        "session_type",
+    )
+
+#inline -> StepProgress
+# class StepProgressSessionInline(TabularInline):
+    # ...
+
+
 @admin.register(m.StepProgress)
 class StepProgressAdmin(BaseAdmin):
     skipped_badge = bool_badge("skipped", true="Skipped", false="On track")
     list_display = ("mentor_assignment", "educational_step", "skipped_badge")
     autocomplete_fields = ("mentor_assignment", "educational_step")
     list_filter = ("skipped", "educational_step__learning_path")
-    inlines = (StepExtensionInline,)
+    inlines = (StepExtensionInline, )
     conditional_fields = {"initial_promise_days": "skipped == false"}
     search_fields = (
         "mentor_assignment__mentor__user__first_name",
@@ -337,6 +309,23 @@ class TaskSubmissionAdmin(BaseAdmin):
     search_fields = (
         "task__title",
         "step_progress__educational_step__title",
+    )
+
+
+@admin.register(m.TaskEvaluation)
+class TaskEvaluationAdmin(BaseAdmin):
+    submitted_j = jalali_display("evaluated_at", label="evaluated_at")
+
+    list_display = (
+        "submission",
+        "mentor",
+        "score_numeric",
+        "feedback_text",
+    )
+    autocomplete_fields = ("mentor", "submission")
+    search_fields = (
+        "submission__task__title"
+        "mentor__user",
     )
 
 
@@ -394,28 +383,97 @@ class LearnerSubscribePlanAdmin(BaseAdmin):
             "expired": ("Expired", "danger"),
             "canceled": ("Canceled", "danger"),
         },
+        desc="Status",
     )
-    start_j = jalali_display("start_date", label="Start")
-    list_display = ("learner_enrolment", "subscription_plan", "start_j", "status_badge")
-    list_filter = ("status", "subscription_plan")
+    start_j = jalali_display("start_datetime", label="Start")
+    end_j   = jalali_display("end_datetime",   label="End")
+
+    # formatted money / percent columns
+    @display(description=_("Disc. %"))
+    def discount_disp(self, obj):
+        return f"{obj.discount} %"
+
+    @display(description=_("Final cost (T)"))
+    def cost_disp(self, obj):
+        return intcomma(obj.final_cost)
+
+    list_display = (
+        "learner_enrolment",
+        "subscription_plan",
+        "start_j",
+        "end_j",
+        "discount_disp",
+        "cost_disp",
+        "status_badge",
+    )
+
+    list_filter = ("status", "subscription_plan", "discount")
+    search_fields = (
+        "learner_enrolment__learner__user__email",
+        "subscription_plan__name",
+    )
+
     autocomplete_fields = ("subscription_plan", "learner_enrolment")
     inlines = (FreezeInline,)
 
+    # Prevent manual tampering with system-calculated values
+    readonly_fields = ("end_datetime", "final_cost")
+
+    # Nice, compact field layout
+    fieldsets = (
+        (None, {
+            "fields": (
+                ("learner_enrolment", "subscription_plan"),
+                ("start_datetime", "end_datetime"),
+                ("discount", "final_cost"),
+                "status",
+            )
+        }),
+    )
 
 # ════════════════════════════════════════════════════════════════
 #  MENTOR GROUP SESSIONS
 # ════════════════════════════════════════════════════════════════
+@admin.register(m.MentorGroupSessionParticipant)
+class MentorGroupSessionParticipantAdmin(ModelAdmin):
+    list_display = (
+        "mentor_group_session_occurence",
+        "mentor_assignment",
+        "present",
+    )
+    list_filter = ("present",)
+    autocomplete_fields = ("mentor_group_session_occurence", "mentor_assignment",)
+    search_fields = ("mentor_assignment",)
+    list_select_related = ("mentor_group_session_occurence", "mentor_assignment" ,)
+    show_full_result_count = False
+
+
 class MGSParticipantInline(TabularInline):
     model = m.MentorGroupSessionParticipant
     extra = 0
-    autocomplete_fields = ("learner",)
-    fields = ("learner", "present")
+    autocomplete_fields = ("mentor_assignment",)
+    fields = ("mentor_assignment", "present")
+
+
+@admin.register(m.MentorGroupSessionOcuurence)
+class MentorGroupSessionOcuurenceAdmin(BaseAdmin):
+    list_display = (
+        "mentor_group_session",
+        "occurence_datetime",
+        "change_the_datetime",
+        "reason_for_change",
+        "session_video_record",
+    )
+    autocomplete_fields = ("mentor_group_session",)
+    search_fields = ("mentor_group_session" ,)
+    list_select_related = ("mentor_group_session" ,)
+    inlines = (MGSParticipantInline,)
 
 
 class MGSOccurrenceInline(TabularInline):
     model = m.MentorGroupSessionOcuurence
     extra = 0
-    fields = ("occurence_datetime", "change_the_datetime", "reason_for_change", "google_meet_record")
+    fields = ("occurence_datetime", "change_the_datetime", "reason_for_change", "session_video_record")
     conditional_fields = {"reason_for_change": "change_the_datetime == true"}
 
 
@@ -430,5 +488,7 @@ class MentorGroupSessionAdmin(BaseAdmin):
     )
     list_filter = ("mentor", "learning_path", "session_type", "suppused_day")
     autocomplete_fields = ("mentor", "learning_path", "session_type")
-    inlines = (MGSOccurrenceInline, MGSParticipantInline)
+    inlines = (MGSOccurrenceInline,)
+    search_fields = ("mentor",)
     
+

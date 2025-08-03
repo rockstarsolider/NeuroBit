@@ -10,15 +10,19 @@
 # ➑  Subscription plans                   │
 # ➒  Mentor‑group sessions  ← new block   │  **added to match ERD**
 
+from datetime import timedelta
 
 from django.core.validators import (
     RegexValidator, MinValueValidator, MaxValueValidator
 )
-from django.db import models
+from django.db import models, transaction
 from django.utils import timezone
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
 from core.utility import phone_re
+from pages.templatetags.custom_translation_tags import translate_number
+from pages.templatetags.persian_calendar_convertor import convert_to_persian_calendar, format_persian_datetime
 
 
 # ────────────────────────────────────────────────────────────────
@@ -214,7 +218,7 @@ class MentorAssignment(models.Model):
     start_date = models.DateField(default=timezone.now)
     end_date = models.DateField(null=True, blank=True)
     reason_for_change = models.TextField(blank=True)
-    code_review_pro_session_datetime = models.DateTimeField(blank=True)
+    code_review_pro_session_datetime = models.DateTimeField(blank=True, null=True)
     code_review_session_day = models.PositiveSmallIntegerField(choices=Weekday, default=Weekday.SAT)
     code_review_session_time = models.TimeField(default=timezone.now)
 
@@ -245,74 +249,6 @@ class SessionType(models.Model):
         return self.get_code_display()
 
 
-class SessionTemplate(models.Model):
-    mentor_assignment = models.ForeignKey(MentorAssignment,
-                                          on_delete=models.CASCADE,
-                                          null=True, blank=True,
-                                          related_name="session_templates")
-    learning_path = models.ForeignKey(LearningPath,
-                                      on_delete=models.CASCADE,
-                                      null=True, blank=True,
-                                      related_name="session_templates")
-    session_type = models.ForeignKey(SessionType,
-                                     on_delete=models.CASCADE,
-                                     related_name="templates")
-    weekday = models.IntegerField(choices=Weekday.choices)
-    active_from = models.DateField(default=timezone.now)
-    status = models.CharField(max_length=8,
-                              choices=SessionTemplateStatus.choices,
-                              default=SessionTemplateStatus.ACTIVE)
-    google_meet_link = models.URLField(max_length=500)
-
-    class Meta:
-        ordering = ("weekday", "active_from")
-
-    def __str__(self):
-        return f"{self.learning_path} – {self.get_weekday_display()} – {self.session_type}"
-
-
-class SessionOccurrence(models.Model):
-    template = models.ForeignKey(SessionTemplate,
-                                 on_delete=models.CASCADE,
-                                 related_name="occurrences")
-    planned_date = models.DateField()
-    planned_start_time = models.TimeField()
-    planned_end_time = models.TimeField()
-    actual_start_time = models.TimeField(null=True, blank=True)
-    actual_end_time = models.TimeField(null=True, blank=True)
-    status = models.CharField(max_length=10,
-                              choices=SessionOccurrenceStatus.choices,
-                              default=SessionOccurrenceStatus.SCHEDULED)
-    recorded_meet_link = models.URLField(max_length=500, blank=True)
-    notes = models.TextField(blank=True)
-
-    class Meta:
-        ordering = ("-planned_date", "planned_start_time")
-        unique_together = ("template", "planned_date", "planned_start_time")
-
-    def __str__(self):
-        return f"{self.template} – {self.planned_date}"
-
-
-class SessionParticipant(models.Model):
-    learner = models.ForeignKey(Learner,
-                                on_delete=models.CASCADE,
-                                related_name="session_participations")
-    occurrence = models.ForeignKey(SessionOccurrence,
-                                   on_delete=models.CASCADE,
-                                   related_name="participants")
-    guest_name = models.CharField(max_length=120, blank=True)
-    attendance_status = models.CharField(max_length=8,
-                                         choices=AttendanceStatus.choices,
-                                         default=AttendanceStatus.ABSENT)
-
-    class Meta:
-        unique_together = ("learner", "occurrence")
-
-    def __str__(self):
-        return f"{self.learner} @ {self.occurrence}"
-
-
 # ────────────────────────────────────────────────────────────────
 # ➐  PROGRESS & TASKS
 # ────────────────────────────────────────────────────────────────
@@ -323,7 +259,7 @@ class StepProgress(models.Model):
     initial_promise_date = models.DateTimeField(auto_now_add=True)
     initial_promise_days = models.PositiveSmallIntegerField(default=1)
     repromise_count = models.PositiveSmallIntegerField(default=0)
-    task_completion_date = models.DateTimeField(blank=True)
+    task_completion_date = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         unique_together = ("mentor_assignment", "educational_step")
@@ -399,7 +335,7 @@ class TaskEvaluation(models.Model):
     score_numeric = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)]
     )
-    feedback_text = models.TextField(blank=True)
+    feedback_text = models.TextField(max_length=10000, blank=True)
     evaluated_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
@@ -449,7 +385,7 @@ class Feature(models.Model):
 class SubscriptionPlan(models.Model):
     name = models.CharField(max_length=20, unique=True, help_text="(Basic/Plus/Pro)")
     description = models.TextField(blank=True)
-    price_amount = models.PositiveIntegerField()
+    price_amount = models.PositiveIntegerField(default=0, help_text="Toman")
     duration_in_days = models.PositiveSmallIntegerField(choices=SubscriptionDurations, default=SubscriptionDurations.ONE_MONTHS)
     is_active = models.BooleanField(default=True)
 
@@ -471,17 +407,65 @@ class PlanFeature(models.Model):
 class LearnerSubscribePlan(models.Model):
     learner_enrolment = models.ForeignKey(LearnerEnrolment, on_delete=models.CASCADE, related_name="learner_subscribe_plans")
     subscription_plan = models.ForeignKey(SubscriptionPlan, on_delete=models.CASCADE, related_name="learner_subscribe_plans")
-    start_date = models.DateTimeField(auto_now_add=True)
+    start_datetime = models.DateTimeField(blank=False, null=False, default=timezone.now)
+    end_datetime = models.DateTimeField(blank=True, null=True)
     discount = models.PositiveSmallIntegerField(
         default=0, 
-        validators=[MaxValueValidator(100, r"100% discount is the highest valid amount!")],
+        validators=[MaxValueValidator(100, r"100 % discount is the maximum allowed value!")],
         help_text=r"% discount (e.g. 10 => 10%)"
         )
     status = models.CharField(max_length=8, choices=SubscribePlanStatus.choices, default=SubscribePlanStatus.ACTIVE)
+    final_cost = models.PositiveBigIntegerField(default=0)
 
+    def clean(self):
+        if self.start_datetime is None:
+            self.start_datetime = timezone.now()
+
+        previous = (
+            LearnerSubscribePlan.objects
+            .filter(learner_enrolment=self.learner_enrolment)
+            .exclude(pk=self.pk)                     # ignore self on update
+            .order_by("-start_datetime")
+            .first()
+        )
+        if previous and self.start_datetime <= previous.start_datetime:
+            raise ValidationError({
+                "start_datetime":
+                    f"Start must be **after** "
+                    f"{convert_to_persian_calendar(format_persian_datetime(translate_number(previous.start_datetime)))}.",
+            })
+
+    # ──────── PERSISTENCE HOOK ────────────────────────
+    def save(self, *args, **kwargs):
+        # run clean() every time save() is called programmatically
+        self.full_clean()
+
+        # ➊  end_datetime
+        if self.subscription_plan and self.start_datetime:
+            self.end_datetime = (
+                self.start_datetime +
+                timedelta(days=self.subscription_plan.duration_in_days)
+            )
+
+        # ➋  final_cost
+        if self.subscription_plan:
+            price = self.subscription_plan.price_amount
+            self.final_cost = int(price * (100 - self.discount) / 100)
+
+        # ➌  keep the whole thing atomic (especially important if you
+        #     add signals that might query inside the same transaction)
+        with transaction.atomic():
+            super().save(*args, **kwargs)
+    
     class Meta:
-        ordering = ("-start_date",)
-        unique_together = ("subscription_plan", "learner_enrolment", "start_date")
+        ordering = ("-start_datetime",)
+        # unique_together = ("subscription_plan", "learner_enrolment", "start_datetime")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("learner_enrolment", "start_datetime"),
+                name="unique_start_per_enrolment",
+            )
+        ]
 
     def __str__(self):
         return f"{self.learner_enrolment} | {self.subscription_plan}"
@@ -511,32 +495,34 @@ class MentorGroupSession(models.Model):
     learning_path = models.ForeignKey(LearningPath, on_delete=models.CASCADE, related_name="group_sessions")
     session_type = models.ForeignKey(SessionType, on_delete=models.CASCADE, related_name="group_sessions")
     suppused_day = models.PositiveSmallIntegerField(choices=Weekday, default=Weekday.SAT)
-    suppoused_time = models.TimeField(blank=True)
+    suppoused_time = models.TimeField(blank=True, null=True)
     google_meet_link = models.URLField(blank=True)
 
     class Meta:
         ordering = ("-suppused_day", "-suppoused_time")
 
     def __str__(self):
-        return f"{self.title} – {self.start_datetime:%Y‑%m‑%d}"
+        return f"{self.mentor} - {self.suppused_day}"
 
 
 class MentorGroupSessionOcuurence(models.Model):
     mentor_group_session = models.ForeignKey(MentorGroupSession, on_delete=models.CASCADE, related_name="mentor_group_sessions")
     occurence_datetime = models.DateTimeField(blank=False)
-    change_the_datetime = models.BinaryField(default=False)
+    change_the_datetime = models.DateTimeField(blank=True, null=True)
     reason_for_change = models.TextField(max_length=5000)
-    google_meet_record = models.URLField(blank=False)
-
-
-class MentorGroupSessionParticipant(models.Model):
-    session = models.ForeignKey(MentorGroupSession,on_delete=models.CASCADE, related_name="participants")
-    learner = models.ForeignKey(Learner, on_delete=models.CASCADE, related_name="group_sessions")
-    present = models.BooleanField(default=True)
-    joined_at = models.TimeField(blank=True)
+    session_video_record = models.URLField(blank=True, null=True, help_text="The link for downloading the record of the session.")
 
     class Meta:
-        unique_together = ("session", "learner")
+        ordering = ("-occurence_datetime",)
+        indexes = [models.Index(fields=("mentor_group_session", "occurence_datetime"))]
+
+class MentorGroupSessionParticipant(models.Model):
+    mentor_group_session_occurence = models.ForeignKey(MentorGroupSessionOcuurence,on_delete=models.CASCADE, related_name="participants")
+    mentor_assignment = models.ForeignKey(MentorAssignment,on_delete=models.CASCADE, related_name="participants")
+    present = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = ("mentor_group_session_occurence", "mentor_assignment")
 
     def __str__(self):
-        return f"{self.learner} in {self.session}"
+        return f"{self.mentor_assignment} in {self.mentor_group_session_occurence}"
