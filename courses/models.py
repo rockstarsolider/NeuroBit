@@ -16,9 +16,11 @@ from django.core.validators import (
     RegexValidator, MinValueValidator, MaxValueValidator
 )
 from django.db import models, transaction
+from django.db.models import Q, CheckConstraint
 from django.utils import timezone
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.contrib.postgres.fields import ArrayField
 
 from core.utility import phone_re
 from pages.templatetags.custom_translation_tags import translate_number
@@ -353,19 +355,43 @@ class TaskEvaluation(models.Model):
         return f"{self.score_numeric}/5 by {self.mentor}"
 
 
+class SocialMedia(models.Model):
+    platform = models.CharField(
+        max_length=32,
+        unique=True,
+        help_text="Social-media platform (e.g. Twitter, LinkedIn).",
+    )
+
+    class Meta:
+        ordering = ("platform",)
+
+    def __str__(self):
+        return self.platform
+
+
 class SocialPost(models.Model):
-    Learner = models.ForeignKey(Learner, on_delete=models.CASCADE, related_name="social_posts")
+    learner = models.ForeignKey(Learner, on_delete=models.CASCADE, related_name="social_posts")
     step_progress = models.ForeignKey(StepProgress, on_delete=models.CASCADE, related_name="social_posts")
-    platform = models.CharField(max_length=32)
-    url = models.URLField(max_length=500)
+    platform = models.ManyToManyField(SocialMedia, related_name="social_posts")
+    
+    # url = models.URLField(max_length=500,  help_text="The address of the post.")
+    urls = ArrayField(
+        base_field=models.URLField(max_length=500),
+        size=None,              # unlimited – set a number if you want to cap it.
+        blank=True, default=list,
+        help_text="One or more URLs of the published post(s).",
+    )
+    
     posted_at = models.DateTimeField()
-    description = models.TextField(max_length=7000)
+    description = models.TextField(max_length=10000, blank=True)
 
     class Meta:
         ordering = ("-posted_at",)
 
-    def __str__(self):
-        return f"{self.platform} – {self.url}"
+    # def __str__(self):
+    #     plats = ", ".join(self.platform.values_list("platform", flat=True))
+    #     first = self.urls[0] if self.urls else "—"
+    #     return f"{plats} → {first}"
 
 
 # ────────────────────────────────────────────────────────────────
@@ -496,7 +522,7 @@ class MentorGroupSession(models.Model):
     session_type = models.ForeignKey(SessionType, on_delete=models.CASCADE, related_name="group_sessions")
     suppused_day = models.PositiveSmallIntegerField(choices=Weekday, default=Weekday.SAT)
     suppoused_time = models.TimeField(blank=True, null=True)
-    google_meet_link = models.URLField(blank=True)
+    google_meet_link = models.URLField(blank=True, help_text="The link for joining the meeting session.")
 
     class Meta:
         ordering = ("-suppused_day", "-suppoused_time")
@@ -505,21 +531,35 @@ class MentorGroupSession(models.Model):
         return f"{self.mentor} - {self.suppused_day}"
 
 
-class MentorGroupSessionOcuurence(models.Model):
+class MentorGroupSessionOccurrence(models.Model):
     mentor_group_session = models.ForeignKey(MentorGroupSession, on_delete=models.CASCADE, related_name="mentor_group_sessions")
     occurence_datetime = models.DateTimeField(blank=False)
-    change_the_datetime = models.DateTimeField(blank=True, null=True)
-    reason_for_change = models.TextField(max_length=5000)
-    session_video_record = models.URLField(blank=True, null=True, help_text="The link for downloading the record of the session.")
+    occurence_datetime_changed = models.BooleanField(default=False, help_text="⚠️If the inital DateTime has been changed then You must turn this on!")
+    new_datetime = models.DateTimeField(blank=True, null=True)
+    reason_for_change = models.TextField(max_length=10000)
+    session_video_record = models.URLField(blank=True, null=True, help_text="Link for downloading the session record.")
 
     class Meta:
         ordering = ("-occurence_datetime",)
         indexes = [models.Index(fields=("mentor_group_session", "occurence_datetime"))]
+        constraints = [
+            # data-level guarantee: if changed → new_datetime must be set
+            CheckConstraint(
+                check=(
+                    Q(occurence_datetime_changed=True,  new_datetime__isnull=False) |
+                    Q(occurence_datetime_changed=False, new_datetime__isnull=True)
+                ),
+                name="occurrence_requires_new_datetime_when_changed",
+            )
+        ]
+    
+    def __str__(self):
+        return f"{self.mentor_group_session} @ {self.occurence_datetime:%Y-%m-%d %H:%M}"
 
 class MentorGroupSessionParticipant(models.Model):
-    mentor_group_session_occurence = models.ForeignKey(MentorGroupSessionOcuurence,on_delete=models.CASCADE, related_name="participants")
+    mentor_group_session_occurence = models.ForeignKey(MentorGroupSessionOccurrence,on_delete=models.CASCADE, related_name="participants")
     mentor_assignment = models.ForeignKey(MentorAssignment,on_delete=models.CASCADE, related_name="participants")
-    present = models.BooleanField(default=True)
+    present = models.BooleanField(default=True, help_text="Status (present or absent.)")
 
     class Meta:
         unique_together = ("mentor_group_session_occurence", "mentor_assignment")

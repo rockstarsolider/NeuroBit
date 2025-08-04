@@ -156,9 +156,8 @@ class CustomUserAdmin(DjangoUserAdmin, ModelAdmin, ImportExportModelAdmin):
             "classes": ("wide",),
             "fields": (
                 "image",
-                "username", "first_name", "last_name", "email", "phone_number", "national_id",
+                "username", "first_name", "last_name", "email", "phone_number",
                 "password1", "password2",
-                "is_staff", "is_active",
             ),
         }),
     )

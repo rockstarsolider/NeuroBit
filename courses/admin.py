@@ -8,6 +8,7 @@ from django.contrib.humanize.templatetags.humanize import intcomma
 from django.db import models
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
+from django.contrib.postgres.fields import ArrayField 
 
 from import_export.admin import ImportExportModelAdmin
 
@@ -73,6 +74,7 @@ def choice_badge(attr, *, mapping: dict[str, tuple[str, str]], desc="Status"):
 FORM_OVERRIDES = {
     models.TextField: {"widget": WysiwygWidget},
     models.JSONField: {"widget": ArrayWidget},
+    ArrayField: {"widget": ArrayWidget},
 }
 
 
@@ -329,13 +331,37 @@ class TaskEvaluationAdmin(BaseAdmin):
     )
 
 
+@admin.register(m.SocialMedia)
+class SocialMediaAdmin(BaseAdmin):
+    list_display = ("platform",)
+    search_fields = ("platform",)
+
+
 @admin.register(m.SocialPost)
 class SocialPostAdmin(BaseAdmin):
     posted_j = jalali_display("posted_at", label="Posted")
-    list_display = ("platform", "Learner", "step_progress", "posted_j")
+    
+    @display(description="Platforms")
+    def platforms_disp(self, obj):
+        return ", ".join(obj.platform.values_list("platform", flat=True))
+    
+    list_display = ("platforms_disp", "learner", "step_progress", "posted_j")
     list_filter = ("platform",)
-    autocomplete_fields = ("Learner", "step_progress")
-    search_fields = ("step_progress__educational_step__title", "url")
+    autocomplete_fields = ("learner", "step_progress", "platform")
+    search_fields = (
+        "learner__user__email",
+        "step_progress__educational_step__title",
+        "urls",
+    )
+
+    # 🔑  Unfold magic:
+    conditional_fields = {
+        # show only when the checkbox is ticked
+        "urls": "platform == true",
+        "posted_at": "platform == true",
+        "description": "platform == true",
+    }
+
 
 
 # ════════════════════════════════════════════════════════════════
@@ -450,31 +476,60 @@ class MentorGroupSessionParticipantAdmin(ModelAdmin):
 
 class MGSParticipantInline(TabularInline):
     model = m.MentorGroupSessionParticipant
+    tab = True
     extra = 0
     autocomplete_fields = ("mentor_assignment",)
     fields = ("mentor_assignment", "present")
 
 
-@admin.register(m.MentorGroupSessionOcuurence)
-class MentorGroupSessionOcuurenceAdmin(BaseAdmin):
+@admin.register(m.MentorGroupSessionOccurrence)
+class MentorGroupSessionOccurrenceAdmin(BaseAdmin):
     list_display = (
         "mentor_group_session",
         "occurence_datetime",
-        "change_the_datetime",
+        "occurence_datetime_changed",
+        "new_datetime",
+        "reason_for_change",
+        "session_video_record",
+    )
+    fields = (
+        "mentor_group_session",
+        "occurence_datetime",
+        "occurence_datetime_changed",
+        "new_datetime",
         "reason_for_change",
         "session_video_record",
     )
     autocomplete_fields = ("mentor_group_session",)
-    search_fields = ("mentor_group_session" ,)
+    search_fields = (
+        "mentor_group_session__learning_path__name",
+        "mentor_group_session__mentor__user__email",
+    )
     list_select_related = ("mentor_group_session" ,)
     inlines = (MGSParticipantInline,)
+    # 🔑  Unfold magic:
+    conditional_fields = {
+        # show only when the checkbox is ticked
+        "new_datetime": "occurence_datetime_changed == true",
+        "reason_for_change": "occurence_datetime_changed == true",
+    }
 
 
 class MGSOccurrenceInline(TabularInline):
-    model = m.MentorGroupSessionOcuurence
+    model = m.MentorGroupSessionOccurrence
+    tab = True
     extra = 0
-    fields = ("occurence_datetime", "change_the_datetime", "reason_for_change", "session_video_record")
-    conditional_fields = {"reason_for_change": "change_the_datetime == true"}
+    fields = (
+        "occurence_datetime", 
+        "occurence_datetime_changed",
+        "new_datetime", 
+        "reason_for_change", 
+        "session_video_record",
+        )
+    conditional_fields = {
+        "new_datetime": "occurence_datetime_changed == true",
+        "reason_for_change": "occurence_datetime_changed == true",
+    }
 
 
 @admin.register(m.MentorGroupSession)
