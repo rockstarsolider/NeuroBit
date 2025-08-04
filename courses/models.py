@@ -122,7 +122,7 @@ class Mentor(models.Model):
     address = models.TextField(blank=True)
     bio = models.TextField(blank=True)
     specialties = models.ManyToManyField(Specialty, blank=True, related_name="mentors")
-    hire_date = models.DateField(null=True, blank=True)
+    hire_date = models.DateField(null=True, blank=True, default=timezone.now)
     status = models.CharField(max_length=8, choices=ActiveStatus.choices, default=ActiveStatus.ACTIVE)
 
     class Meta:
@@ -220,6 +220,7 @@ class MentorAssignment(models.Model):
     start_date = models.DateField(default=timezone.now)
     end_date = models.DateField(null=True, blank=True)
     reason_for_change = models.TextField(blank=True)
+    # if the learner was pro
     code_review_pro_session_datetime = models.DateTimeField(blank=True, null=True)
     code_review_session_day = models.PositiveSmallIntegerField(choices=Weekday, default=Weekday.SAT)
     code_review_session_time = models.TimeField(default=timezone.now)
@@ -277,14 +278,14 @@ class StepProgressSession(models.Model):
     datetime = models.DateTimeField(auto_now=True)
     present = models.BooleanField(default=True)
     description = models.TextField(blank=True)
-    recorded_meet_link = models.URLField()
+    recorded_meet_link = models.URLField(blank=True, null=True)
 
 
 class StepExtension(models.Model):
     step_progress = models.ForeignKey(StepProgress, on_delete=models.CASCADE, related_name="extensions")
     extended_by_days = models.PositiveSmallIntegerField(default=0)
     requested_at = models.DateTimeField(default=timezone.now)
-    approved_by_mentor = models.BooleanField(default=False)
+    approved_by_mentor = models.BooleanField(default=True)
     reason = models.TextField(blank=True)
 
     class Meta:
@@ -316,7 +317,7 @@ def submissions_upload_to(instance, filename) -> str:  # noqa: D401
 class TaskSubmission(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="submissions")
     step_progress = models.ForeignKey(StepProgress, on_delete=models.CASCADE, related_name="submissions")
-    submitted_at = models.DateTimeField(default=timezone.now)
+    submitted_at = models.DateTimeField(blank=True, null=True)
     artifact_url = models.URLField(max_length=500, blank=True)
     file = models.FileField(upload_to=submissions_upload_to, blank=True)
     report_video_file = models.FileField(upload_to=submissions_upload_to, blank=True)
@@ -330,14 +331,36 @@ class TaskSubmission(models.Model):
     def __str__(self):
         return f"Submission #{self.pk} – {self.step_progress}"
 
+class ScoreTaskEvaluation(models.IntegerChoices):
+    ONE   =   1, "⭐"
+    TWO   =   2, "⭐⭐"
+    THREE =   3, "⭐⭐⭐"
+    FOUR  =   4, "⭐⭐⭐⭐"
+    FIVE  =   5, "⭐⭐⭐⭐⭐"
+
 
 class TaskEvaluation(models.Model):
     submission = models.ForeignKey(TaskSubmission, on_delete=models.CASCADE, related_name="evaluations")
     mentor = models.ForeignKey(Mentor, on_delete=models.CASCADE, related_name="evaluations")
-    score_numeric = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(5)]
+    score = models.PositiveSmallIntegerField(
+        choices=ScoreTaskEvaluation,
+        default=ScoreTaskEvaluation.ONE,
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        help_text="""
+        <b>⚖️Stars will increase if:</b>
+        <br>
+        1- Completed the task.
+        <br>
+        2- Task has doc/readme file and is published on the github.
+        <br>
+        3- Deadline was honored.
+        <br>
+        4- Learner inform the mentro before he deadline.
+        <br>
+        5- There is creativity and perfection.
+        """
     )
-    feedback_text = models.TextField(max_length=10000, blank=True)
+    feedback = models.TextField(max_length=10000, blank=True)
     evaluated_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
@@ -345,14 +368,14 @@ class TaskEvaluation(models.Model):
         ordering = ("-evaluated_at",)
         constraints = [
             models.CheckConstraint(
-                check=models.Q(score_numeric__gte=1,
-                               score_numeric__lte=5),
+                check=models.Q(score__gte=1,
+                               score__lte=5),
                 name="valid_score_range",
             )
         ]
 
     def __str__(self):
-        return f"{self.score_numeric}/5 by {self.mentor}"
+        return f"{self.score}/5 by {self.mentor}"
 
 
 class SocialMedia(models.Model):
@@ -361,6 +384,7 @@ class SocialMedia(models.Model):
         unique=True,
         help_text="Social-media platform (e.g. Twitter, LinkedIn).",
     )
+
 
     class Meta:
         ordering = ("platform",)
@@ -372,26 +396,18 @@ class SocialMedia(models.Model):
 class SocialPost(models.Model):
     learner = models.ForeignKey(Learner, on_delete=models.CASCADE, related_name="social_posts")
     step_progress = models.ForeignKey(StepProgress, on_delete=models.CASCADE, related_name="social_posts")
-    platform = models.ManyToManyField(SocialMedia, related_name="social_posts")
-    
-    # url = models.URLField(max_length=500,  help_text="The address of the post.")
-    urls = ArrayField(
-        base_field=models.URLField(max_length=500),
-        size=None,              # unlimited – set a number if you want to cap it.
-        blank=True, default=list,
-        help_text="One or more URLs of the published post(s).",
-    )
-    
-    posted_at = models.DateTimeField()
+    platform = models.ForeignKey(SocialMedia, on_delete=models.CASCADE, related_name="social_posts")
+    url = models.URLField(max_length=500,  help_text="The address of the post.", null=True, blank=True)
+    posted_at = models.DateTimeField(blank=True, null=True, default=timezone.now)
     description = models.TextField(max_length=10000, blank=True)
+
+    datetime_created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     class Meta:
         ordering = ("-posted_at",)
 
-    # def __str__(self):
-    #     plats = ", ".join(self.platform.values_list("platform", flat=True))
-    #     first = self.urls[0] if self.urls else "—"
-    #     return f"{plats} → {first}"
+    def __str__(self):
+        return f"{self.learner} posted on {self.platform} at {self.posted_at}"
 
 
 # ────────────────────────────────────────────────────────────────
@@ -513,6 +529,7 @@ class LearnerSubscribePlanFreeze(models.Model):
 # ➒  MENTOR‑GROUP SESSIONS  ← **NEW (missing in old file)**
 # ────────────────────────────────────────────────────────────────
 class MentorGroupSession(models.Model):
+    "نوع جلسه و جزئیات آن را مشخص می کند"
     """
     A themed group session that multiple learners can attend.
     One mentor leads each session.
@@ -532,11 +549,12 @@ class MentorGroupSession(models.Model):
 
 
 class MentorGroupSessionOccurrence(models.Model):
+    "جلسه ی برگزار شده با حضور منتور"
     mentor_group_session = models.ForeignKey(MentorGroupSession, on_delete=models.CASCADE, related_name="mentor_group_sessions")
     occurence_datetime = models.DateTimeField(blank=False)
     occurence_datetime_changed = models.BooleanField(default=False, help_text="⚠️If the inital DateTime has been changed then You must turn this on!")
     new_datetime = models.DateTimeField(blank=True, null=True)
-    reason_for_change = models.TextField(max_length=10000)
+    reason_for_change = models.TextField(max_length=10000, blank=True, null=True)
     session_video_record = models.URLField(blank=True, null=True, help_text="Link for downloading the session record.")
 
     class Meta:
@@ -557,9 +575,11 @@ class MentorGroupSessionOccurrence(models.Model):
         return f"{self.mentor_group_session} @ {self.occurence_datetime:%Y-%m-%d %H:%M}"
 
 class MentorGroupSessionParticipant(models.Model):
+    "مشارکت فراگیران در جلسه گروهی"
+    
     mentor_group_session_occurence = models.ForeignKey(MentorGroupSessionOccurrence,on_delete=models.CASCADE, related_name="participants")
     mentor_assignment = models.ForeignKey(MentorAssignment,on_delete=models.CASCADE, related_name="participants")
-    present = models.BooleanField(default=True, help_text="Status (present or absent.)")
+    learner_was_present = models.BooleanField(default=True, help_text="off -> absent, on -> present.")
 
     class Meta:
         unique_together = ("mentor_group_session_occurence", "mentor_assignment")

@@ -17,11 +17,11 @@ from unfold.contrib.forms.widgets import WysiwygWidget, ArrayWidget
 from unfold.contrib.import_export.forms import ImportForm, ExportForm
 from unfold.decorators import display
 
+from pages.templatetags.custom_translation_tags import translate_number
 from pages.templatetags.persian_calendar_convertor import (
     convert_to_persian_calendar,
     format_persian_datetime,
 )
-from pages.templatetags.custom_translation_tags import translate_number
 
 from . import models as m
 
@@ -160,8 +160,6 @@ class MentorAdmin(BaseAdmin):
     hire_j = jalali_display("hire_date", label="Hire date")
     status_badge = bool_badge("status", true="Active", false="Inactive")
 
-    
-
     @display(header=True, description=_("Mentor"))
     def heading(self, obj):
         initials = "".join([obj.user.first_name[:1], obj.user.last_name[:1]])
@@ -169,7 +167,7 @@ class MentorAdmin(BaseAdmin):
 
     list_display = ("heading", "hire_j", "status_badge")
     list_filter = ("status", "specialties")
-    autocomplete_fields = ("specialties",)
+    autocomplete_fields = ("user", "specialties",)
     search_fields = ("user__first_name", "user__last_name", "user__email")
 
 
@@ -214,7 +212,7 @@ class LearnerEnrolmentAdmin(BaseAdmin):
     list_filter = ("status", "learning_path")
     autocomplete_fields = ("learner", "learning_path")
     search_fields = ("learner__user__email", "learning_path__name")
-    inlines = (MentorAssignmentInline,)
+    # inlines = (MentorAssignmentInline,)
 
 
 @admin.register(m.MentorAssignment)
@@ -232,12 +230,22 @@ class MentorAssignmentAdmin(BaseAdmin):
 # ════════════════════════════════════════════════════════════════
 #  PROGRESS & TASKS
 # ════════════════════════════════════════════════════════════════
+@admin.register(m.StepExtension)
+class StepExtension(BaseAdmin):
+    list_display = (
+        "step_progress",
+        "extended_by_days",
+        "requested_at",
+        "approved_by_mentor",
+        "reason",
+    )
+    list_select_related = ("step_progress",)
+
+
 class StepExtensionInline(TabularInline):
     model = m.StepExtension
     extra = 0
-    readonly_fields = ("requested_at",)
     fields = ("extended_by_days", "requested_at", "approved_by_mentor", "reason")
-    conditional_fields = {"reason": "approved_by_mentor == false"}
 
 
 class TaskSubmissionInline(TabularInline):
@@ -321,8 +329,8 @@ class TaskEvaluationAdmin(BaseAdmin):
     list_display = (
         "submission",
         "mentor",
-        "score_numeric",
-        "feedback_text",
+        "score",
+        "feedback",
     )
     autocomplete_fields = ("mentor", "submission")
     search_fields = (
@@ -353,15 +361,6 @@ class SocialPostAdmin(BaseAdmin):
         "step_progress__educational_step__title",
         "urls",
     )
-
-    # 🔑  Unfold magic:
-    conditional_fields = {
-        # show only when the checkbox is ticked
-        "urls": "platform == true",
-        "posted_at": "platform == true",
-        "description": "platform == true",
-    }
-
 
 
 # ════════════════════════════════════════════════════════════════
@@ -461,17 +460,16 @@ class LearnerSubscribePlanAdmin(BaseAdmin):
 #  MENTOR GROUP SESSIONS
 # ════════════════════════════════════════════════════════════════
 @admin.register(m.MentorGroupSessionParticipant)
-class MentorGroupSessionParticipantAdmin(ModelAdmin):
+class MentorGroupSessionParticipantAdmin(BaseAdmin):
     list_display = (
         "mentor_group_session_occurence",
         "mentor_assignment",
-        "present",
+        "learner_was_present",
     )
-    list_filter = ("present",)
+    list_filter = ("learner_was_present",)
     autocomplete_fields = ("mentor_group_session_occurence", "mentor_assignment",)
     search_fields = ("mentor_assignment",)
     list_select_related = ("mentor_group_session_occurence", "mentor_assignment" ,)
-    show_full_result_count = False
 
 
 class MGSParticipantInline(TabularInline):
@@ -479,7 +477,7 @@ class MGSParticipantInline(TabularInline):
     tab = True
     extra = 0
     autocomplete_fields = ("mentor_assignment",)
-    fields = ("mentor_assignment", "present")
+    fields = ("mentor_assignment", "learner_was_present")
 
 
 @admin.register(m.MentorGroupSessionOccurrence)

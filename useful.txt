@@ -1,0 +1,2 @@
+# drop postgres database
+python manage.py reset_db --noinput --close-sessions
