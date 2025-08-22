@@ -11,7 +11,9 @@ urlpatterns = [
 
 # serve media in development
 if settings.DEBUG:
-    from debug_toolbar.toolbar import debug_toolbar_urls
+    # from debug_toolbar.toolbar import debug_toolbar_urls
     from django.conf.urls.static import static
-    urlpatterns += debug_toolbar_urls()
+    import debug_toolbar
+    urlpatterns += [path("__debug__/", include("debug_toolbar.urls"))]
+    # urlpatterns += debug_toolbar_urls()
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

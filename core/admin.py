@@ -24,7 +24,7 @@ from unfold.contrib.forms.widgets import UnfoldAdminTextInputWidget
 
 
 from .models import CustomUser
-
+from . import notify as core_notify
 
 
 class UnfoldAdminPasswordInputWidget(UnfoldAdminTextInputWidget):
@@ -175,3 +175,17 @@ class CustomUserAdmin(DjangoUserAdmin, ModelAdmin, ImportExportModelAdmin):
 
     # widgets
     formfield_overrides = {models.TextField: {"widget": WysiwygWidget}}
+
+
+@admin.register(core_notify.SubscriptionNotificationConfig)
+class SubscriptionNotificationConfigAdmin(ModelAdmin):
+    list_display = ("enable_user_sms", "enable_manager_sms", "updated_at")
+    formfield_overrides = {models.TextField: {"widget": WysiwygWidget}}
+
+    fieldsets = ((None, {
+        "fields": ("enable_user_sms", "enable_manager_sms", "manager_phones",
+                   "user_sms_template", "manager_sms_template")
+    }),)
+    def has_add_permission(self, request):
+        # keep it single-row
+        return not core_notify.SubscriptionNotificationConfig.objects.exists()

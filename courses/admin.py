@@ -2,20 +2,32 @@
 from __future__ import annotations
 
 from datetime import date as _d, datetime as _dt, time as _t, timezone as _tz
+import json
 
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.humanize.templatetags.humanize import intcomma
+from django.contrib.postgres.fields import ArrayField 
+from django.conf import settings
 from django.db import models
+from django.db.models import Sum, Count
+from django.db.models.functions import TruncMonth
+from django.http import HttpResponse, JsonResponse
+from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
-from django.contrib.postgres.fields import ArrayField 
+from django.utils.safestring import mark_safe
+from django.urls import reverse, path
+from django.template.response import TemplateResponse
 
+from simple_history.admin import SimpleHistoryAdmin
 from import_export.admin import ImportExportModelAdmin
 
 from unfold.admin import ModelAdmin, TabularInline, StackedInline
 from unfold.contrib.forms.widgets import WysiwygWidget, ArrayWidget
 from unfold.contrib.import_export.forms import ImportForm, ExportForm
 from unfold.decorators import display
+
+from import_export import resources
 
 from pages.templatetags.custom_translation_tags import translate_number
 from pages.templatetags.persian_calendar_convertor import (
@@ -24,6 +36,35 @@ from pages.templatetags.persian_calendar_convertor import (
 )
 
 from . import models as m
+from core.notify import send_subscription_expired_sms
+from core.utility import shamsi_text
+
+
+@admin.action(description=_("Export selected → PDF"))
+def action_export_selected_pdf(self, request, qs):
+    ctx = {**self.admin_site.each_context(request), "title": "Subscriptions Export (PDF)", "qs": qs}
+    try:
+        import weasyprint
+        html = TemplateResponse(request, "admin/courses/learner_subscribe_plan/export_pdf.html", ctx)
+        html.render()
+        pdf = weasyprint.HTML(string=html.content.decode("utf-8")).write_pdf()
+        resp = HttpResponse(pdf, content_type="application/pdf")
+        resp["Content-Disposition"] = 'attachment; filename="subscriptions_selected.pdf"'
+        return resp
+    except Exception:
+        return TemplateResponse(request, "admin/courses/learner_subscribe_plan/export_pdf.html", ctx)
+
+@admin.action(description=_("Send TEST SMS via Kavenegar"))
+def action_send_test_sms(self, request, qs):
+    sent = 0
+    for sub in qs.select_related("learner_enrolment__learner__user", "subscription_plan"):
+        send_subscription_expired_sms(sub)  # reuses your templates and routing
+        sent += 1
+    self.message_user(request, f"SMS triggered for {sent} subscription(s).")
+
+# register actions (keep your existing 'action_expire_overdue')
+actions = ("action_expire_overdue", "action_export_selected_pdf", "action_send_test_sms")
+
 
 # ════════════════════════════════════════════════════════════════
 #  Helpers
@@ -84,6 +125,10 @@ class BaseAdmin(ModelAdmin, ImportExportModelAdmin):
     show_full_result_count = False
     formfield_overrides = FORM_OVERRIDES
 
+
+# Combine Unfold styling + simple-history admin mixin
+class HistoryBaseAdmin(SimpleHistoryAdmin, BaseAdmin):
+    pass
 
 # ════════════════════════════════════════════════════════════════
 #  CURRICULUM
@@ -366,6 +411,64 @@ class SocialPostAdmin(BaseAdmin):
 # ════════════════════════════════════════════════════════════════
 #  SUBSCRIPTIONS
 # ════════════════════════════════════════════════════════════════
+class SubscriptionTransactionResource(resources.ModelResource):
+    class Meta:
+        model = m.SubscriptionTransaction
+        fields = (
+            "id",
+            "learner_enrolment__learner__user__username",
+            "subscription_plan__name",
+            "kind",
+            "status",
+            "amount",
+            "paid_at",
+            "gateway",
+            "ref",
+            "note",
+        )
+        export_order = fields
+
+
+class LearnerSubscribePlanResource(resources.ModelResource):
+    class Meta:
+        model = m.LearnerSubscribePlan
+        fields = (
+            "id",
+            "learner_enrolment__learner__user__username",
+            "subscription_plan__name",
+            "start_datetime",
+            "end_datetime",
+            "expired_at",
+            "discount",
+            "final_cost",
+            "status",
+        )
+        export_order = fields
+
+
+# ---- Transaction Admin ----
+@admin.register(m.SubscriptionTransaction)
+class SubscriptionTransactionAdmin(SimpleHistoryAdmin, ModelAdmin):
+    resource_class = SubscriptionTransactionResource
+    list_display = ("learner_enrolment", "subscription_plan", "kind", "status", "amount_disp", "paid_at")
+    list_filter = ("kind", "status", "subscription_plan", "gateway")
+    search_fields = ("learner_enrolment__learner__user__username", "subscription_plan__name", "ref", "note")
+    date_hierarchy = "paid_at"
+    autocomplete_fields = ("learner_enrolment", "subscription", "subscription_plan")
+
+    @admin.display(description=_("Amount (T)"))
+    def amount_disp(self, obj): return intcomma(obj.amount)
+
+
+class TransactionInline(admin.TabularInline):
+    model = m.SubscriptionTransaction
+    extra = 0
+    fields = ("paid_at", "kind", "status", "amount", "gateway", "ref", "note")
+    readonly_fields = fields
+    can_delete = False
+    show_change_link = True
+
+
 class PlanFeatureInline(TabularInline):
     model = m.PlanFeature
     extra = 0
@@ -398,64 +501,121 @@ class FreezeInline(TabularInline):
 
 
 @admin.register(m.LearnerSubscribePlan)
-class LearnerSubscribePlanAdmin(BaseAdmin):
-    status_badge = choice_badge(
-        "status",
-        mapping={
-            "active": ("Active", "success"),
-            "freeze": ("Frozen", "secondary"),
-            "reserved": ("Reserved", "warning"),
-            "expired": ("Expired", "danger"),
-            "canceled": ("Canceled", "danger"),
-        },
-        desc="Status",
-    )
-    start_j = jalali_display("start_datetime", label="Start")
-    end_j   = jalali_display("end_datetime",   label="End")
+class LearnerSubscribePlanAdmin(ModelAdmin):
+    list_display = ("id", "enrolment_name", "plan_name", "start_j", "end_j",
+                    "discount", "final_cost", "status", "expired_at_j")
+    list_filter = ("status", "subscription_plan")
+    search_fields = ("learner_enrolment__learner__user__first_name",
+                     "learner_enrolment__learner__user__last_name")
+    actions = ["mark_expired_action"]
+    readonly_fields = ("end_datetime", "final_cost", "expired_at")
 
-    # formatted money / percent columns
-    @display(description=_("Disc. %"))
-    def discount_disp(self, obj):
-        return f"{obj.discount} %"
+    # ---- pretty columns
+    def enrolment_name(self, obj):  # compact name
+        u = getattr(obj.learner_enrolment, "learner", None)
+        return u.user.get_full_name() if u and hasattr(u, "user") else obj.learner_enrolment_id
+    def plan_name(self, obj): return getattr(obj.subscription_plan, "name", obj.subscription_plan_id)
+    def start_j(self, obj): return shamsi_text(obj.start_datetime)
+    def end_j(self, obj): return shamsi_text(obj.end_datetime)
+    def expired_at_j(self, obj): return shamsi_text(obj.expired_at)
+    start_j.short_description = "Start (Shamsi)"
+    end_j.short_description = "End (Shamsi)"
+    expired_at_j.short_description = "Expired At (Shamsi)"
 
-    @display(description=_("Final cost (T)"))
-    def cost_disp(self, obj):
-        return intcomma(obj.final_cost)
+    # ---- admin actions
+    def mark_expired_action(self, request, queryset):
+        from django.utils import timezone
+        now = timezone.now()
+        updated = 0
+        for sub in queryset.filter(status=m.LearnerSubscribePlan.STATUS_ACTIVE, end_datetime__lte=now):
+            sub.status = m.LearnerSubscribePlan.STATUS_EXPIRED
+            sub.expired_at = now
+            sub.save(update_fields=["status","expired_at"])
+            updated += 1
+        self.message_user(request, f"Marked {updated} as expired.")
+    mark_expired_action.short_description = "Mark expired (end <= now)"
 
-    list_display = (
-        "learner_enrolment",
-        "subscription_plan",
-        "start_j",
-        "end_j",
-        "discount_disp",
-        "cost_disp",
-        "status_badge",
-    )
+    # ---- analytics URLs
+    def get_urls(self):
+        return [
+            path(
+                "analytics/",
+                self.admin_site.admin_view(self.analytics_view),
+                name="courses_learnersubscribeplan_analytics",
+            ),
+            path(
+                "analytics/data/",
+                self.admin_site.admin_view(self.analytics_data),
+                name="courses_learnersubscribeplan_analytics_data",
+            ),
+            # ✅ add this route so reverse('admin:courses_learnersubscribeplan_export_pdf') works
+            path(
+                "export-pdf/",
+                self.admin_site.admin_view(self.export_pdf_view),
+                name="courses_learnersubscribeplan_export_pdf",
+            ),
+        ] + super().get_urls()
+    
+    def export_pdf_view(self, request):
+        qs = self.model.objects.select_related(
+            "learner_enrolment__learner__user", "subscription_plan"
+        )
+        ctx = {**self.admin_site.each_context(request),
+            "title": "Subscriptions Export (PDF)",
+            "qs": qs}
+        # Dev-friendly HTML fallback (WeasyPrint optional)
+        try:
+            from django.conf import settings
+            if not getattr(settings, "USE_WEASYPRINT", False):
+                messages.warning(request, "WeasyPrint disabled. Use browser Print → Save as PDF.")
+                return TemplateResponse(request, "admin/courses/learner_subscribe_plan/export_pdf.html", ctx)
+            import weasyprint
+            html = TemplateResponse(request, "admin/courses/learner_subscribe_plan/export_pdf.html", ctx); html.render()
+            pdf = weasyprint.HTML(string=html.content.decode("utf-8")).write_pdf()
+            resp = HttpResponse(pdf, content_type="application/pdf")
+            resp["Content-Disposition"] = 'attachment; filename="subscriptions.pdf"'
+            return resp
+        except Exception as e:
+            messages.error(request, f"PDF fallback (WeasyPrint not available: {e})")
+            return TemplateResponse(request, "admin/courses/learner_subscribe_plan/export_pdf.html", ctx)
 
-    list_filter = ("status", "subscription_plan", "discount")
-    search_fields = (
-        "learner_enrolment__learner__user__email",
-        "subscription_plan__name",
-    )
+    # page with chart + filters
+    def analytics_view(self, request):
+        now = timezone.now()
+        years = list(range(now.year - 3, now.year + 2))  # e.g. 2022..2026
+        ctx = {
+            **self.admin_site.each_context(request),
+            "title": "Subscriptions Analytics",
+            "years": years,
+            "current_year": now.year,
+        }
+        return TemplateResponse(request, "admin/courses/learner_subscribe_plan/analytics.html", ctx)
 
-    autocomplete_fields = ("subscription_plan", "learner_enrolment")
-    inlines = (FreezeInline,)
+    # data endpoint: revenue per month for a given year
+    def analytics_data(self, request):
+        year = int(request.GET.get("year") or timezone.now().year)
+        qs = self.model.objects.filter(start_datetime__year=year)
 
-    # Prevent manual tampering with system-calculated values
-    readonly_fields = ("end_datetime", "final_cost")
+        agg = (
+            qs.annotate(m=TruncMonth("start_datetime"))
+            .values("m")
+            .order_by("m")
+            .annotate(revenue=Sum("final_cost"), count=Count("id"))
+        )
 
-    # Nice, compact field layout
-    fieldsets = (
-        (None, {
-            "fields": (
-                ("learner_enrolment", "subscription_plan"),
-                ("start_datetime", "end_datetime"),
-                ("discount", "final_cost"),
-                "status",
-            )
-        }),
-    )
+        labels  = [row["m"].strftime("%Y-%m") for row in agg]
+        values  = [int(row["revenue"] or 0) for row in agg]
+        counts  = [int(row["count"] or 0) for row in agg]
+        active_now = self.model.objects.filter(status="active").count()
 
+        return JsonResponse({
+            "year": year,
+            "labels": labels,
+            "revenues": values,
+            "counts": counts,
+            "active_now": active_now,
+            "revenue_total": sum(values),
+        })
 # ════════════════════════════════════════════════════════════════
 #  MENTOR GROUP SESSIONS
 # ════════════════════════════════════════════════════════════════

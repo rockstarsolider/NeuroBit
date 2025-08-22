@@ -1,0 +1,43 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+{% load render_bundle from webpack_loader %}
+
+{% block extrastyle %}
+  {# Removed CDN: https://cdn.plot.ly/plotly-2.35.2.min.js #}
+  <style>.box{background:#fff;border:1px solid #eee;border-radius:12px;padding:12px}</style>
+{% endblock %}
+
+{% block content %}
+  {# Provide endpoint to JS via data-* #}
+  <div id="analytics-root"
+       data-endpoint="{% url 'admin:courses_learnersubscribeplan_analytics_data' %}"></div>
+
+  <div class="grid grid-cols-3 gap-4 mb-4">
+    <div class="box">
+      <div class="box__body">
+        <label class="text-sm opacity-70 mr-2">Year</label>
+        <select id="year" class="select">
+          {% for y in years %}
+            <option value="{{ y }}"{% if y == current_year %} selected{% endif %}>{{ y }}</option>
+          {% endfor %}
+        </select>
+        <button id="refresh" class="button ml-2">Refresh</button>
+      </div>
+    </div>
+    <div class="box"><div class="box__body">
+      <div class="text-sm opacity-70">Revenue (T) — year</div>
+      <div id="kpi-rev" class="text-2xl font-bold">0</div>
+    </div></div>
+    <div class="box"><div class="box__body">
+      <div class="text-sm opacity-70">Active now</div>
+      <div id="kpi-active" class="text-2xl font-bold">0</div>
+    </div></div>
+  </div>
+
+  <div class="box">
+    <div class="box__body"><div id="chart" style="height:360px;"></div></div>
+  </div>
+
+  {# Load the compiled JS entry named "admin_analytics" (see webpack.config.js). #}
+  {% render_bundle 'admin_analytics' 'js' %}
+{% endblock %}
