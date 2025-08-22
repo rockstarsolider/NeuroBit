@@ -62,7 +62,7 @@ class CustomUserResource(ModelResource):
     class Meta:
         model = CustomUser
         fields = (
-            "id", "username", "first_name", "last_name",
+            "id", "username", "first_name", "last_name", "birthdate",
             "email", "phone_number", "national_id",
             "is_active", "is_staff", "is_superuser", "date_joined",
         )
@@ -87,7 +87,7 @@ class _AddUserForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = CustomUser
         fields = (
-            "username", "email", "phone_number", "national_id",
+            "username", "email", "phone_number", "birthdate", "national_id",
             "password1", "password2",
         )
 
@@ -145,7 +145,7 @@ class CustomUserAdmin(DjangoUserAdmin, ModelAdmin, ImportExportModelAdmin):
 
     # fieldsets (change form)
     fieldsets = (
-        (None, {"fields": ("image", "username", "first_name", "last_name", "gender", "email", "phone_number", "national_id", "password")}),
+        (None, {"fields": ("image", "username", "first_name", "last_name", "gender", "birthdate", "email", "phone_number", "national_id", "password")}),
         (_("Permissions"), {"fields": ("is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
         (_("Important dates"), {"fields": ("last_login", "date_joined")}),
     )
@@ -156,7 +156,7 @@ class CustomUserAdmin(DjangoUserAdmin, ModelAdmin, ImportExportModelAdmin):
             "classes": ("wide",),
             "fields": (
                 "image",
-                "username", "first_name", "last_name", "email", "phone_number",
+                "username", "first_name", "last_name", "email", "phone_number", "birthdate",
                 "password1", "password2",
             ),
         }),

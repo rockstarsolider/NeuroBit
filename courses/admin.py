@@ -10,7 +10,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.conf import settings
 from django.db import models
 from django.db.models import Sum, Count
-from django.db.models.functions import TruncMonth
+from django.db.models.functions import TruncMonth, TruncDate
 from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
 from django.utils.html import format_html
@@ -538,24 +538,14 @@ class LearnerSubscribePlanAdmin(ModelAdmin):
     # ---- analytics URLs
     def get_urls(self):
         return [
-            path(
-                "analytics/",
-                self.admin_site.admin_view(self.analytics_view),
-                name="courses_learnersubscribeplan_analytics",
-            ),
-            path(
-                "analytics/data/",
-                self.admin_site.admin_view(self.analytics_data),
-                name="courses_learnersubscribeplan_analytics_data",
-            ),
-            # ✅ add this route so reverse('admin:courses_learnersubscribeplan_export_pdf') works
-            path(
-                "export-pdf/",
-                self.admin_site.admin_view(self.export_pdf_view),
-                name="courses_learnersubscribeplan_export_pdf",
-            ),
+            path("analytics/", self.admin_site.admin_view(self.analytics_view),
+                name="courses_learnersubscribeplan_analytics"),
+            path("analytics/data/", self.admin_site.admin_view(self.analytics_data),
+                name="courses_learnersubscribeplan_analytics_data"),
+            path("export-pdf/", self.admin_site.admin_view(self.export_pdf_view),
+                name="courses_learnersubscribeplan_export_pdf"),
         ] + super().get_urls()
-    
+
     def export_pdf_view(self, request):
         qs = self.model.objects.select_related(
             "learner_enrolment__learner__user", "subscription_plan"
@@ -582,40 +572,131 @@ class LearnerSubscribePlanAdmin(ModelAdmin):
     # page with chart + filters
     def analytics_view(self, request):
         now = timezone.now()
-        years = list(range(now.year - 3, now.year + 2))  # e.g. 2022..2026
+        years = list(range(now.year - 3, now.year + 2))
+        chart_options = [
+            ("monthly_bar", "Monthly Revenue (Bar)"),
+            ("revenue_line", "Revenue Over Time (Line + Markers)"),
+            ("paths_pie",   "Learners by Learning-Path (Pie)"),
+            ("age_scatter", "Learner Age vs Revenue (Scatter)"),
+        ]
         ctx = {
             **self.admin_site.each_context(request),
             "title": "Subscriptions Analytics",
             "years": years,
             "current_year": now.year,
+            "chart_options": chart_options,
         }
         return TemplateResponse(request, "admin/courses/learner_subscribe_plan/analytics.html", ctx)
 
+    
     # data endpoint: revenue per month for a given year
     def analytics_data(self, request):
-        year = int(request.GET.get("year") or timezone.now().year)
-        qs = self.model.objects.filter(start_datetime__year=year)
+        """
+        Returns JSON tailored to requested chart type.
+        chart=monthly_bar|revenue_line|paths_pie|age_scatter
+        """
+        chart = request.GET.get("chart") or "monthly_bar"
+        year = request.GET.get("year")
+        try:
+            year = int(year) if year else timezone.now().year
+        except Exception:
+            year = timezone.now().year
 
-        agg = (
-            qs.annotate(m=TruncMonth("start_datetime"))
-            .values("m")
-            .order_by("m")
-            .annotate(revenue=Sum("final_cost"), count=Count("id"))
-        )
+        qs = self.model.objects.all()
 
-        labels  = [row["m"].strftime("%Y-%m") for row in agg]
-        values  = [int(row["revenue"] or 0) for row in agg]
-        counts  = [int(row["count"] or 0) for row in agg]
-        active_now = self.model.objects.filter(status="active").count()
+        # --- Monthly Revenue (Bar) ---
+        if chart == "monthly_bar":
+            qs_y = qs.filter(start_datetime__year=year)
+            agg = (qs_y.annotate(m=TruncMonth("start_datetime"))
+                    .values("m").order_by("m")
+                    .annotate(revenue=Sum("final_cost"), count=Count("id")))
+            labels = [row["m"].strftime("%Y-%m") for row in agg]
+            revenues = [int(row["revenue"] or 0) for row in agg]
+            counts = [int(row["count"] or 0) for row in agg]
+            active_now = self.model.objects.filter(status="active").count()
+            return JsonResponse({
+                "chart": chart, "year": year,
+                "labels": labels, "revenues": revenues, "counts": counts,
+                "revenue_total": sum(revenues), "active_now": active_now,
+            })
 
-        return JsonResponse({
-            "year": year,
-            "labels": labels,
-            "revenues": values,
-            "counts": counts,
-            "active_now": active_now,
-            "revenue_total": sum(values),
-        })
+        # --- Revenue Over Time (Line on Date axis; lines+markers) ---
+        if chart == "revenue_line":
+            qs_y = qs.filter(start_datetime__year=year)
+            daily = (qs_y.annotate(d=TruncDate("start_datetime"))
+                        .values("d").order_by("d")
+                        .annotate(revenue=Sum("final_cost")))
+            x_dates = [row["d"].isoformat() for row in daily]
+            y_vals  = [int(row["revenue"] or 0) for row in daily]
+            return JsonResponse({
+                "chart": chart, "year": year,
+                "x": x_dates, "y": y_vals,
+                "mode": "lines+markers",  # client will honor this
+            })
+
+        # --- Learners by Learning-Path (Pie) ---
+        if chart == "paths_pie":
+            # Try courses.LearningPath -> enrolments -> learners
+            labels, values = [], []
+            try:
+                from courses.models import LearningPath, LearnerEnrolment  # optional model names
+                # Count unique learners per path (or total enrolments)
+                rows = (LearnerEnrolment.objects
+                        .values("learning_path__name")
+                        .annotate(c=Count("id"))
+                        .order_by("-c"))
+                labels = [r["learning_path__name"] or "—" for r in rows]
+                values = [int(r["c"] or 0) for r in rows]
+            except Exception:
+                # Fallback: pie by Subscription Plan counts this year
+                rows = (qs.filter(start_datetime__year=year)
+                        .values("subscription_plan__name")
+                        .annotate(c=Count("id")).order_by("-c"))
+                labels = [r["subscription_plan__name"] or "—" for r in rows]
+                values = [int(r["c"] or 0) for r in rows]
+            return JsonResponse({"chart": chart, "labels": labels, "values": values})
+
+        # --- Learner Age vs Revenue (Scatter) ---
+        if chart == "age_scatter":
+            # Aggregate total revenue per learner; compute age in Python if DOB exists
+            from collections import defaultdict
+            rev_by_learner = defaultdict(int)
+            for row in (qs.values("learner_enrolment__learner_id")
+                        .annotate(total=Sum("final_cost"))):
+                rev_by_learner[row["learner_enrolment__learner_id"]] = int(row["total"] or 0)
+
+            ages, totals = [], []
+            try:
+                from courses.models import Learner  # adjust if your Learner model lives elsewhere
+                learners = Learner.objects.filter(id__in=rev_by_learner.keys()).select_related("user")
+                now = timezone.now().date()
+
+                def calc_age(obj):
+                    # try several common DOB fields
+                    for f in ("date_of_birth", "birth_date", "dob"):
+                        if hasattr(obj, f) and getattr(obj, f):
+                            dob = getattr(obj, f)
+                            return now.year - dob.year - ((now.month, now.day) < (dob.month, dob.day))
+                    u = getattr(obj, "user", None)
+                    for f in ("date_of_birth", "birth_date", "dob"):
+                        if u and hasattr(u, f) and getattr(u, f):
+                            dob = getattr(u, f)
+                            return now.year - dob.year - ((now.month, now.day) < (dob.month, dob.day))
+                    return None
+
+                for l in learners:
+                    age = calc_age(l)
+                    if age is not None and 5 <= age <= 100:
+                        ages.append(int(age))
+                        totals.append(rev_by_learner.get(l.id, 0))
+            except Exception:
+                # If Learner model not available, return empty set
+                ages, totals = [], []
+
+            return JsonResponse({"chart": chart, "x": ages, "y": totals, "x_title": "Age", "y_title": "Revenue (T)"})
+
+        # default
+        return JsonResponse({"chart": chart, "labels": [], "revenues": [], "counts": []})
 # ════════════════════════════════════════════════════════════════
 #  MENTOR GROUP SESSIONS
 # ════════════════════════════════════════════════════════════════

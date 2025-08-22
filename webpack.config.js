@@ -80,4 +80,10 @@ module.exports = {
             minRatio: 0.8,
         }),
     ],
+    resolve: {
+        alias: {
+        // Plotly modular core may reference maplibre CSS via registry; skip it.
+        'maplibre-gl/dist/maplibre-gl.css': false,
+        },
+    },
 };

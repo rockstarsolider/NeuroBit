@@ -1,87 +1,83 @@
 {
   "status": "done",
   "assets": {
-    "admin_analytics-bc94c92e00fbe5e06f3e.js": {
-      "name": "admin_analytics-bc94c92e00fbe5e06f3e.js",
-      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\admin_analytics-bc94c92e00fbe5e06f3e.js",
-      "publicPath": "/static/webpack_output/admin_analytics-bc94c92e00fbe5e06f3e.js"
+    "admin_analytics-4d4fc8a188bbfce21d69.js": {
+      "name": "admin_analytics-4d4fc8a188bbfce21d69.js",
+      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\admin_analytics-4d4fc8a188bbfce21d69.js",
+      "publicPath": "/static/webpack_output/admin_analytics-4d4fc8a188bbfce21d69.js"
     },
-    "admin_analytics-bc94c92e00fbe5e06f3e.js.LICENSE.txt": {
-      "name": "admin_analytics-bc94c92e00fbe5e06f3e.js.LICENSE.txt",
-      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\admin_analytics-bc94c92e00fbe5e06f3e.js.LICENSE.txt",
-      "publicPath": "/static/webpack_output/admin_analytics-bc94c92e00fbe5e06f3e.js.LICENSE.txt"
+    "admin_analytics-4d4fc8a188bbfce21d69.js.LICENSE.txt": {
+      "name": "admin_analytics-4d4fc8a188bbfce21d69.js.LICENSE.txt",
+      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\admin_analytics-4d4fc8a188bbfce21d69.js.LICENSE.txt",
+      "publicPath": "/static/webpack_output/admin_analytics-4d4fc8a188bbfce21d69.js.LICENSE.txt"
     },
-    "learning_paths-708ca39e036a2de6583b.js": {
-      "name": "learning_paths-708ca39e036a2de6583b.js",
-      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\learning_paths-708ca39e036a2de6583b.js",
-      "publicPath": "/static/webpack_output/learning_paths-708ca39e036a2de6583b.js"
+    "learning_paths-aeb38e1f56cf69d198b6.js": {
+      "name": "learning_paths-aeb38e1f56cf69d198b6.js",
+      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\learning_paths-aeb38e1f56cf69d198b6.js",
+      "publicPath": "/static/webpack_output/learning_paths-aeb38e1f56cf69d198b6.js"
     },
-    "main-f6531b9f9aa1726c825b.js": {
-      "name": "main-f6531b9f9aa1726c825b.js",
-      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\main-f6531b9f9aa1726c825b.js",
-      "publicPath": "/static/webpack_output/main-f6531b9f9aa1726c825b.js"
+    "main-1dd0fe3078b2bf20d3ca.js": {
+      "name": "main-1dd0fe3078b2bf20d3ca.js",
+      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\main-1dd0fe3078b2bf20d3ca.js",
+      "publicPath": "/static/webpack_output/main-1dd0fe3078b2bf20d3ca.js"
     },
-    "plotly-52a584d5a5e9048ac8c4.js": {
-      "name": "plotly-52a584d5a5e9048ac8c4.js",
-      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\plotly-52a584d5a5e9048ac8c4.js",
-      "publicPath": "/static/webpack_output/plotly-52a584d5a5e9048ac8c4.js"
+    "plotly-a2ab6bbec2d55f99651e.js": {
+      "name": "plotly-a2ab6bbec2d55f99651e.js",
+      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\plotly-a2ab6bbec2d55f99651e.js",
+      "publicPath": "/static/webpack_output/plotly-a2ab6bbec2d55f99651e.js"
     },
-    "plotly-52a584d5a5e9048ac8c4.js.br": {
-      "name": "plotly-52a584d5a5e9048ac8c4.js.br",
-      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\plotly-52a584d5a5e9048ac8c4.js.br",
-      "publicPath": "/static/webpack_output/plotly-52a584d5a5e9048ac8c4.js.br"
+    "plotly-a2ab6bbec2d55f99651e.js.br": {
+      "name": "plotly-a2ab6bbec2d55f99651e.js.br",
+      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\plotly-a2ab6bbec2d55f99651e.js.br",
+      "publicPath": "/static/webpack_output/plotly-a2ab6bbec2d55f99651e.js.br"
     },
-    "plotly-52a584d5a5e9048ac8c4.js.gz": {
-      "name": "plotly-52a584d5a5e9048ac8c4.js.gz",
-      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\plotly-52a584d5a5e9048ac8c4.js.gz",
-      "publicPath": "/static/webpack_output/plotly-52a584d5a5e9048ac8c4.js.gz"
+    "plotly-a2ab6bbec2d55f99651e.js.gz": {
+      "name": "plotly-a2ab6bbec2d55f99651e.js.gz",
+      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\plotly-a2ab6bbec2d55f99651e.js.gz",
+      "publicPath": "/static/webpack_output/plotly-a2ab6bbec2d55f99651e.js.gz"
     },
-    "plotly-52a584d5a5e9048ac8c4.js.LICENSE.txt": {
-      "name": "plotly-52a584d5a5e9048ac8c4.js.LICENSE.txt",
-      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\plotly-52a584d5a5e9048ac8c4.js.LICENSE.txt",
-      "publicPath": "/static/webpack_output/plotly-52a584d5a5e9048ac8c4.js.LICENSE.txt"
+    "runtime-c1f9f41d0622a3e4965d.js": {
+      "name": "runtime-c1f9f41d0622a3e4965d.js",
+      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\runtime-c1f9f41d0622a3e4965d.js",
+      "publicPath": "/static/webpack_output/runtime-c1f9f41d0622a3e4965d.js"
     },
-    "runtime-9382be04745d18506b07.js": {
-      "name": "runtime-9382be04745d18506b07.js",
-      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\runtime-9382be04745d18506b07.js",
-      "publicPath": "/static/webpack_output/runtime-9382be04745d18506b07.js"
+    "vendors-de7f60f731db01db941e.js": {
+      "name": "vendors-de7f60f731db01db941e.js",
+      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\vendors-de7f60f731db01db941e.js",
+      "publicPath": "/static/webpack_output/vendors-de7f60f731db01db941e.js"
     },
-    "vendors-0bf44bc64764caba98c3.js": {
-      "name": "vendors-0bf44bc64764caba98c3.js",
-      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\vendors-0bf44bc64764caba98c3.js",
-      "publicPath": "/static/webpack_output/vendors-0bf44bc64764caba98c3.js"
+    "vendors-de7f60f731db01db941e.js.br": {
+      "name": "vendors-de7f60f731db01db941e.js.br",
+      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\vendors-de7f60f731db01db941e.js.br",
+      "publicPath": "/static/webpack_output/vendors-de7f60f731db01db941e.js.br"
     },
-    "vendors-0bf44bc64764caba98c3.js.br": {
-      "name": "vendors-0bf44bc64764caba98c3.js.br",
-      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\vendors-0bf44bc64764caba98c3.js.br",
-      "publicPath": "/static/webpack_output/vendors-0bf44bc64764caba98c3.js.br"
+    "vendors-de7f60f731db01db941e.js.gz": {
+      "name": "vendors-de7f60f731db01db941e.js.gz",
+      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\vendors-de7f60f731db01db941e.js.gz",
+      "publicPath": "/static/webpack_output/vendors-de7f60f731db01db941e.js.gz"
     },
-    "vendors-0bf44bc64764caba98c3.js.gz": {
-      "name": "vendors-0bf44bc64764caba98c3.js.gz",
-      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\vendors-0bf44bc64764caba98c3.js.gz",
-      "publicPath": "/static/webpack_output/vendors-0bf44bc64764caba98c3.js.gz"
-    },
-    "vendors-0bf44bc64764caba98c3.js.LICENSE.txt": {
-      "name": "vendors-0bf44bc64764caba98c3.js.LICENSE.txt",
-      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\vendors-0bf44bc64764caba98c3.js.LICENSE.txt",
-      "publicPath": "/static/webpack_output/vendors-0bf44bc64764caba98c3.js.LICENSE.txt"
+    "vendors-de7f60f731db01db941e.js.LICENSE.txt": {
+      "name": "vendors-de7f60f731db01db941e.js.LICENSE.txt",
+      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\vendors-de7f60f731db01db941e.js.LICENSE.txt",
+      "publicPath": "/static/webpack_output/vendors-de7f60f731db01db941e.js.LICENSE.txt"
     }
   },
   "chunks": {
     "admin_analytics": [
-      "runtime-9382be04745d18506b07.js",
-      "plotly-52a584d5a5e9048ac8c4.js",
-      "admin_analytics-bc94c92e00fbe5e06f3e.js"
+      "runtime-c1f9f41d0622a3e4965d.js",
+      "plotly-a2ab6bbec2d55f99651e.js",
+      "vendors-de7f60f731db01db941e.js",
+      "admin_analytics-4d4fc8a188bbfce21d69.js"
     ],
     "learning_paths": [
-      "runtime-9382be04745d18506b07.js",
-      "vendors-0bf44bc64764caba98c3.js",
-      "learning_paths-708ca39e036a2de6583b.js"
+      "runtime-c1f9f41d0622a3e4965d.js",
+      "vendors-de7f60f731db01db941e.js",
+      "learning_paths-aeb38e1f56cf69d198b6.js"
     ],
     "main": [
-      "runtime-9382be04745d18506b07.js",
-      "vendors-0bf44bc64764caba98c3.js",
-      "main-f6531b9f9aa1726c825b.js"
+      "runtime-c1f9f41d0622a3e4965d.js",
+      "vendors-de7f60f731db01db941e.js",
+      "main-1dd0fe3078b2bf20d3ca.js"
     ]
   },
   "publicPath": "/static/webpack_output/"
