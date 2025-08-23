@@ -11,6 +11,8 @@
 # ➒  Mentor‑group sessions  ← new block   │  **added to match ERD**
 
 from datetime import timedelta
+import jdatetime as jd
+from decimal import Decimal
 
 from django.core.validators import (
     RegexValidator, MinValueValidator, MaxValueValidator
@@ -34,6 +36,18 @@ from pages.templatetags.custom_translation_tags import translate_number
 from pages.templatetags.persian_calendar_convertor import convert_to_persian_calendar, format_persian_datetime
 
 
+JALALI_MONTHS_EN = [
+    "farvardin","ordibehesht","khordad","tir","mordad","shahrivar",
+    "mehr","aban","azar","dey","bahman","esfand"
+]
+
+def shamsi_verbose(dt) -> str:
+    if not dt:
+        return "-"
+    d = dt.date() if hasattr(dt, "date") else dt
+    j = jd.date.fromgregorian(date=d)
+    return f"{j.year}-{JALALI_MONTHS_EN[j.month-1]}-{j.day:02d}"
+
 # ────────────────────────────────────────────────────────────────
 # ➋  ENUMS
 # ────────────────────────────────────────────────────────────────
@@ -49,7 +63,7 @@ class ActiveStatus(models.TextChoices):
     INACTIVE = "inactive", "Inactive"
 
 
-class LearnerEnrolmentStatus(models.TextChoices):
+class LearnerEnrollmentStatus(models.TextChoices):
     ACTIVE = "active", "Active"
     GRADUATED = "graduated", "Graduated"
     DROPPED = "dropped", "Dropped"
@@ -146,7 +160,7 @@ class Learner(models.Model):
     status = models.CharField(max_length=8, choices=ActiveStatus.choices, default=ActiveStatus.ACTIVE)
     notes = models.TextField(blank=True, help_text="Any data about the learner.")
     signup_date = models.DateTimeField(auto_now_add=True)
-
+    
     class Meta:
         ordering = ("-signup_date",)
 
@@ -202,15 +216,15 @@ class Resources(models.Model):
 # ────────────────────────────────────────────────────────────────
 # ➎  ENROLMENT & MENTORING
 # ────────────────────────────────────────────────────────────────
-class LearnerEnrolment(models.Model):
-    learner = models.ForeignKey(Learner, on_delete=models.CASCADE, related_name="enrolments")
-    learning_path = models.ForeignKey(LearningPath, on_delete=models.CASCADE,related_name="enrolments")
+class LearnerEnrollment(models.Model):
+    learner = models.ForeignKey(Learner, on_delete=models.CASCADE, related_name="enrollments")
+    learning_path = models.ForeignKey(LearningPath, on_delete=models.CASCADE,related_name="enrollments")
     enroll_date = models.DateTimeField(auto_now_add=True)
     unenroll_date = models.DateTimeField(null=True, blank=True)
     status = models.CharField( 
         max_length=9,
-        choices=LearnerEnrolmentStatus.choices,
-        default=LearnerEnrolmentStatus.ACTIVE
+        choices=LearnerEnrollmentStatus.choices,
+        default=LearnerEnrollmentStatus.ACTIVE
         )
 
     class Meta:
@@ -222,7 +236,7 @@ class LearnerEnrolment(models.Model):
 
 
 class MentorAssignment(models.Model):
-    enrolment = models.ForeignKey(LearnerEnrolment, on_delete=models.CASCADE, related_name="mentor_assignments")
+    enrollment = models.ForeignKey(LearnerEnrollment, on_delete=models.CASCADE, related_name="mentor_assignments")
     mentor = models.ForeignKey(Mentor, on_delete=models.CASCADE, related_name="assignments")
     start_date = models.DateField(default=timezone.now)
     end_date = models.DateField(null=True, blank=True)
@@ -234,10 +248,10 @@ class MentorAssignment(models.Model):
 
     class Meta:
         ordering = ("-start_date",)
-        unique_together = ("enrolment", "mentor", "start_date")
+        unique_together = ("enrollment", "mentor", "start_date")
 
     def __str__(self):
-        return f"{self.enrolment} ↔ {self.mentor}"
+        return f"{self.enrollment} ↔ {self.mentor}"
 
 
 # ────────────────────────────────────────────────────────────────
@@ -431,6 +445,7 @@ class Feature(models.Model):
         return self.name
 
 
+
 class SubscriptionPlan(models.Model):
     name = models.CharField(max_length=20, unique=True, help_text="(Basic/Plus/Pro)")
     description = models.TextField(blank=True)
@@ -460,23 +475,24 @@ class TransactionStatus(models.TextChoices):
 
 
 class SubscriptionTransaction(models.Model):
-    learner_enrolment = models.ForeignKey("courses.LearnerEnrolment", on_delete=models.CASCADE, related_name="subscription_transactions")
+    learner_enrollment = models.ForeignKey("courses.LearnerEnrollment", on_delete=models.CASCADE, related_name="subscription_transactions")
     subscription      = models.ForeignKey("courses.LearnerSubscribePlan", on_delete=models.CASCADE, related_name="transactions", null=True, blank=True)
     subscription_plan = models.ForeignKey(SubscriptionPlan, on_delete=models.PROTECT, related_name="transactions")
     kind    = models.CharField(max_length=10, choices=TransactionKind.choices, default=TransactionKind.PURCHASE)
     status  = models.CharField(max_length=10, choices=TransactionStatus.choices, default=TransactionStatus.PAID)
-    amount  = models.PositiveBigIntegerField(default=0, help_text="Toman")
+    amount  = models.PositiveBigIntegerField(default=0, help_text="Toman")   # Toman
     paid_at = models.DateTimeField(default=timezone.now)
     gateway = models.CharField(max_length=40, blank=True, help_text="e.g., Zarinpal/Stripe/Cash")
     ref     = models.CharField(max_length=80, blank=True, help_text="Gateway reference / receipt")
     note    = models.TextField(blank=True)
     history = HistoricalRecords()
-
-    class Meta:
+    
+    class Meta: 
         ordering = ("-paid_at", "-id")
+    
+    def __str__(self): 
+        return f"{self.learner_enrollment} / {self.subscription_plan} / {self.amount}T @ {self.paid_at:%Y-%m-%d}"
 
-    def __str__(self):
-        return f"{self.learner_enrolment} / {self.subscription_plan} / {self.amount}T @ {self.paid_at:%Y-%m-%d}"
 
 
 
@@ -489,9 +505,10 @@ class PlanFeature(models.Model):
     
 
 class LearnerSubscribePlanQuerySet(models.QuerySet):
-    def overlapping(self, enrolment, start, end, exclude_pk=None):
-        qs = self.filter(learner_enrolment=enrolment)
-        if exclude_pk: qs = qs.exclude(pk=exclude_pk)
+    def overlapping(self, enrollment, start, end, exclude_pk=None):
+        qs = self.filter(learner_enrollment=enrollment)
+        if exclude_pk:
+            qs = qs.exclude(pk=exclude_pk)
         return qs.filter(start_datetime__lt=end, end_datetime__gt=start)
 
     def due_to_expire(self, at=None):
@@ -501,7 +518,7 @@ class LearnerSubscribePlanQuerySet(models.QuerySet):
     def expire_and_notify(self, at=None):
         at = at or timezone.now()
         rows = list(self.due_to_expire(at).select_related(
-            "learner_enrolment__learner__user", "subscription_plan"
+            "learner_enrollment__learner__user", "subscription_plan"
         ))
         if not rows: return 0
         for s in rows:
@@ -509,114 +526,111 @@ class LearnerSubscribePlanQuerySet(models.QuerySet):
             s.expired_at = s.end_datetime
         type(self).bulk_update(rows, ["status", "expired_at"])
         for s in rows:
-            try: send_subscription_expired_sms(s)
-            except Exception: pass
+            try:
+                send_subscription_expired_sms(s)
+            except Exception:
+                pass
         return len(rows)
-    
 
 
 class LearnerSubscribePlan(models.Model):
-    STATUS_CHOICES = [("active","Active"), ("expired","Expired"), ("canceled","Canceled")]
+    STATUS_ACTIVE = "active"
+    STATUS_EXPIRED = "expired"
+    STATUS_CHOICES = (
+        (STATUS_ACTIVE, "Active"),
+        (STATUS_EXPIRED, "Expired"),
+    )
 
-    learner_enrolment = models.ForeignKey("courses.LearnerEnrolment", on_delete=models.CASCADE, related_name="subscriptions")
-    subscription_plan = models.ForeignKey("courses.SubscriptionPlan", on_delete=models.PROTECT, related_name="purchases")
+    learner_enrollment = models.ForeignKey(
+        LearnerEnrollment, on_delete=models.CASCADE, related_name="subscriptions"
+    )
+    subscription_plan = models.ForeignKey(
+        SubscriptionPlan, on_delete=models.PROTECT, related_name="subscriptions"
+    )
+    start_datetime = models.DateTimeField(default=timezone.now, db_index=True)
+    end_datetime = models.DateTimeField(db_index=True)
+    discount = models.PositiveSmallIntegerField(default=0, help_text="0..100")
+    final_cost = models.PositiveIntegerField(default=0, help_text="Toman")
+    status = models.CharField(max_length=12, choices=STATUS_CHOICES, default=STATUS_ACTIVE, db_index=True)
+    expired_at = models.DateTimeField(null=True, blank=True, db_index=True)
 
-    start_datetime = models.DateTimeField()
-    end_datetime   = models.DateTimeField(blank=True, null=True)  # auto-filled from plan if blank
-    discount       = models.PositiveIntegerField(default=0)       # percent, 0..100
-    final_cost     = models.PositiveIntegerField(default=0)       # auto: price - discount
-    status         = models.CharField(max_length=16, choices=STATUS_CHOICES, default="active")
-    expired_at     = models.DateTimeField(blank=True, null=True)
-
-    history = HistoricalRecords()
-    objects = LearnerSubscribePlanQuerySet.as_manager()
+    # Auditing
+    history = HistoricalRecords(inherit=True)
 
     class Meta:
-        ordering = ["-start_datetime", "-id"]
+        ordering = ("-start_datetime", "-id")
         indexes = [
-            Index(fields=["status", "end_datetime"]),
-            Index(fields=["learner_enrolment", "start_datetime"]),
-        ]
-        constraints = [
-            models.CheckConstraint(check=Q(discount__gte=0, discount__lte=100), name="discount_0_100"),
+            models.Index(fields=("status", "end_datetime")),
+            models.Index(fields=("start_datetime",)),
         ]
 
-    # ---- derivations
-    def _compute_end_if_needed(self):
+    # --- Calculations & guards ------------------------------------------------
+    def _calc_end(self):
         if not self.end_datetime:
-            days = int(self.subscription_plan.duration_in_days or 0)
-            self.end_datetime = self.start_datetime + timedelta(days=days)
+            days = self.subscription_plan.duration_in_days or 30
+            return self.start_datetime + timezone.timedelta(days=days)
+        return self.end_datetime
 
-    def _compute_final_cost(self):
-        price = int(self.subscription_plan.price_amount or 0)
-        disc  = max(0, min(100, int(self.discount or 0)))
-        self.final_cost = int(price * (100 - disc) / 100)
+    def _calc_final_cost(self):
+        price = Decimal(self.subscription_plan.price_amount or 0)
+        disc = Decimal(self.discount or 0)
+        if disc < 0: disc = Decimal(0)
+        if disc > 100: disc = Decimal(100)
+        return int((price * (Decimal(100) - disc) / Decimal(100)).quantize(Decimal("1")))
 
-    # ---- validation
     def clean(self):
-        if not self.subscription_plan_id:
-            raise ValidationError({"subscription_plan": "Select a subscription plan."})
-        if not self.start_datetime:
-            raise ValidationError({"start_datetime": "Start is required."})
-
-        self._compute_end_if_needed()
-        if not self.end_datetime or self.end_datetime <= self.start_datetime:
-            raise ValidationError({"end_datetime": "End must be after Start."})
-
-        if self.status == "active" and LearnerSubscribePlan.objects.overlapping(
-            self.learner_enrolment, self.start_datetime, self.end_datetime, exclude_pk=self.pk
-        ).exists():
-            raise ValidationError("There is an active subscription overlapping this period.")
-
-    def _mark_expired_if_needed(self):
-        now = timezone.now()
-        if self.status != "expired" and self.end_datetime and self.end_datetime <= now:
-            self.status = "expired"
-            self.expired_at = self.end_datetime
-            return True
-        return False
+        # Enforce start <= end
+        end = self._calc_end()
+        if self.start_datetime and end and end < self.start_datetime:
+            from django.core.exceptions import ValidationError
+            raise ValidationError({"end_datetime": "End must be after start."})
 
     def save(self, *args, **kwargs):
-        old_status = None
-        if self.pk:
-            old_status = type(self).objects.only("status").get(pk=self.pk).status
+        # derive end + final_cost
+        self.end_datetime = self._calc_end()
+        self.final_cost = self._calc_final_cost()
 
-        self._compute_end_if_needed()
-        self._compute_final_cost()
-        self.full_clean()
-        just_expired = self._mark_expired_if_needed()
+        # auto-expire if past end
+        now = timezone.now()
+        if self.end_datetime and now >= self.end_datetime:
+            self.status = self.STATUS_EXPIRED
+            if not self.expired_at:
+                # use the logical end as the expired_at moment
+                self.expired_at = self.end_datetime
 
-        with transaction.atomic():
-            super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
-        if (just_expired and old_status != "expired") or (old_status is None and self.status == "expired"):
-            try: send_subscription_expired_sms(self)
-            except Exception: pass
+    # --- Admin helpers (Shamsi) ----------------------------------------------
+    @property
+    def start_shamsi(self) -> str:
+        return shamsi_verbose(self.start_datetime)
 
     @property
-    def is_expired(self): return self.status == "expired"
+    def end_shamsi(self) -> str:
+        return shamsi_verbose(self.end_datetime)
 
     def __str__(self):
-        s = self.start_datetime.strftime("%Y-%m-%d") if self.start_datetime else "?"
-        e = self.end_datetime.strftime("%Y-%m-%d") if self.end_datetime else "?"
-        return f"{self.learner_enrolment} | {self.subscription_plan} [{s} → {e}]"
+        return f"{self.learner_enrollment.learner.full_name()} → {self.subscription_plan.name}"
+
 
 @receiver(post_save, sender=LearnerSubscribePlan)
 def create_purchase_transaction(sender, instance: LearnerSubscribePlan, created, **kwargs):
-    if not created:  # only on first creation
+    if not created:
         return
     SubscriptionTransaction.objects.create(
-        learner_enrolment=instance.learner_enrolment,
+        learner_enrollment=instance.learner_enrollment,
         subscription=instance,
         subscription_plan=instance.subscription_plan,
         kind=TransactionKind.PURCHASE,
         status=TransactionStatus.PAID,
         amount=instance.final_cost,
         paid_at=instance.start_datetime,
-        gateway="manual",  # adjust in your flow if using a real gateway
+        gateway="manual",
         ref=f"SUB#{instance.pk}",
         note="Auto-created on subscription purchase",
     )
+
+
 
 
 class LearnerSubscribePlanFreeze(models.Model):

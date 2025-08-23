@@ -36,12 +36,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "django.contrib.humanize",
 
+    "import_export",
     "simple_history",
     "crispy_forms",
     "debug_toolbar",
     'webpack_loader',
     "django_extensions",
-    "import_export",
 
     "core.apps.CoreConfig",
     'pages',
@@ -76,8 +76,6 @@ INTERNAL_IPS = ["127.0.0.1", "localhost", "::1"]
 # Show toolbar on every DEBUG request
 DEBUG_TOOLBAR_CONFIG = {"SHOW_TOOLBAR_CALLBACK": lambda request: True}
 
-# Optional: toggle WeasyPrint on/off (dev default: off on Windows)
-USE_WEASYPRINT = os.getenv("USE_WEASYPRINT", "0").lower() in ("1","true","yes")
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -177,6 +175,7 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = ["unfold_crispy"]
 UNFOLD = {
     # "TABS": "config.admin.tabs_callback",
     # "SHOW_LANGUAGES": True,
+    "STYLES": ["css/admin-fixes.css"],
     "SITE_DROPDOWN": [
         {
             "icon": "home",
@@ -231,11 +230,11 @@ UNFOLD = {
                         "icon": "query_stats",
                         "link": reverse_lazy("admin:courses_learnersubscribeplan_analytics"), 
                     },
-                    {
-                        "title": _("Subscriptions PDF"),
-                        "icon": "picture_as_pdf",
-                        "link": reverse_lazy("admin:courses_learnersubscribeplan_export_pdf"),
-                    },
+                    # {
+                    #     "title": _("Subscriptions PDF"),
+                    #     "icon": "picture_as_pdf",
+                    #     "link": reverse_lazy("admin:courses_learnersubscribeplan_export_pdf"),
+                    # },
                     {
                         "title": _("SMS Notifications"),
                         "icon": "sms",
@@ -302,4 +301,18 @@ UNFOLD = {
     },
 }
 
+from django.conf import settings
+
 AUTH_USER_MODEL = 'core.CustomUser'
+
+# --- django-import-export ---
+IMPORT_EXPORT_USE_TRANSACTIONS = True
+
+# Optional: toggle WeasyPrint on/off (dev default: off on Windows)
+USE_WEASYPRINT = os.getenv("USE_WEASYPRINT", "0").lower() in ("1","true","yes")
+# Optional: hide PDF unless WeasyPrint is usable (you already have USE_WEASYPRINT)
+try:
+    from weasyprint import HTML  # noqa
+    IMPORT_EXPORT_ENABLE_PDF = bool(USE_WEASYPRINT)
+except Exception:
+    IMPORT_EXPORT_ENABLE_PDF = False

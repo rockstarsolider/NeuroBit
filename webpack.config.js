@@ -3,87 +3,87 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const BundleTracker = require('webpack-bundle-tracker');
 const CompressionPlugin = require('compression-webpack-plugin');
 
-module.exports = {
-    mode: 'production',
-    devtool: false,
+module.exports = (env, argv) => {
+  const isProd = argv.mode === 'production';
+
+  return {
+    mode: isProd ? 'production' : 'development',
+    devtool: isProd ? false : 'eval-cheap-module-source-map',
+    cache: { type: 'filesystem' },                 // ✅ persistent cache (massive speed-up)
     context: __dirname,
     entry: {
-        main: './static/webpack_entry/js/index.js',
-        learning_paths: './static/js/learning_paths.js',
-        admin_analytics: './static/webpack_entry/js/admin_analytics.js',
+      main: './static/webpack_entry/js/index.js',
+      learning_paths: './static/js/learning_paths.js',
+      admin_analytics: './static/webpack_entry/js/admin_analytics.js',
     },
     output: {
-        path: path.resolve('./static/webpack_output/'),
-        filename: '[name]-[contenthash].js',
-        publicPath: '/static/webpack_output/',
-        clean: true,
+      path: path.resolve('./static/webpack_output/'),
+      filename: '[name]-[contenthash].js',
+      publicPath: '/static/webpack_output/',
+      clean: true,
     },
     module: {
-        rules: [
-            {
-                test: /\.js$/,
-                exclude: /node_modules/,
-                use: {
-                    loader: 'babel-loader',
-                },
-            },
-            {
-                test: /\.css$/,
-                use: [
-                    MiniCssExtractPlugin.loader,
-                    'css-loader',
-                    'postcss-loader',
-                ],
-            },
-            {
-                test: /\.(woff|woff2|eot|ttf|svg)$/i,
-                type: 'asset/resource',
-                generator: {
-                    filename: 'fonts/[name][ext][query][contenthash:8]',
-                },
-            },
-        ],
+      rules: [
+        {
+          test: /\.js$/,
+          exclude: /node_modules/,
+          use: {
+            loader: 'babel-loader',
+            options: { cacheDirectory: true },      // ✅ cache babel transforms
+          },
+        },
+        {
+          test: /\.css$/,
+          use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader'],
+        },
+        {
+          test: /\.(woff|woff2|eot|ttf|svg)$/i,
+          type: 'asset/resource',
+          generator: { filename: 'fonts/[name][ext][query][contenthash:8]' },
+        },
+      ],
     },
     optimization: {
-        splitChunks: {
+      splitChunks: {
         chunks: 'all',
         cacheGroups: {
-            plotly: { test: /plotly\.js/, name: 'plotly', chunks: 'all', priority: 20 },
-            vendors: { test: /[\\/]node_modules[\\/]/, name: 'vendors', chunks: 'all', priority: 10 },
+          // keep Plotly in its own async chunk; we’ll lazy-load it in JS
+          plotly: { test: /plotly\.js-dist-min/, name: 'plotly', chunks: 'all', priority: 20 },
+          vendors: { test: /[\\/]node_modules[\\/]/, name: 'vendors', chunks: 'all', priority: 10 },
         },
-        },
-        runtimeChunk: { name: 'runtime' },
+      },
+      runtimeChunk: { name: 'runtime' },
+      minimize: isProd, // don’t minify in dev => faster rebuilds
     },
     plugins: [
-        new MiniCssExtractPlugin({
-            filename: '[name]-[contenthash].css',
-        }),
-        new BundleTracker({
-            path: __dirname,
-            filename: 'webpack-stats.json',
-        }),
-        // Emit .br (Brotli)
-        new CompressionPlugin({
-            algorithm: 'brotliCompress',
-            filename: '[path][base].br',
-            test: /\.(js|css|svg|woff2?)$/i,
-            compressionOptions: { level: 11 },
-            threshold: 10 * 1024,
-            minRatio: 0.8,
-        }),
-        // Emit .gz as a fallback
-        new CompressionPlugin({
-            algorithm: 'gzip',
-            filename: '[path][base].gz',
-            test: /\.(js|css|svg|woff2?)$/i,
-            threshold: 10 * 1024,
-            minRatio: 0.8,
-        }),
+      new MiniCssExtractPlugin({ filename: '[name]-[contenthash].css' }),
+      new BundleTracker({ path: __dirname, filename: 'webpack-stats.json' }),
+      ...(isProd
+        ? [
+            // compress only for prod
+            new CompressionPlugin({
+              algorithm: 'brotliCompress',
+              filename: '[path][base].br',
+              test: /\.(js|css|svg|woff2?)$/i,
+              compressionOptions: { level: 11 },
+              threshold: 10 * 1024,
+              minRatio: 0.8,
+            }),
+            new CompressionPlugin({
+              algorithm: 'gzip',
+              filename: '[path][base].gz',
+              test: /\.(js|css|svg|woff2?)$/i,
+              threshold: 10 * 1024,
+              minRatio: 0.8,
+            }),
+          ]
+        : []),
     ],
     resolve: {
-        alias: {
-        // Plotly modular core may reference maplibre CSS via registry; skip it.
-        'maplibre-gl/dist/maplibre-gl.css': false,
-        },
+      alias: {
+        'maplibre-gl/dist/maplibre-gl.css': false, // avoid accidental heavy css pulls
+      },
     },
+    performance: { hints: false },
+  };
 };

@@ -1,0 +1,32 @@
+/* Unfold actions dropdown readability */
+.unfold .actions [data-unfold-dropdown],
+.unfold .actions .dropdown .item {
+  color: var(--unfold-foreground, #111) !important;
+}
+.unfold .actions .dropdown .item:hover {
+  background: var(--unfold-muted, #f3f4f6);
+}
+
+/* static/css/admin-fixes.css */
+.actions .dropdown__button { color: #111 !important; }
+.actions .dropdown__menu   { color: #111 !important; }
+.badge--success { background: #16a34a; color: #fff; }
+.badge--danger  { background: #dc2626; color: #fff; }
+/* Tweak card titles and inputs a touch */
+.box .text-sm { color: rgba(17,24,39,.7); }
+.select, .button { border-radius: .5rem; }
+
+/* Fix white-on-white text in action dropdowns/buttons/selects */
+.dropdown__menu a,
+.dropdown__menu button,
+.select select,
+.button { color: #111 !important; }
+
+/* Make our KPIs and chart breathe a bit */
+.admin-analytics .aa-toolbar { display:flex; gap:1rem; align-items:end; margin-bottom:1rem; }
+.admin-analytics .aa-toolbar label { display:flex; flex-direction:column; font-weight:600; }
+.admin-analytics .aa-kpis { display:flex; gap:1.25rem; margin-bottom:0.75rem; }
+.admin-analytics .aa-kpi { background: var(--color-surface-2, #f6f6f7); padding:0.5rem 0.75rem; border-radius:8px; }
+.admin-analytics .aa-kpi__value { font-size:1rem; font-weight:700; }
+.admin-analytics .aa-kpi__note { font-weight:400; opacity:.8; }
+.admin-analytics .aa-chart { min-height:420px; }

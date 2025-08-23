@@ -3,49 +3,114 @@
 {% load render_bundle from webpack_loader %}
 
 {% block extrastyle %}
-  <style>.box{background:#fff;border:1px solid #eee;border-radius:12px;padding:12px}</style>
+  <style>
+    /* Small visual tune-ups that work fine with Unfold */
+    .nb-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin-bottom:14px}
+    .nb-card{background:var(--body-bg);border:1px solid var(--border-color,#e5e7eb);border-radius:10px}
+    .nb-card__body{padding:14px}
+    .nb-label{display:block;font:500 12px/1.2 system-ui,Segoe UI,Roboto,Helvetica,Arial;color:var(--body-quiet-color,#6b7280);margin-bottom:6px}
+    .nb-select,.nb-button{
+      appearance:none;border-radius:8px;border:1px solid var(--border-color,#e5e7eb);
+      padding:8px 10px;background:var(--darkened-bg,#fff);color:var(--body-fg,#111827);width:100%;
+      font:500 13px/1.2 system-ui,Segoe UI,Roboto,Helvetica,Arial;
+    }
+    .nb-button{cursor:pointer;background:var(--primary,#2563eb);color:#fff;border:none}
+    .nb-button.secondary{background:transparent;color:var(--primary,#2563eb);border:1px solid var(--primary,#2563eb)}
+    .nb-kpi{display:flex;align-items:center;gap:10px}
+    .nb-kpi .v{font:700 18px/1.2 system-ui,Segoe UI,Roboto,Helvetica,Arial;color:var(--body-fg,#111827)}
+    .nb-kpi .k{font:500 12px/1.2 system-ui,Segoe UI,Roboto,Helvetica,Arial;color:var(--body-quiet-color,#6b7280)}
+    .nb-chart{height:420px}
+    .nb-muted{color:var(--body-quiet-color,#6b7280);font-size:12px}
+  </style>
 {% endblock %}
 
 {% block content %}
-  <div id="analytics-root"
-       data-endpoint="{% url 'admin:courses_learnersubscribeplan_analytics_data' %}"></div>
+<div id="analytics-root"
+     data-url="{% url 'admin:courses_learnersubscribeplan_analytics_data' %}"
+     class="unfold-container">
 
-  <div class="grid grid-cols-3 gap-4 mb-4">
-    <div class="box">
-      <div class="box__body">
-        <label class="text-sm opacity-70 mr-2">Chart</label>
-        <select id="chart-type" class="select">
-          {% for val,label in chart_options %}
-            <option value="{{ val }}">{{ label }}</option>
-          {% endfor %}
+  <!-- Controls -->
+  <div class="nb-grid">
+    <div class="nb-card">
+      <div class="nb-card__body">
+        <label class="nb-label">Chart</label>
+        <select id="chartType" class="nb-select">
+          <optgroup label="Revenue & Counts">
+            <option value="hist">Monthly revenue (bar)</option>
+            <option value="lines">Revenue time-series (lines)</option>
+            <option value="lines_markers">Revenue time-series (lines+markers)</option>
+          </optgroup>
+          <optgroup label="Learners Breakdown">
+            <option value="plan_month_counts">Plan count per month (bar)</option>
+            <option value="path_pie">Learning paths (pie)</option>
+            <option value="age_scatter">Age distribution (scatter)</option>
+          </optgroup>
         </select>
-
-        <span id="year-wrap" class="ml-4">
-          <label class="text-sm opacity-70 mr-2">Year</label>
-          <select id="year" class="select">
-            {% for y in years %}
-              <option value="{{ y }}"{% if y == current_year %} selected{% endif %}>{{ y }}</option>
-            {% endfor %}
-          </select>
-        </span>
-
-        <button id="refresh" class="button ml-2">Refresh</button>
       </div>
     </div>
 
-    <div class="box"><div class="box__body">
-      <div class="text-sm opacity-70">Revenue (T)</div>
-      <div id="kpi-rev" class="text-2xl font-bold">0</div>
-    </div></div>
-    <div class="box"><div class="box__body">
-      <div class="text-sm opacity-70">Active now</div>
-      <div id="kpi-active" class="text-2xl font-bold">0</div>
-    </div></div>
+    <div class="nb-card">
+      <div class="nb-card__body">
+        <label class="nb-label">Year</label>
+        <select id="year" class="nb-select"></select>
+      </div>
+    </div>
+
+    <div class="nb-card">
+      <div class="nb-card__body">
+        <label class="nb-label">Month (optional)</label>
+        <select id="month" class="nb-select">
+          <option value="">All months</option>
+          <option value="1">Jan</option><option value="2">Feb</option><option value="3">Mar</option>
+          <option value="4">Apr</option><option value="5">May</option><option value="6">Jun</option>
+          <option value="7">Jul</option><option value="8">Aug</option><option value="9">Sep</option>
+          <option value="10">Oct</option><option value="11">Nov</option><option value="12">Dec</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="nb-card">
+      <div class="nb-card__body">
+        <label class="nb-label">Scope</label>
+        <select id="scope" class="nb-select">
+          <option value="active">Active learners</option>
+          <option value="all">All-time learners</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="nb-card">
+      <div class="nb-card__body">
+        <label class="nb-label">Actions</label>
+        <div style="display:flex;gap:8px">
+          <button id="refresh" class="nb-button">Refresh</button>
+          <button id="reset" class="nb-button secondary">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="nb-card">
+      <div class="nb-card__body nb-kpi">
+        <div>
+          <div class="v" id="kpiRevenue">–</div>
+          <div class="k">Revenue (selected)</div>
+        </div>
+        <div>
+          <div class="v" id="kpiCount">–</div>
+          <div class="k">Subscriptions (selected)</div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="box">
-    <div class="box__body"><div id="chart" style="height:360px;"></div></div>
+  <!-- Chart -->
+  <div class="nb-card">
+    <div class="nb-card__body">
+      <div id="chart" class="nb-chart"></div>
+      <div id="msg" class="nb-muted" style="margin-top:8px"></div>
+    </div>
   </div>
+</div>
 
-  {% render_bundle 'admin_analytics' 'js' %}
+{% render_bundle 'admin_analytics' 'js' %}
 {% endblock %}

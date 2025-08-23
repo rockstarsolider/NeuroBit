@@ -1,3 +1,4 @@
+// courses\static\courses\admin_analytics.js
 (function () {
   const node = document.getElementById("subdata");
   if (!node) return;
