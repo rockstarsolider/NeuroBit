@@ -5,18 +5,18 @@
  *
  * Frontend <-> Backend mapping:
  *   hist, lines, lines_markers   -> monthly_revenue
- *   plan_month_counts            -> plan_counts  (fallback: single-series bar)
+ *   plan_month_counts            -> plan_counts
  *   path_pie                     -> paths_pie
  *   age_scatter                  -> age_scatter
  *
- * Payloads supported (back-compat):
- *   monthly_revenue -> {labels:["YYYY-MM",...], revenues:[...], counts:[...]}
- *                  or {months:[1..12], revenue:[...], count:[...]}
- *   plan_counts     -> {labels:[plan,...], counts:[...]}  // (we draw a bar)
- *                  or {months:[1..12], series:[{name,values:[]},...]} // (stacked)
+ * Payloads supported:
+ *   monthly_revenue
+ *     - by year:   {labels:["YYYY-MM",...], revenues:[...], counts:[...]}
+ *     - by month:  {labels:["YYYY-MM-DD",...], revenues:[...], counts:[...]}
+ *     - (alt)      {months:[1..12], revenue:[...], count:[...]}
+ *   plan_counts     -> {labels:[plan,...], counts:[...]}
  *   paths_pie       -> {labels:[...], values:[...]}
- *   age_scatter     -> {x:[...], y:[...]}  // fallback style
- *                  or {dates:[...], ages:[...], labels:[...]}
+ *   age_scatter     -> {x:[...], y:[...]}  (or {dates:[...], ages:[...], labels:[...]})
  */
 
 let PlotlyLib = null;
@@ -43,6 +43,12 @@ function formatMoney(v) {
   } catch {
     return String(Math.round(v));
   }
+}
+
+function monthName(m) {
+  const names = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const i = Math.max(1, Math.min(12, parseInt(m || 0, 10))) - 1;
+  return names[i] || '';
 }
 
 function mapChartParam(uiValue) {
@@ -79,8 +85,8 @@ function sum(arr) { return (arr || []).reduce((a, b) => a + (Number(b) || 0), 0)
 async function draw() {
   const Plotly = await loadPlotly();
 
-  const chartType = qs('chartType').value;   // UI type
-  const serverChart = mapChartParam(chartType); // backend param
+  const chartType = qs('chartType').value;           // UI type
+  const serverChart = mapChartParam(chartType);      // backend param
   const year  = qs('year').value;
   const month = qs('month').value;
   const scope = qs('scope').value; // active | all
@@ -98,7 +104,7 @@ async function draw() {
 
   const el = qs('chart');
 
-  // KPIs — we compute if backend didn’t send explicit totals
+  // KPIs — compute if not provided
   let totalRevenue = typeof data.total_revenue === 'number' ? data.total_revenue : null;
   let totalCount   = typeof data.total_count   === 'number' ? data.total_count   : null;
 
@@ -116,10 +122,7 @@ async function draw() {
   // monthly_revenue -> used by hist, lines, lines_markers
   // ─────────────────────────────────────────────────────────────
   if (serverChart === 'monthly_revenue') {
-    // normalize shapes
-    // Backend (current): labels:["YYYY-MM"], revenues:[], counts:[]
-    // Alt shape (future): months:[1..12], revenue:[], count:[]
-    const labels = Array.isArray(data.labels) ? data.labels : null;
+    const labels = Array.isArray(data.labels) ? data.labels : null; // YYYY-MM or YYYY-MM-DD
     let months = Array.isArray(data.months) ? data.months.map(Number) : null;
 
     const revenues = Array.isArray(data.revenues) ? data.revenues
@@ -128,40 +131,39 @@ async function draw() {
                     : Array.isArray(data.count)   ? data.count   : [];
 
     if (!months && labels) {
-      // derive month 1..12 from "YYYY-MM"
-      months = labels.map(s => {
-        const m = String(s).slice(5, 7);
-        return parseInt(m, 10);
-      });
+      // if labels are YYYY-MM, derive month; if YYYY-MM-DD, do not derive
+      const looksLikeMonth = labels.every(s => String(s).length === 7);
+      months = looksLikeMonth ? labels.map(s => parseInt(String(s).slice(5, 7), 10)) : null;
     }
-    // If still nothing, ensure arrays are aligned and not undefined
-    months = months || [];
 
     if (totalRevenue == null) totalRevenue = sum(revenues);
     if (totalCount   == null) totalCount   = sum(counts);
 
+    const useMonthsAxis = Array.isArray(months) && months.length > 0;
+    const xForBars = useMonthsAxis ? months.map(m => String(m).padStart(2, '0')) : (labels || []);
+    const xTitle = useMonthsAxis ? 'Month' : 'Date';
+    const hoverMonth = useMonthsAxis ? 'Month %{x}' : 'Date %{x}';
+
     if (chartType === 'hist') {
-      const x = (months.length ? months : (labels || [])).map(v => String(v).padStart(2, '0'));
       traces = [{
         type: 'bar',
-        x, y: revenues,
+        x: xForBars, y: revenues,
         name: 'Revenue',
-        hovertemplate: 'Month %{x}<br>Revenue %{y:,} تومان<extra></extra>',
+        hovertemplate: `${hoverMonth}<br>Revenue %{y:,} تومان<extra></extra>`,
       }, {
         type: 'bar',
-        x, y: counts,
+        x: xForBars, y: counts,
         name: 'Subscriptions',
         yaxis: 'y2',
-        hovertemplate: 'Month %{x}<br>Count %{y}<extra></extra>',
+        hovertemplate: `${hoverMonth}<br>Count %{y}<extra></extra>`,
       }];
       layout.barmode = 'group';
       layout.yaxis2 = { overlaying: 'y', side: 'right' };
-      layout.xaxis.title = 'Month';
+      layout.xaxis.title = xTitle;
       layout.yaxis.title = 'Value';
     } else {
-      // lines / lines_markers — draw revenue trend (use labels or YYYY-MM)
       const x = labels && labels.length ? labels
-                : months.map(m => String(m).padStart(2, '0'));
+                : (months || []).map(m => String(m).padStart(2, '0'));
       traces = [{
         type: 'scatter',
         mode: chartType === 'lines_markers' ? 'lines+markers' : 'lines',
@@ -169,50 +171,32 @@ async function draw() {
         name: 'Revenue',
         hovertemplate: '%{x}<br>%{y:,} تومان<extra></extra>',
       }];
-      layout.xaxis.title = 'Period';
+      layout.xaxis.title = labels && labels.length && labels[0].length === 10 ? 'Date' : 'Period';
       layout.yaxis.title = 'Revenue';
     }
   }
 
   // ─────────────────────────────────────────────────────────────
-  // plan_counts -> map UI "plan_month_counts" to either stacked series
-  //               or (current backend) a single bar by plan
+  // plan_counts -> "Plan count (bar)" — respects month
   // ─────────────────────────────────────────────────────────────
   if (serverChart === 'plan_counts') {
-    if (Array.isArray(data.series) && Array.isArray(data.months)) {
-      // stacked monthly per plan — if you ever add this server-side
-      const months = data.months.map(m => String(m).padStart(2, '0'));
-      traces = (data.series || []).map(s => ({
-        type: 'bar',
-        x: months,
-        y: s.values || [],
-        name: s.name || 'Plan',
-        hovertemplate: '%{x}<br>%{y} learners<extra></extra>',
-      }));
-      layout.barmode = 'stack';
-      layout.xaxis.title = 'Month';
-      layout.yaxis.title = 'Learners';
-      totalCount = sum((data.series || []).flatMap(s => s.values || []));
-    } else {
-      // current backend shape: labels=[plan], counts=[n]
-      const labels = data.labels || [];
-      const counts = data.counts || [];
-      traces = [{
-        type: 'bar',
-        x: labels,
-        y: counts,
-        name: 'Subscriptions',
-        hovertemplate: '%{x}<br>%{y} learners<extra></extra>',
-      }];
-      layout.barmode = 'group';
-      layout.xaxis.title = 'Plan';
-      layout.yaxis.title = 'Learners';
-      totalCount = totalCount == null ? sum(counts) : totalCount;
-    }
+    const labels = data.labels || [];
+    const counts = data.counts || [];
+    traces = [{
+      type: 'bar',
+      x: labels,
+      y: counts,
+      name: 'Subscriptions',
+      hovertemplate: '%{x}<br>%{y} learners<extra></extra>',
+    }];
+    layout.barmode = 'group';
+    layout.xaxis.title = 'Plan';
+    layout.yaxis.title = 'Learners';
+    totalCount = totalCount == null ? sum(counts) : totalCount;
   }
 
   // ─────────────────────────────────────────────────────────────
-  // paths_pie
+  // paths_pie — respects month
   // ─────────────────────────────────────────────────────────────
   if (serverChart === 'paths_pie') {
     traces = [{
@@ -226,17 +210,15 @@ async function draw() {
   }
 
   // ─────────────────────────────────────────────────────────────
-  // age_scatter
+  // age_scatter — NOW respects month (server filters it)
   // ─────────────────────────────────────────────────────────────
   if (serverChart === 'age_scatter') {
-    // Accept both {x,y} and {dates,ages,labels}
     const x = Array.isArray(data.x) ? data.x : (data.dates || []);
     const y = Array.isArray(data.y) ? data.y : (data.ages  || []);
     const text = data.labels || [];
     if (!y.length) {
-      msgEl.textContent = data.note || 'No age data available.';
+      msgEl.textContent = data.note || 'No age data available for this filter.';
       Plotly.purge(el);
-      // Update KPIs area but keep it quiet for this chart type
       if (totalRevenue != null) qs('kpiRevenue').textContent = formatMoney(totalRevenue);
       if (totalCount   != null) qs('kpiCount').textContent = String(totalCount);
       return;
@@ -253,12 +235,15 @@ async function draw() {
     layout.yaxis.title = 'Age';
   }
 
-  // Write KPIs (if we could compute)
+  // Write KPIs
   if (totalRevenue != null) qs('kpiRevenue').textContent = formatMoney(totalRevenue);
   if (totalCount   != null) qs('kpiCount').textContent   = String(totalCount);
 
   await Plotly.react(el, traces, layout, { responsive: true, displaylogo: false });
-  msgEl.textContent = scope === 'active' ? 'Filtered: active learners' : 'Filtered: all learners';
+
+  const monthNote = month ? ` • Month: ${monthName(month)}` : '';
+  msgEl.textContent =
+    (scope === 'active' ? 'Filtered: active learners' : 'Filtered: all learners') + monthNote;
 }
 
 function attachUI() {
@@ -271,6 +256,8 @@ function attachUI() {
     qs('chartType').value = 'hist';
     draw();
   });
+
+  // Each control just redraws with current chart type (no auto-switching)
   ['chartType','year','month','scope'].forEach(id => {
     qs(id).addEventListener('change', draw);
   });

@@ -2,36 +2,32 @@
 from __future__ import annotations
 
 from datetime import date as _d, datetime as _dt, time as _t, timezone as _tz
-import json
 from decimal import Decimal
-from typing import List, Optional, Type
+from typing import List, Type
 
-from django.apps import apps
-from django.contrib import admin, messages
+from django.contrib import admin
 from django.contrib.humanize.templatetags.humanize import intcomma
 from django.contrib.postgres.fields import ArrayField
 from django.conf import settings
 from django.db import models
-from django.db.models import Sum, Count, F, Prefetch
+from django.db.models import Sum, Count
 from django.db.models.functions import TruncMonth, TruncDate
 from django.http import HttpResponse, JsonResponse, HttpRequest
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
-from django.utils.safestring import mark_safe
 from django.urls import reverse, path
 from django.template.response import TemplateResponse
 from django.template.loader import render_to_string
-from django.shortcuts import redirect  # ← use proper redirect
+from django.shortcuts import redirect
 
 from simple_history.admin import SimpleHistoryAdmin
-from import_export.admin import ImportExportModelAdmin, ExportActionModelAdmin
+from import_export.admin import ImportExportModelAdmin
 from import_export import resources, fields
 from import_export.formats.base_formats import CSV, JSON, XLSX, Format
-from import_export.formats import base_formats
 
 from unfold.enums import ActionVariant
-from unfold.admin import ModelAdmin, TabularInline, StackedInline
+from unfold.admin import ModelAdmin, TabularInline
 from unfold.contrib.forms.widgets import WysiwygWidget, ArrayWidget
 from unfold.contrib.import_export.forms import ImportForm, ExportForm
 from unfold.decorators import display, action
@@ -44,22 +40,24 @@ from pages.templatetags.persian_calendar_convertor import (
 
 from . import models as m
 from core.notify import send_subscription_expired_sms
-from core.utility import shamsi_text
-from core.export_formats import WeasyPDF
 
 
+# ──────────────────────────────────────────────────────────────
+# Actions (examples)
+# ──────────────────────────────────────────────────────────────
 @action(description=_("Export selected → PDF"))
 def action_export_selected_pdf(self, request, qs):
     ctx = {**self.admin_site.each_context(request), "title": "Subscriptions Export (PDF)", "qs": qs}
     try:
-        import weasyprint
+        from weasyprint import HTML  # optional
         html = TemplateResponse(request, "admin/courses/learner_subscribe_plan/export_pdf.html", ctx)
         html.render()
-        pdf = weasyprint.HTML(string=html.content.decode("utf-8")).write_pdf()
+        pdf = HTML(string=html.content.decode("utf-8")).write_pdf()
         resp = HttpResponse(pdf, content_type="application/pdf")
         resp["Content-Disposition"] = 'attachment; filename="subscriptions_selected.pdf"'
         return resp
     except Exception:
+        # fall back to HTML preview in the admin if WeasyPrint not installed
         return TemplateResponse(request, "admin/courses/learner_subscribe_plan/export_pdf.html", ctx)
 
 
@@ -67,18 +65,18 @@ def action_export_selected_pdf(self, request, qs):
 def action_send_test_sms(self, request, qs):
     sent = 0
     for sub in qs.select_related("learner_enrollment__learner__user", "subscription_plan"):
-        send_subscription_expired_sms(sub)  # reuses your templates and routing
+        send_subscription_expired_sms(sub)
         sent += 1
     self.message_user(request, f"SMS triggered for {sent} subscription(s).")
 
 
-# register actions (keep your existing 'action_expire_overdue')
-actions = ("action_expire_overdue", "action_export_selected_pdf", "action_send_test_sms")
+# register actions (include your existing custom ones if any)
+actions = ("action_export_selected_pdf", "action_send_test_sms")
 
 
-# ════════════════════════════════════════════════════════════════
-#  Helpers
-# ════════════════════════════════════════════════════════════════
+# ──────────────────────────────────────────────────────────────
+# Helpers
+# ──────────────────────────────────────────────────────────────
 def _jalali(val):
     if isinstance(val, _d) and not isinstance(val, _dt):
         val = _dt.combine(val, _t.min, tzinfo=_tz.utc)
@@ -120,9 +118,66 @@ def choice_badge(attr, *, mapping: dict[str, tuple[str, str]], desc="Status"):
     return _fn
 
 
-# ════════════════════════════════════════════════════════════════
-#  Base mix-in
-# ════════════════════════════════════════════════════════════════
+def badge(text: str, variant: str) -> str:
+    # Unfold badge variants: primary, success, info, warning, danger, default
+    return f'<span class="badge badge--{variant}">{text}</span>'
+
+
+def _format_shamsi(dt) -> str:
+    if hasattr(dt, "strftime"):
+        return timezone.localtime(dt).strftime("%Y-%m-%d %H:%M")
+    return "—"
+
+
+# ──────────────────────────────────────────────────────────────
+# Import/Export resources
+# ──────────────────────────────────────────────────────────────
+class LearnerSubscribePlanResource(resources.ModelResource):
+    learner = fields.Field(column_name="learner_full_name")
+    plan = fields.Field(column_name="plan_name")
+    start = fields.Field(attribute="start_datetime", column_name="start_datetime")
+    end = fields.Field(attribute="end_datetime", column_name="end_datetime")
+    discount = fields.Field(attribute="discount", column_name="discount_percent")
+    final_cost = fields.Field(attribute="final_cost", column_name="final_cost_toman")
+    status = fields.Field(attribute="status", column_name="status")
+
+    class Meta:
+        model = m.LearnerSubscribePlan
+        fields = ("learner", "plan", "start", "end", "discount", "final_cost", "status")
+        export_order = ("learner", "plan", "start", "end", "discount", "final_cost", "status")
+
+    def dehydrate_learner(self, obj: m.LearnerSubscribePlan) -> str:
+        try:
+            u = obj.learner_enrollment.learner.user
+            return f"{u.first_name} {u.last_name}".strip() or u.email
+        except Exception:
+            return str(obj.learner_enrollment_id)
+
+    def dehydrate_plan(self, obj: m.LearnerSubscribePlan) -> str:
+        return getattr(obj.subscription_plan, "name", str(obj.subscription_plan_id))
+
+
+class PDF(Format):
+    def get_title(self): return "pdf"
+    def get_extension(self): return "pdf"
+    def get_content_type(self): return "application/pdf"
+    def export_data(self, dataset, **kwargs):
+        html = render_to_string(
+            "admin/courses/learner_subscribe_plan/export_pdf.html",
+            {"dataset": dataset, "generated_at": timezone.now()},
+        )
+        try:
+            if getattr(settings, "USE_WEASYPRINT", False):
+                from weasyprint import HTML
+                return HTML(string=html).write_pdf()
+        except Exception:
+            pass
+        return html.encode("utf-8")
+
+
+# ──────────────────────────────────────────────────────────────
+# Base Admin
+# ──────────────────────────────────────────────────────────────
 FORM_OVERRIDES = {
     models.TextField: {"widget": WysiwygWidget},
     models.JSONField: {"widget": ArrayWidget},
@@ -137,14 +192,13 @@ class BaseAdmin(ModelAdmin, ImportExportModelAdmin):
     formfield_overrides = FORM_OVERRIDES
 
 
-# Combine Unfold styling + simple-history admin mixin
 class HistoryBaseAdmin(SimpleHistoryAdmin, BaseAdmin):
     pass
 
 
-# ════════════════════════════════════════════════════════════════
-#  CURRICULUM
-# ════════════════════════════════════════════════════════════════
+# ──────────────────────────────────────────────────────────────
+# CURRICULUM
+# ──────────────────────────────────────────────────────────────
 class ResourceInline(TabularInline):
     model = m.Resources
     extra = 0
@@ -201,9 +255,9 @@ class ResourceAdmin(BaseAdmin):
     search_fields = ("title", "address")
 
 
-# ════════════════════════════════════════════════════════════════
-#  PEOPLE
-# ════════════════════════════════════════════════════════════════
+# ──────────────────────────────────────────────────────────────
+# PEOPLE
+# ──────────────────────────────────────────────────────────────
 @admin.register(m.Specialty)
 class SpecialtyAdmin(BaseAdmin):
     active_badge = bool_badge("is_active")
@@ -236,9 +290,9 @@ class LearnerAdmin(BaseAdmin):
     autocomplete_fields = ("user",)
 
 
-# ════════════════════════════════════════════════════════════════
-#  ENROLMENT & MENTORING
-# ════════════════════════════════════════════════════════════════
+# ──────────────────────────────────────────────────────────────
+# ENROLMENT & MENTORING
+# ──────────────────────────────────────────────────────────────
 class MentorAssignmentInline(TabularInline):
     model = m.MentorAssignment
     extra = 0
@@ -285,9 +339,9 @@ class MentorAssignmentAdmin(BaseAdmin):
     )
 
 
-# ════════════════════════════════════════════════════════════════
-#  PROGRESS & TASKS
-# ════════════════════════════════════════════════════════════════
+# ──────────────────────────────────────────────────────────────
+# PROGRESS & TASKS
+# ──────────────────────────────────────────────────────────────
 @admin.register(m.StepExtension)
 class StepExtension(BaseAdmin):
     list_display = (
@@ -330,15 +384,8 @@ class StepProgressSessionAdmin(BaseAdmin):
         "description",
         "recorded_meet_link",
     )
-    autocomplete_fields = (
-        "step_progress",
-        "session_type",
-    )
-    # list_select_related = ("step_progress", "session_type",)
-    search_fields = (
-        "step_progress",
-        "session_type",
-    )
+    autocomplete_fields = ("step_progress", "session_type")
+    search_fields = ("step_progress", "session_type")
 
 
 @admin.register(m.StepProgress)
@@ -373,22 +420,14 @@ class TaskSubmissionAdmin(BaseAdmin):
     list_display = ("task", "step_progress", "submitted_j")
     autocomplete_fields = ("task", "step_progress")
     readonly_fields = ("submitted_at",)
-    search_fields = (
-        "task__title",
-        "step_progress__educational_step__title",
-    )
+    search_fields = ("task__title", "step_progress__educational_step__title")
 
 
 @admin.register(m.TaskEvaluation)
 class TaskEvaluationAdmin(BaseAdmin):
-    submitted_j = jalali_display("evaluated_at", label="evaluated_at")
+    submitted_j = jalali_display("evaluated_at", label="Evaluated")
 
-    list_display = (
-        "submission",
-        "mentor",
-        "score",
-        "feedback",
-    )
+    list_display = ("submission", "mentor", "score", "feedback")
     autocomplete_fields = ("mentor", "submission")
     search_fields = ("submission__task__title", "mentor__user")
 
@@ -410,16 +449,12 @@ class SocialPostAdmin(BaseAdmin):
     list_display = ("platforms_disp", "learner", "step_progress", "posted_j")
     list_filter = ("platform",)
     autocomplete_fields = ("learner", "step_progress", "platform")
-    search_fields = (
-        "learner__user__email",
-        "step_progress__educational_step__title",
-        "urls",
-    )
+    search_fields = ("learner__user__email", "step_progress__educational_step__title", "urls")
 
 
-# ════════════════════════════════════════════════════════════════
-#  SUBSCRIPTIONS
-# ════════════════════════════════════════════════════════════════
+# ──────────────────────────────────────────────────────────────
+# SUBSCRIPTIONS
+# ──────────────────────────────────────────────────────────────
 class SubscriptionTransactionResource(resources.ModelResource):
     class Meta:
         model = m.SubscriptionTransaction
@@ -438,7 +473,6 @@ class SubscriptionTransactionResource(resources.ModelResource):
         export_order = fields
 
 
-# ---- Transaction Admin ----
 @admin.register(m.SubscriptionTransaction)
 class SubscriptionTransactionAdmin(SimpleHistoryAdmin, ModelAdmin):
     resource_class = SubscriptionTransactionResource
@@ -496,92 +530,6 @@ class FreezeInline(TabularInline):
     fields = ("duration",)
 
 
-# ============ Helpers
-def badge(text: str, variant: str) -> str:
-    # Unfold badges
-    # Variants: primary, success, info, warning, danger, default
-    return f'<span class="badge badge--{variant}">{text}</span>'
-
-
-def _format_shamsi(dt) -> str:
-    # Prefer model helpers if present.
-    if hasattr(dt, "strftime"):
-        # Fallback Gregorian readable
-        return timezone.localtime(dt).strftime("%Y-%m-%d %H:%M")
-    return "—"
-
-
-# =============================== Import/Export resource
-class LearnerSubscribePlanResource(resources.ModelResource):
-    learner = fields.Field(column_name="learner_full_name")
-    plan = fields.Field(column_name="plan_name")
-    start = fields.Field(attribute="start_datetime", column_name="start_datetime")
-    end = fields.Field(attribute="end_datetime", column_name="end_datetime")
-    discount = fields.Field(attribute="discount", column_name="discount_percent")
-    final_cost = fields.Field(attribute="final_cost", column_name="final_cost_toman")
-    status = fields.Field(attribute="status", column_name="status")
-
-    class Meta:
-        model = m.LearnerSubscribePlan
-        fields = (
-            "learner",
-            "plan",
-            "start",
-            "end",
-            "discount",
-            "final_cost",
-            "status",
-        )
-        export_order = (
-            "learner",
-            "plan",
-            "start",
-            "end",
-            "discount",
-            "final_cost",
-            "status",
-        )
-
-    # Computed fields
-    def dehydrate_learner(self, obj: m.LearnerSubscribePlan) -> str:
-        try:
-            u = obj.learner_enrollment.learner.user
-            return f"{u.first_name} {u.last_name}".strip() or u.email
-        except Exception:
-            return str(obj.learner_enrollment_id)
-
-    def dehydrate_plan(self, obj: m.LearnerSubscribePlan) -> str:
-        return getattr(obj.subscription_plan, "name", str(obj.subscription_plan_id))
-
-
-# ----------------------------------------- Optional PDF format
-class PDF(Format):
-    def get_title(self):
-        return "pdf"
-
-    def get_extension(self):
-        return "pdf"
-
-    def get_content_type(self):
-        return "application/pdf"
-
-    def export_data(self, dataset, **kwargs):
-        html = render_to_string(
-            "admin/courses/learner_subscribe_plan/export_pdf.html",
-            {"dataset": dataset, "generated_at": timezone.now()},
-        )
-        if getattr(settings, "USE_WEASYPRINT", False):
-            try:
-                from weasyprint import HTML
-
-                return HTML(string=html).write_pdf()
-            except Exception as exc:
-                # fall back silently
-                pass
-        return html.encode("utf-8")
-
-
-# =========================================== Inline: show transactions
 class TransactionInline(admin.TabularInline):
     model = m.SubscriptionTransaction
     extra = 0
@@ -589,19 +537,17 @@ class TransactionInline(admin.TabularInline):
     readonly_fields = ("paid_at", "kind", "status", "amount", "gateway", "ref")
 
 
-# ===================================== Main admin for LearnerSubscribePlan
+# ──────────────────────────────────────────────────────────────
+# MAIN ADMIN: LearnerSubscribePlan + Analytics
+# ──────────────────────────────────────────────────────────────
 @admin.register(m.LearnerSubscribePlan)
 class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
     # Unfold + Import/Export integration
-    import_form_class = None  # Unfold's ImportForm can be set if you use imports
-    from unfold.contrib.import_export.forms import ExportForm  # styled
     export_form_class = ExportForm
     resource_classes = [LearnerSubscribePlanResource]
 
-    # Inline
     inlines = (TransactionInline,)
 
-    # Query perf
     list_select_related = (
         "learner_enrollment__learner__user",
         "learner_enrollment__learning_path",
@@ -616,7 +562,7 @@ class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
             "subscription_plan",
         )
 
-    # Changelist columns (no ID!)
+    # Changelist columns
     list_display = (
         "learner_full_name",
         "plan_name",
@@ -636,7 +582,7 @@ class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
     list_per_page = 50
     readonly_fields = ("end_datetime", "final_cost", "expired_at")
 
-    # Clean action button (visible on listing top)
+    # List action button (toolbar)
     actions_list = ["go_analytics_dropdown"]
 
     @action(
@@ -645,14 +591,7 @@ class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
         variant=ActionVariant.PRIMARY,
     )
     def go_analytics_dropdown(self, request: HttpRequest, queryset=None):
-        """
-        Unfold list-action handler.
-        Called as a 'view' (no queryset) from actions_list, and also safe if triggered as a bulk action.
-        """
-        return self._redirect_to_analytics(request)
-
-    def _redirect_to_analytics(self, request: HttpRequest):
-        # proper redirect()
+        """Works both as a list-action view and a bulk action (queryset optional)."""
         return redirect(reverse("admin:courses_learnersubscribeplan_analytics"))
 
     # Pretty accessors
@@ -664,13 +603,9 @@ class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
         return obj.subscription_plan.name
 
     def start_shamsi(self, obj: m.LearnerSubscribePlan) -> str:
-        if hasattr(obj, "start_shamsi"):
-            return obj.start_shamsi
         return _format_shamsi(obj.start_datetime)
 
     def end_shamsi(self, obj: m.LearnerSubscribePlan) -> str:
-        if hasattr(obj, "end_shamsi"):
-            return obj.end_shamsi
         return _format_shamsi(obj.end_datetime)
 
     def discount_percent(self, obj: m.LearnerSubscribePlan) -> str:
@@ -697,18 +632,14 @@ class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
     discount_percent.short_description = _("Disc")
     final_cost_h.short_description = _("Final Cost")
 
-    # ====== Export formats (returns classes, not instances) ======
+    # Export formats
     def get_export_formats(self) -> List[Type[Format]]:
-        """
-        MUST return a list of **classes**, not instances.
-        """
-        fmts: List[Type[Format]] = [CSV, JSON, XLSX]  # Excel via XLSX
-        # Only offer PDF when explicitly enabled (and template exists).
+        fmts: List[Type[Format]] = [CSV, JSON, XLSX]
         if getattr(settings, "USE_WEASYPRINT", False):
             fmts.append(PDF)
         return fmts
 
-    # ====== URLs for analytics and JSON data ======
+    # URLs for analytics and JSON data
     def get_urls(self):
         return [
             path(
@@ -724,30 +655,29 @@ class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
         ] + super().get_urls()
 
     def analytics_view(self, request: HttpRequest):
-        ctx = dict(
-            self.admin_site.each_context(request),
-            title=_("Subscriptions Analytics"),
-        )
-        # Template path you already have in your repo
+        ctx = dict(self.admin_site.each_context(request), title=_("Subscriptions Analytics"))
+        # Keep your existing template path (this matches your uploaded file)
         return TemplateResponse(
             request,
             "admin/courses/learner_subscribe_plan/analytics.html",
             ctx,
         )
 
+    # ──────────────────────────────────────────────────────────
+    # JSON endpoint — MONTH AFFECTS **ALL** CHARTS
+    # ──────────────────────────────────────────────────────────
     def analytics_data(self, request: HttpRequest):
         """
-        JSON API used by your front-end (Chart.js / Plotly).
-
         Query params:
           - chart: monthly_revenue | plan_counts | paths_pie | age_scatter
           - year:  YYYY (default: current year)
-          - month: 1..12 (optional for plan_counts)
+          - month: 1..12 (optional; when present, applies to ALL chart types)
           - scope: 'active' or 'all' (default: all)
         """
-        chart = request.GET.get("chart") or "monthly_revenue"
+        chart = (request.GET.get("chart") or "monthly_revenue").strip()
         year = int(request.GET.get("year") or timezone.now().year)
-        month = request.GET.get("month")
+        month_str = (request.GET.get("month") or "").strip()
+        month = int(month_str) if month_str.isdigit() else None
         scope = (request.GET.get("scope") or "all").lower()
 
         qs = m.LearnerSubscribePlan.objects.select_related(
@@ -758,78 +688,107 @@ class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
         if scope == "active":
             qs = qs.filter(status=m.LearnerSubscribePlan.STATUS_ACTIVE)
 
-        # --- Monthly revenue / count ---
+        # --- Monthly/Daily revenue & count ---
         if chart == "monthly_revenue":
-            rows = (
-                qs.filter(start_datetime__year=year)
-                .annotate(m=TruncMonth("start_datetime"))
-                .values("m")
-                .order_by("m")
-                .annotate(revenue=Sum("final_cost"), count=Count("id"))
-            )
-            labels, revenues, counts = [], [], []
-            for r in rows:
-                mval = r["m"]
-                labels.append(mval.strftime("%Y-%m"))
-                revenues.append(int(r["revenue"] or 0))
-                counts.append(int(r["count"] or 0))
-            return JsonResponse(
-                {"chart": chart, "year": year, "labels": labels, "revenues": revenues, "counts": counts}
-            )
-
-        # --- Plan counts for a specific month/year ---
-        if chart == "plan_counts":
             if month:
-                m_int = int(month)
+                # DAILY series for selected month
                 rows = (
-                    qs.filter(start_datetime__year=year, start_datetime__month=m_int)
-                    .values("subscription_plan__name")
-                    .annotate(c=Count("id"))
-                    .order_by("-c")
+                    qs.filter(start_datetime__year=year, start_datetime__month=month)
+                    .annotate(d=TruncDate("start_datetime"))
+                    .values("d")
+                    .order_by("d")
+                    .annotate(revenue=Sum("final_cost"), count=Count("id"))
+                )
+                labels, revenues, counts = [], [], []
+                for r in rows:
+                    dval = r["d"]
+                    labels.append(dval.strftime("%Y-%m-%d"))
+                    revenues.append(int(r["revenue"] or 0))
+                    counts.append(int(r["count"] or 0))
+                return JsonResponse(
+                    {
+                        "chart": chart,
+                        "year": year,
+                        "month": month,
+                        "labels": labels,  # YYYY-MM-DD
+                        "revenues": revenues,
+                        "counts": counts,
+                        "total_revenue": sum(revenues),
+                        "total_count": sum(counts),
+                    }
                 )
             else:
+                # MONTHLY series for the whole year
                 rows = (
                     qs.filter(start_datetime__year=year)
-                    .values("subscription_plan__name")
-                    .annotate(c=Count("id"))
-                    .order_by("-c")
+                    .annotate(m=TruncMonth("start_datetime"))
+                    .values("m")
+                    .order_by("m")
+                    .annotate(revenue=Sum("final_cost"), count=Count("id"))
                 )
+                labels, revenues, counts = [], [], []
+                for r in rows:
+                    mval = r["m"]
+                    labels.append(mval.strftime("%Y-%m"))
+                    revenues.append(int(r["revenue"] or 0))
+                    counts.append(int(r["count"] or 0))
+                return JsonResponse(
+                    {
+                        "chart": chart,
+                        "year": year,
+                        "labels": labels,  # YYYY-MM
+                        "revenues": revenues,
+                        "counts": counts,
+                        "total_revenue": sum(revenues),
+                        "total_count": sum(counts),
+                    }
+                )
+
+        # --- Plan counts (bar) — respects month ---
+        if chart == "plan_counts":
+            base = qs.filter(start_datetime__year=year)
+            if month:
+                base = base.filter(start_datetime__month=month)
+            rows = (
+                base.values("subscription_plan__name")
+                .annotate(c=Count("id"))
+                .order_by("-c")
+            )
             labels = [r["subscription_plan__name"] or "—" for r in rows]
             counts = [int(r["c"] or 0) for r in rows]
             return JsonResponse(
                 {
                     "chart": chart,
                     "year": year,
-                    "month": int(month) if month else None,
+                    "month": month,
                     "labels": labels,
                     "counts": counts,
                     "total": sum(counts),
+                    "total_count": sum(counts),
                 }
             )
 
-        # --- Learners per learning-path (Pie) ---
+        # --- Learners per learning-path (Pie) — respects month ---
         if chart == "paths_pie":
-            try:
-                rows = (
-                    qs.filter(start_datetime__year=year)
-                    .values("learner_enrollment__learning_path__name")
-                    .annotate(c=Count("id"))
-                    .order_by("-c")
-                )
-                labels = [r["learner_enrollment__learning_path__name"] or "—" for r in rows]
-                values = [int(r["c"] or 0) for r in rows]
-            except Exception:
-                labels, values = [], []
+            base = qs.filter(start_datetime__year=year)
+            if month:
+                base = base.filter(start_datetime__month=month)
+            rows = (
+                base.values("learner_enrollment__learning_path__name")
+                .annotate(c=Count("id"))
+                .order_by("-c")
+            )
+            labels = [r["learner_enrollment__learning_path__name"] or "—" for r in rows]
+            values = [int(r["c"] or 0) for r in rows]
             return JsonResponse({"chart": chart, "labels": labels, "values": values})
 
-        # --- Age vs revenue (Scatter) ---
+        # --- Age vs revenue (Scatter) — now respects month ---
         if chart == "age_scatter":
-            # Aggregate revenue per learner for selected year
-            rev = (
-                qs.filter(start_datetime__year=year)
-                .values("learner_enrollment__learner_id")
-                .annotate(total=Sum("final_cost"))
-            )
+            base = qs.filter(start_datetime__year=year)
+            if month:
+                base = base.filter(start_datetime__month=month)
+            # revenue per learner in the selected period
+            rev = base.values("learner_enrollment__learner_id").annotate(total=Sum("final_cost"))
             rev_map = {
                 r["learner_enrollment__learner_id"]: int(r["total"] or 0)
                 for r in rev
@@ -839,12 +798,11 @@ class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
 
             ages, totals = [], []
             if learner_ids:
-                # Pull DOB from Learner.user.birthdate (your CoreUser field name)
-                # This avoids incorrect joins to CustomUser via 'learner__…'
+                # Pull DOB from Learner.user.birthdate (field from core.CustomUser)
                 learners = m.Learner.objects.filter(id__in=learner_ids).select_related("user")
                 today = timezone.now().date()
                 for lr in learners:
-                    dob = getattr(lr.user, "birthdate", None)  # ← field name from your core.models
+                    dob = getattr(lr.user, "birthdate", None)
                     if dob:
                         age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
                         if 5 <= age <= 100:
@@ -855,25 +813,18 @@ class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
                 {"chart": chart, "x": ages, "y": totals, "x_title": "Age", "y_title": "Revenue (T)"}
             )
 
-        # default
+        # default (empty)
         return JsonResponse({"chart": chart, "labels": [], "revenues": [], "counts": []})
 
 
-# ════════════════════════════════════════════════════════════════
-#  MENTOR GROUP SESSIONS
-# ════════════════════════════════════════════════════════════════
+# ──────────────────────────────────────────────────────────────
+# MENTOR GROUP SESSIONS
+# ──────────────────────────────────────────────────────────────
 @admin.register(m.MentorGroupSessionParticipant)
 class MentorGroupSessionParticipantAdmin(BaseAdmin):
-    list_display = (
-        "mentor_group_session_occurence",
-        "mentor_assignment",
-        "learner_was_present",
-    )
+    list_display = ("mentor_group_session_occurence", "mentor_assignment", "learner_was_present")
     list_filter = ("learner_was_present",)
-    autocomplete_fields = (
-        "mentor_group_session_occurence",
-        "mentor_assignment",
-    )
+    autocomplete_fields = ("mentor_group_session_occurence", "mentor_assignment")
     search_fields = ("mentor_assignment",)
     list_select_related = ("mentor_group_session_occurence", "mentor_assignment")
 
@@ -911,9 +862,7 @@ class MentorGroupSessionOccurrenceAdmin(BaseAdmin):
     )
     list_select_related = ("mentor_group_session",)
     inlines = (MGSParticipantInline,)
-    # 🔑  Unfold magic:
     conditional_fields = {
-        # show only when the checkbox is ticked
         "new_datetime": "occurence_datetime_changed == true",
         "reason_for_change": "occurence_datetime_changed == true",
     }
@@ -938,13 +887,7 @@ class MGSOccurrenceInline(TabularInline):
 
 @admin.register(m.MentorGroupSession)
 class MentorGroupSessionAdmin(BaseAdmin):
-    list_display = (
-        "mentor",
-        "learning_path",
-        "session_type",
-        "suppused_day",
-        "suppoused_time",
-    )
+    list_display = ("mentor", "learning_path", "session_type", "suppused_day", "suppoused_time")
     list_filter = ("mentor", "learning_path", "session_type", "suppused_day")
     autocomplete_fields = ("mentor", "learning_path", "session_type")
     inlines = (MGSOccurrenceInline,)
