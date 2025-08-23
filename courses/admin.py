@@ -1,4 +1,4 @@
-# courses/admin.py  – Django 5.2 • Unfold 0.24 • import‑export 4.x
+# courses/admin.py  – Django 5.2 • Unfold • import-export
 from __future__ import annotations
 
 from datetime import date as _d, datetime as _dt, time as _t, timezone as _tz
@@ -9,7 +9,7 @@ from typing import List, Optional, Type
 from django.apps import apps
 from django.contrib import admin, messages
 from django.contrib.humanize.templatetags.humanize import intcomma
-from django.contrib.postgres.fields import ArrayField 
+from django.contrib.postgres.fields import ArrayField
 from django.conf import settings
 from django.db import models
 from django.db.models import Sum, Count, F, Prefetch
@@ -22,6 +22,7 @@ from django.utils.safestring import mark_safe
 from django.urls import reverse, path
 from django.template.response import TemplateResponse
 from django.template.loader import render_to_string
+from django.shortcuts import redirect  # ← use proper redirect
 
 from simple_history.admin import SimpleHistoryAdmin
 from import_export.admin import ImportExportModelAdmin, ExportActionModelAdmin
@@ -33,7 +34,7 @@ from unfold.enums import ActionVariant
 from unfold.admin import ModelAdmin, TabularInline, StackedInline
 from unfold.contrib.forms.widgets import WysiwygWidget, ArrayWidget
 from unfold.contrib.import_export.forms import ImportForm, ExportForm
-from unfold.decorators import display , action
+from unfold.decorators import display, action
 
 from pages.templatetags.custom_translation_tags import translate_number
 from pages.templatetags.persian_calendar_convertor import (
@@ -61,6 +62,7 @@ def action_export_selected_pdf(self, request, qs):
     except Exception:
         return TemplateResponse(request, "admin/courses/learner_subscribe_plan/export_pdf.html", ctx)
 
+
 @action(description=_("Send TEST SMS via Kavenegar"))
 def action_send_test_sms(self, request, qs):
     sent = 0
@@ -68,6 +70,7 @@ def action_send_test_sms(self, request, qs):
         send_subscription_expired_sms(sub)  # reuses your templates and routing
         sent += 1
     self.message_user(request, f"SMS triggered for {sent} subscription(s).")
+
 
 # register actions (keep your existing 'action_expire_overdue')
 actions = ("action_expire_overdue", "action_export_selected_pdf", "action_send_test_sms")
@@ -94,12 +97,12 @@ def jalali_display(attr="created_at", *, label=None):
     return _fn
 
 
-def bool_badge(attr, *, true="Yes", false="No",
-               t_color="success", f_color="danger", desc="Status"):
+def bool_badge(attr, *, true="Yes", false="No", t_color="success", f_color="danger", desc="Status"):
     @display(description=desc, label={True: t_color, False: f_color})
     def _fn(self, obj):
         val = getattr(obj, attr)
         return val, true if val else false
+
     _fn.__name__ = f"{attr}_badge"
     return _fn
 
@@ -112,12 +115,13 @@ def choice_badge(attr, *, mapping: dict[str, tuple[str, str]], desc="Status"):
         raw = getattr(obj, attr)
         text, _ = mapping.get(raw, (raw, "info"))
         return raw, text
+
     _fn.__name__ = f"{attr}_badge"
     return _fn
 
 
 # ════════════════════════════════════════════════════════════════
-#  Base mix‑in
+#  Base mix-in
 # ════════════════════════════════════════════════════════════════
 FORM_OVERRIDES = {
     models.TextField: {"widget": WysiwygWidget},
@@ -136,6 +140,7 @@ class BaseAdmin(ModelAdmin, ImportExportModelAdmin):
 # Combine Unfold styling + simple-history admin mixin
 class HistoryBaseAdmin(SimpleHistoryAdmin, BaseAdmin):
     pass
+
 
 # ════════════════════════════════════════════════════════════════
 #  CURRICULUM
@@ -209,7 +214,7 @@ class SpecialtyAdmin(BaseAdmin):
 
 @admin.register(m.Mentor)
 class MentorAdmin(BaseAdmin):
-    hire_j = jalali_display("hire_date", label="Hire date")
+    hire_j = jalali_display("hire_date", label="Hire date")
     status_badge = bool_badge("status", true="Active", false="Inactive")
 
     @display(header=True, description=_("Mentor"))
@@ -219,7 +224,7 @@ class MentorAdmin(BaseAdmin):
 
     list_display = ("heading", "hire_j", "status_badge")
     list_filter = ("status", "specialties")
-    autocomplete_fields = ("user", "specialties",)
+    autocomplete_fields = ("user", "specialties")
     search_fields = ("user__first_name", "user__last_name", "user__email")
 
 
@@ -279,6 +284,7 @@ class MentorAssignmentAdmin(BaseAdmin):
         "enrollment__learner__user__email",
     )
 
+
 # ════════════════════════════════════════════════════════════════
 #  PROGRESS & TASKS
 # ════════════════════════════════════════════════════════════════
@@ -324,16 +330,15 @@ class StepProgressSessionAdmin(BaseAdmin):
         "description",
         "recorded_meet_link",
     )
-    autocomplete_fields = ("step_progress", "session_type",)
+    autocomplete_fields = (
+        "step_progress",
+        "session_type",
+    )
     # list_select_related = ("step_progress", "session_type",)
     search_fields = (
         "step_progress",
         "session_type",
     )
-
-#inline -> StepProgress
-# class StepProgressSessionInline(TabularInline):
-    # ...
 
 
 @admin.register(m.StepProgress)
@@ -342,7 +347,7 @@ class StepProgressAdmin(BaseAdmin):
     list_display = ("mentor_assignment", "educational_step", "skipped_badge")
     autocomplete_fields = ("mentor_assignment", "educational_step")
     list_filter = ("skipped", "educational_step__learning_path")
-    inlines = (StepExtensionInline, )
+    inlines = (StepExtensionInline,)
     conditional_fields = {"initial_promise_days": "skipped == false"}
     search_fields = (
         "mentor_assignment__mentor__user__first_name",
@@ -385,10 +390,7 @@ class TaskEvaluationAdmin(BaseAdmin):
         "feedback",
     )
     autocomplete_fields = ("mentor", "submission")
-    search_fields = (
-        "submission__task__title"
-        "mentor__user",
-    )
+    search_fields = ("submission__task__title", "mentor__user")
 
 
 @admin.register(m.SocialMedia)
@@ -400,11 +402,11 @@ class SocialMediaAdmin(BaseAdmin):
 @admin.register(m.SocialPost)
 class SocialPostAdmin(BaseAdmin):
     posted_j = jalali_display("posted_at", label="Posted")
-    
+
     @display(description="Platforms")
     def platforms_disp(self, obj):
         return ", ".join(obj.platform.values_list("platform", flat=True))
-    
+
     list_display = ("platforms_disp", "learner", "step_progress", "posted_j")
     list_filter = ("platform",)
     autocomplete_fields = ("learner", "step_progress", "platform")
@@ -440,14 +442,27 @@ class SubscriptionTransactionResource(resources.ModelResource):
 @admin.register(m.SubscriptionTransaction)
 class SubscriptionTransactionAdmin(SimpleHistoryAdmin, ModelAdmin):
     resource_class = SubscriptionTransactionResource
-    list_display = ("learner_enrollment", "subscription_plan", "kind", "status", "amount_disp", "paid_at")
+    list_display = (
+        "learner_enrollment",
+        "subscription_plan",
+        "kind",
+        "status",
+        "amount_disp",
+        "paid_at",
+    )
     list_filter = ("kind", "status", "subscription_plan", "gateway")
-    search_fields = ("learner_enrollment__learner__user__username", "subscription_plan__name", "ref", "note")
+    search_fields = (
+        "learner_enrollment__learner__user__username",
+        "subscription_plan__name",
+        "ref",
+        "note",
+    )
     date_hierarchy = "paid_at"
     autocomplete_fields = ("learner_enrollment", "subscription", "subscription_plan")
 
     @display(description=_("Amount (T)"))
-    def amount_disp(self, obj): return intcomma(obj.amount)
+    def amount_disp(self, obj):
+        return intcomma(obj.amount)
 
 
 class PlanFeatureInline(TabularInline):
@@ -481,9 +496,7 @@ class FreezeInline(TabularInline):
     fields = ("duration",)
 
 
-# ============
-# Helper bits
-# ============
+# ============ Helpers
 def badge(text: str, variant: str) -> str:
     # Unfold badges
     # Variants: primary, success, info, warning, danger, default
@@ -498,9 +511,7 @@ def _format_shamsi(dt) -> str:
     return "—"
 
 
-# ===============================
-# Import/Export resource (clean!)
-# ===============================
+# =============================== Import/Export resource
 class LearnerSubscribePlanResource(resources.ModelResource):
     learner = fields.Field(column_name="learner_full_name")
     plan = fields.Field(column_name="plan_name")
@@ -543,13 +554,16 @@ class LearnerSubscribePlanResource(resources.ModelResource):
         return getattr(obj.subscription_plan, "name", str(obj.subscription_plan_id))
 
 
-# -----------------------------------------
-# Optional PDF format (guarded & graceful)
-# -----------------------------------------
+# ----------------------------------------- Optional PDF format
 class PDF(Format):
-    def get_title(self):       return "pdf"
-    def get_extension(self):   return "pdf"
-    def get_content_type(self):return "application/pdf"
+    def get_title(self):
+        return "pdf"
+
+    def get_extension(self):
+        return "pdf"
+
+    def get_content_type(self):
+        return "application/pdf"
 
     def export_data(self, dataset, **kwargs):
         html = render_to_string(
@@ -559,17 +573,15 @@ class PDF(Format):
         if getattr(settings, "USE_WEASYPRINT", False):
             try:
                 from weasyprint import HTML
+
                 return HTML(string=html).write_pdf()
             except Exception as exc:
-                # Fall back to HTML bytes if WeasyPrint missing/broken
-                # (and show a warning in the admin flash messages if we have a request in context)
+                # fall back silently
                 pass
         return html.encode("utf-8")
 
 
-# ===========================================
-# Inline: show transactions under a sub plan
-# ===========================================
+# =========================================== Inline: show transactions
 class TransactionInline(admin.TabularInline):
     model = m.SubscriptionTransaction
     extra = 0
@@ -577,9 +589,7 @@ class TransactionInline(admin.TabularInline):
     readonly_fields = ("paid_at", "kind", "status", "amount", "gateway", "ref")
 
 
-# =====================================
-# Main admin for LearnerSubscribePlan
-# =====================================
+# ===================================== Main admin for LearnerSubscribePlan
 @admin.register(m.LearnerSubscribePlan)
 class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
     # Unfold + Import/Export integration
@@ -634,12 +644,16 @@ class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
         icon="query_stats",
         variant=ActionVariant.PRIMARY,
     )
-    def go_analytics_dropdown(self, request: HttpRequest, queryset):
-        # Send users to analytics (no queryset use)
+    def go_analytics_dropdown(self, request: HttpRequest, queryset=None):
+        """
+        Unfold list-action handler.
+        Called as a 'view' (no queryset) from actions_list, and also safe if triggered as a bulk action.
+        """
         return self._redirect_to_analytics(request)
 
     def _redirect_to_analytics(self, request: HttpRequest):
-        return admin.redirects.redirect(reverse("admin:courses_learnersubscribeplan_analytics"))
+        # proper redirect()
+        return redirect(reverse("admin:courses_learnersubscribeplan_analytics"))
 
     # Pretty accessors
     def learner_full_name(self, obj: m.LearnerSubscribePlan) -> str:
@@ -683,7 +697,7 @@ class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
     discount_percent.short_description = _("Disc")
     final_cost_h.short_description = _("Final Cost")
 
-    # ====== Export formats (FIXES your error) ======
+    # ====== Export formats (returns classes, not instances) ======
     def get_export_formats(self) -> List[Type[Format]]:
         """
         MUST return a list of **classes**, not instances.
@@ -717,7 +731,7 @@ class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
         # Template path you already have in your repo
         return TemplateResponse(
             request,
-            "admin/courses/learnersubscribeplan/analytics.html",
+            "admin/courses/learner_subscribe_plan/analytics.html",
             ctx,
         )
 
@@ -816,34 +830,34 @@ class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
                 .values("learner_enrollment__learner_id")
                 .annotate(total=Sum("final_cost"))
             )
-            rev_map = {r["learner_enrollment__learner_id"]: int(r["total"] or 0) for r in rev if r["learner_enrollment__learner_id"]}
+            rev_map = {
+                r["learner_enrollment__learner_id"]: int(r["total"] or 0)
+                for r in rev
+                if r["learner_enrollment__learner_id"]
+            }
             learner_ids = list(rev_map.keys())
 
             ages, totals = [], []
             if learner_ids:
-                # DOB is on CustomUser (you told me that)
-                from core.models import CustomUser
-                users = (
-                    CustomUser.objects.filter(learner__id__in=learner_ids)
-                    .only("id", "date_of_birth")
-                )
-                today = timezone.now().date()
-                # Map learner_id -> age
-                # Need learner_id -> user map
-                # learner -> user is 1-1 through Learner model
+                # Pull DOB from Learner.user.birthdate (your CoreUser field name)
+                # This avoids incorrect joins to CustomUser via 'learner__…'
                 learners = m.Learner.objects.filter(id__in=learner_ids).select_related("user")
+                today = timezone.now().date()
                 for lr in learners:
-                    dob = getattr(lr.user, "date_of_birth", None)
+                    dob = getattr(lr.user, "birthdate", None)  # ← field name from your core.models
                     if dob:
                         age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
                         if 5 <= age <= 100:
                             ages.append(int(age))
                             totals.append(rev_map.get(lr.id, 0))
 
-            return JsonResponse({"chart": chart, "x": ages, "y": totals, "x_title": "Age", "y_title": "Revenue (T)"})
+            return JsonResponse(
+                {"chart": chart, "x": ages, "y": totals, "x_title": "Age", "y_title": "Revenue (T)"}
+            )
 
         # default
         return JsonResponse({"chart": chart, "labels": [], "revenues": [], "counts": []})
+
 
 # ════════════════════════════════════════════════════════════════
 #  MENTOR GROUP SESSIONS
@@ -856,9 +870,12 @@ class MentorGroupSessionParticipantAdmin(BaseAdmin):
         "learner_was_present",
     )
     list_filter = ("learner_was_present",)
-    autocomplete_fields = ("mentor_group_session_occurence", "mentor_assignment",)
+    autocomplete_fields = (
+        "mentor_group_session_occurence",
+        "mentor_assignment",
+    )
     search_fields = ("mentor_assignment",)
-    list_select_related = ("mentor_group_session_occurence", "mentor_assignment" ,)
+    list_select_related = ("mentor_group_session_occurence", "mentor_assignment")
 
 
 class MGSParticipantInline(TabularInline):
@@ -892,7 +909,7 @@ class MentorGroupSessionOccurrenceAdmin(BaseAdmin):
         "mentor_group_session__learning_path__name",
         "mentor_group_session__mentor__user__email",
     )
-    list_select_related = ("mentor_group_session" ,)
+    list_select_related = ("mentor_group_session",)
     inlines = (MGSParticipantInline,)
     # 🔑  Unfold magic:
     conditional_fields = {
@@ -907,12 +924,12 @@ class MGSOccurrenceInline(TabularInline):
     tab = True
     extra = 0
     fields = (
-        "occurence_datetime", 
+        "occurence_datetime",
         "occurence_datetime_changed",
-        "new_datetime", 
-        "reason_for_change", 
+        "new_datetime",
+        "reason_for_change",
         "session_video_record",
-        )
+    )
     conditional_fields = {
         "new_datetime": "occurence_datetime_changed == true",
         "reason_for_change": "occurence_datetime_changed == true",
@@ -932,5 +949,3 @@ class MentorGroupSessionAdmin(BaseAdmin):
     autocomplete_fields = ("mentor", "learning_path", "session_type")
     inlines = (MGSOccurrenceInline,)
     search_fields = ("mentor",)
-    
-

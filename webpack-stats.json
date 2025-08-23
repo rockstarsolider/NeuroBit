@@ -1,10 +1,10 @@
 {
   "status": "done",
   "assets": {
-    "admin_analytics-767c2fbb2746b22c26ab.js": {
-      "name": "admin_analytics-767c2fbb2746b22c26ab.js",
-      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\admin_analytics-767c2fbb2746b22c26ab.js",
-      "publicPath": "/static/webpack_output/admin_analytics-767c2fbb2746b22c26ab.js"
+    "admin_analytics-085cacda27e984b5e670.js": {
+      "name": "admin_analytics-085cacda27e984b5e670.js",
+      "path": "D:\\Student_CLUB\\neurobit_django\\static\\webpack_output\\admin_analytics-085cacda27e984b5e670.js",
+      "publicPath": "/static/webpack_output/admin_analytics-085cacda27e984b5e670.js"
     },
     "learning_paths-bbc64ef1ac64270a1f11.js": {
       "name": "learning_paths-bbc64ef1ac64270a1f11.js",
@@ -36,7 +36,7 @@
     "admin_analytics": [
       "runtime-0a1d7751042834c98a40.js",
       "plotly-dfda75b91078736e5c96.js",
-      "admin_analytics-767c2fbb2746b22c26ab.js"
+      "admin_analytics-085cacda27e984b5e670.js"
     ],
     "learning_paths": [
       "runtime-0a1d7751042834c98a40.js",
