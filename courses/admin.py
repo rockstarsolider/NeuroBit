@@ -10,8 +10,8 @@ from django.contrib.humanize.templatetags.humanize import intcomma
 from django.contrib.postgres.fields import ArrayField
 from django.conf import settings
 from django.db import models
-from django.db.models import Sum, Count
-from django.db.models.functions import TruncMonth, TruncDate
+from django.db.models import Sum, Count, Avg, Q
+from django.db.models.functions import TruncMonth, TruncDate, Concat
 from django.http import HttpResponse, JsonResponse, HttpRequest
 from django.utils import timezone
 from django.utils.html import format_html
@@ -27,7 +27,7 @@ from import_export import resources, fields
 from import_export.formats.base_formats import CSV, JSON, XLSX, Format
 
 from unfold.enums import ActionVariant
-from unfold.admin import ModelAdmin, TabularInline
+from unfold.admin import ModelAdmin, TabularInline, StackedInline
 from unfold.contrib.forms.widgets import WysiwygWidget, ArrayWidget
 from unfold.contrib.import_export.forms import ImportForm, ExportForm
 from unfold.decorators import display, action
@@ -40,38 +40,6 @@ from pages.templatetags.persian_calendar_convertor import (
 
 from . import models as m
 from core.notify import send_subscription_expired_sms
-
-
-# ──────────────────────────────────────────────────────────────
-# Actions (examples)
-# ──────────────────────────────────────────────────────────────
-@action(description=_("Export selected → PDF"))
-def action_export_selected_pdf(self, request, qs):
-    ctx = {**self.admin_site.each_context(request), "title": "Subscriptions Export (PDF)", "qs": qs}
-    try:
-        from weasyprint import HTML  # optional
-        html = TemplateResponse(request, "admin/courses/learner_subscribe_plan/export_pdf.html", ctx)
-        html.render()
-        pdf = HTML(string=html.content.decode("utf-8")).write_pdf()
-        resp = HttpResponse(pdf, content_type="application/pdf")
-        resp["Content-Disposition"] = 'attachment; filename="subscriptions_selected.pdf"'
-        return resp
-    except Exception:
-        # fall back to HTML preview in the admin if WeasyPrint not installed
-        return TemplateResponse(request, "admin/courses/learner_subscribe_plan/export_pdf.html", ctx)
-
-
-@action(description=_("Send TEST SMS via Kavenegar"))
-def action_send_test_sms(self, request, qs):
-    sent = 0
-    for sub in qs.select_related("learner_enrollment__learner__user", "subscription_plan"):
-        send_subscription_expired_sms(sub)
-        sent += 1
-    self.message_user(request, f"SMS triggered for {sent} subscription(s).")
-
-
-# register actions (include your existing custom ones if any)
-actions = ("action_export_selected_pdf", "action_send_test_sms")
 
 
 # ──────────────────────────────────────────────────────────────
@@ -90,7 +58,6 @@ def jalali_display(attr="created_at", *, label=None):
     def _fn(self, obj):
         v = getattr(obj, attr)
         return "-" if not v else format_html("<b dir='rtl'>{}</b>", translate_number(_jalali(v)))
-
     _fn.__name__ = f"{attr}_jalali"
     return _fn
 
@@ -100,7 +67,6 @@ def bool_badge(attr, *, true="Yes", false="No", t_color="success", f_color="dang
     def _fn(self, obj):
         val = getattr(obj, attr)
         return val, true if val else false
-
     _fn.__name__ = f"{attr}_badge"
     return _fn
 
@@ -113,7 +79,6 @@ def choice_badge(attr, *, mapping: dict[str, tuple[str, str]], desc="Status"):
         raw = getattr(obj, attr)
         text, _ = mapping.get(raw, (raw, "info"))
         return raw, text
-
     _fn.__name__ = f"{attr}_badge"
     return _fn
 
@@ -130,7 +95,7 @@ def _format_shamsi(dt) -> str:
 
 
 # ──────────────────────────────────────────────────────────────
-# Import/Export resources
+# Import/Export resources (Subscriptions)
 # ──────────────────────────────────────────────────────────────
 class LearnerSubscribePlanResource(resources.ModelResource):
     learner = fields.Field(column_name="learner_full_name")
@@ -229,7 +194,279 @@ class LearningPathAdmin(BaseAdmin):
     list_display = ("name", "active_badge", "created_j")
     list_filter = ("is_active",)
     search_fields = ("name",)
-    # inlines = (EducationalStepInline,)
+
+    # Open the progress analytics dashboard (separate from financial analytics)
+    actions_list = ["go_progress_analytics"]
+
+    @action(description=_("Progress Analytics"), icon="timeline", variant=ActionVariant.PRIMARY)
+    def go_progress_analytics(self, request: HttpRequest, queryset=None):
+        return redirect(reverse("admin:courses_learningpath_progress_analytics"))
+
+    # ---- URLs for the progress analytics
+    def get_urls(self):
+        return [
+            path(
+                "progress-analytics/",
+                self.admin_site.admin_view(self.progress_analytics_view),
+                name="courses_learningpath_progress_analytics",
+            ),
+            path(
+                "progress-analytics/data/",
+                self.admin_site.admin_view(self.progress_analytics_data),
+                name="courses_learningpath_progress_analytics_data",
+            ),
+            path(
+                "progress-analytics/choices/",
+                self.admin_site.admin_view(self.progress_analytics_choices),
+                name="courses_learningpath_progress_analytics_choices",
+            ),
+            path(
+                "progress-analytics/search/mentors/",
+                self.admin_site.admin_view(self.progress_analytics_search_mentors),
+                name="courses_learningpath_progress_analytics_search_mentors",
+            ),
+            path(
+                "progress-analytics/search/learners/",
+                self.admin_site.admin_view(self.progress_analytics_search_learners),
+                name="courses_learningpath_progress_analytics_search_learners",
+            ),
+        ] + super().get_urls()
+
+
+    def progress_analytics_view(self, request):
+        ctx = dict(self.admin_site.each_context(request), title=_("Progress Analytics"))
+        return TemplateResponse(
+            request,
+            "admin/courses/learningpath/progress_analytics.html",
+            ctx,
+        )
+
+
+    # --- initial choices for dropdowns (used once on page load)
+    def progress_analytics_choices(self, request: HttpRequest):
+        """
+        Initial lists and re-population for LP, mentors, learners.
+        Accepts optional: lp, mentor
+        """
+        from . import models as m
+        lp_id = request.GET.get("lp")
+        mentor_id = request.GET.get("mentor")
+
+        lps = list(m.LearningPath.objects.order_by("name").values("id", "name"))
+
+        mentors_qs = m.Mentor.objects.select_related("user").order_by("user__first_name", "user__last_name")
+        if lp_id:
+            mentors_qs = mentors_qs.filter(
+                mentorassignment__enrollment__learning_path_id=lp_id
+            ).distinct()
+        mentors = [
+            {"id": i.id, "name": f"{i.user.first_name} {i.user.last_name}".strip() or i.user.email}
+            for i in mentors_qs[:50]
+        ]
+
+        learners_qs = m.Learner.objects.select_related("user").order_by("user__first_name", "user__last_name")
+        if lp_id:
+            learners_qs = learners_qs.filter(
+                learnerenrollment__learning_path_id=lp_id
+            )
+        if mentor_id:
+            learners_qs = learners_qs.filter(
+                learnerenrollment__mentorassignment__mentor_id=mentor_id
+            )
+        learners_qs = learners_qs.distinct()[:50]
+        learners = [
+            {"id": i.id, "name": f"{i.user.first_name} {i.user.last_name}".strip() or i.user.email}
+            for i in learners_qs
+        ]
+
+        return JsonResponse({"learning_paths": lps, "mentors": mentors, "learners": learners})
+
+    # --- instant-search: mentors
+    def progress_analytics_search_mentors(self, request: HttpRequest):
+        """Search mentors, filtered by lp and (optionally) learner."""
+        from django.db.models import Q
+        from . import models as m
+
+        q = (request.GET.get("q") or "").strip()
+        lp_id = request.GET.get("lp")
+        learner_id = request.GET.get("learner")
+
+        qs = m.Mentor.objects.select_related("user")
+        if lp_id:
+            qs = qs.filter(mentorassignment__enrollment__learning_path_id=lp_id)
+        if learner_id:
+            qs = qs.filter(mentorassignment__enrollment__learner_id=learner_id)
+
+        if q:
+            qs = qs.filter(
+                Q(user__first_name__icontains=q) |
+                Q(user__last_name__icontains=q) |
+                Q(user__email__icontains=q)
+            )
+
+        qs = qs.order_by("user__first_name", "user__last_name").distinct()[:20]
+        data = [{"id": o.id, "name": f"{o.user.first_name} {o.user.last_name}".strip() or o.user.email} for o in qs]
+        return JsonResponse({"results": data})
+
+    # --- instant-search: learners
+    def progress_analytics_search_learners(self, request: HttpRequest):
+        """Search learners, filtered by lp and (optionally) mentor."""
+        from django.db.models import Q
+        from . import models as m
+
+        q = (request.GET.get("q") or "").strip()
+        lp_id = request.GET.get("lp")
+        mentor_id = request.GET.get("mentor")
+
+        qs = m.Learner.objects.select_related("user")
+        if lp_id:
+            qs = qs.filter(learnerenrollment__learning_path_id=lp_id)
+        if mentor_id:
+            qs = qs.filter(learnerenrollment__mentorassignment__mentor_id=mentor_id)
+
+        if q:
+            qs = qs.filter(
+                Q(user__first_name__icontains=q) |
+                Q(user__last_name__icontains=q) |
+                Q(user__email__icontains=q)
+            )
+
+        qs = qs.order_by("user__first_name", "user__last_name").distinct()[:20]
+        data = [{"id": o.id, "name": f"{o.user.first_name} {o.user.last_name}".strip() or o.user.email} for o in qs]
+        return JsonResponse({"results": data})
+
+    # --- Data endpoint for charts
+    def progress_analytics_data(self, request: HttpRequest):
+        """
+        JSON API for progress analytics.
+        chart: step_funnel | avg_score | completions_over_time | learner_progress
+        filters: lp (required), mentor, learner, year, month
+        """
+        from django.db.models import Count, Avg
+        from django.db.models.functions import TruncDay
+        from . import models as m
+
+        chart = (request.GET.get("chart") or "step_funnel").strip()
+        lp_id = request.GET.get("lp")
+        mentor_id = request.GET.get("mentor")
+        learner_id = request.GET.get("learner")
+        year = request.GET.get("year")
+        month = request.GET.get("month")
+
+        if not lp_id:
+            return JsonResponse({"error": "lp required"}, status=400)
+
+        # base StepProgress filter
+        sp_base = m.StepProgress.objects.select_related(
+            "educational_step",
+            "mentor_assignment",
+            "mentor_assignment__enrollment",
+            "mentor_assignment__enrollment__learner",
+            "mentor_assignment__enrollment__learning_path",
+        ).filter(
+            educational_step__learning_path_id=lp_id
+        )
+        if mentor_id:
+            sp_base = sp_base.filter(mentor_assignment__mentor_id=mentor_id)
+        if learner_id:
+            sp_base = sp_base.filter(mentor_assignment__enrollment__learner_id=learner_id)
+
+        # STEP FUNNEL: per step => completed vs total
+        if chart == "step_funnel":
+            steps = list(
+                m.EducationalStep.objects.filter(learning_path_id=lp_id)
+                .order_by("sequence_no")
+                .values("id", "title")
+            )
+            step_ids = [s["id"] for s in steps]
+            total_by_step = dict(
+                sp_base.values("educational_step_id").annotate(c=Count("id")).values_list("educational_step_id", "c")
+            )
+            completed_by_step = dict(
+                sp_base.filter(task_completion_date__isnull=False)
+                    .values("educational_step_id")
+                    .annotate(c=Count("id"))
+                    .values_list("educational_step_id", "c")
+            )
+            labels = [s["title"] for s in steps]
+            total = [int(total_by_step.get(sid, 0)) for sid in step_ids]
+            completed = [int(completed_by_step.get(sid, 0)) for sid in step_ids]
+            return JsonResponse({"chart": chart, "labels": labels, "total": total, "completed": completed})
+
+        # AVG SCORE: average TaskEvaluation.score per step
+        if chart == "avg_score":
+            # link: StepProgress -> TaskSubmission -> TaskEvaluation
+            evals = m.TaskEvaluation.objects.select_related(
+                "submission", "submission__step_progress", "submission__step_progress__educational_step",
+                "submission__step_progress__mentor_assignment__enrollment__learner",
+                "submission__step_progress__mentor_assignment__enrollment__learning_path",
+            ).filter(
+                submission__step_progress__educational_step__learning_path_id=lp_id
+            )
+            if mentor_id:
+                evals = evals.filter(submission__step_progress__mentor_assignment__mentor_id=mentor_id)
+            if learner_id:
+                evals = evals.filter(submission__step_progress__mentor_assignment__enrollment__learner_id=learner_id)
+
+            rows = (evals.values("submission__step_progress__educational_step__title")
+                        .annotate(score=Avg("score")).order_by("submission__step_progress__educational_step__sequence_no"))
+            labels = [r["submission__step_progress__educational_step__title"] for r in rows]
+            scores = [round(r["score"] or 0, 2) for r in rows]
+            return JsonResponse({"chart": chart, "labels": labels, "scores": scores})
+
+        # COMPLETIONS OVER TIME: use StepProgress.task_completion_date
+        if chart == "completions_over_time":
+            sps = sp_base.filter(task_completion_date__isnull=False)
+            if year:
+                sps = sps.filter(task_completion_date__year=int(year))
+            if month:
+                sps = sps.filter(task_completion_date__month=int(month))
+
+            rows = (sps.annotate(d=TruncDay("task_completion_date"))
+                        .values("d").order_by("d")
+                        .annotate(c=Count("id")))
+            labels = [r["d"].date().isoformat() for r in rows]
+            daily = [int(r["c"] or 0) for r in rows]
+            cum = []
+            t = 0
+            for v in daily:
+                t += v
+                cum.append(t)
+            return JsonResponse({"chart": chart, "labels": labels, "daily": daily, "cumulative": cum})
+
+        # LEARNER PROGRESS (requires learner)
+        if chart == "learner_progress":
+            if not learner_id:
+                return JsonResponse({"chart": chart, "labels": [], "promised_days": [], "actual_days": []})
+            sps = sp_base.filter(mentor_assignment__enrollment__learner_id=learner_id) \
+                        .order_by("educational_step__sequence_no")
+            labels, promised, actual = [], [], []
+            for sp in sps:
+                labels.append(sp.educational_step.title)
+                # promised days (prefer explicit number; otherwise diff between promised date and created)
+                p_days = 0
+                if getattr(sp, "initial_promise_days", None):
+                    p_days = int(sp.initial_promise_days or 0)
+                elif getattr(sp, "initial_promise_date", None):
+                    try:
+                        delta = (sp.initial_promise_date - sp.created_at.date()).days
+                        p_days = max(delta, 0)
+                    except Exception:
+                        p_days = 0
+                promised.append(p_days)
+
+                # actual days (if completed)
+                a_days = 0
+                if sp.task_completion_date:
+                    try:
+                        a_days = (sp.task_completion_date - sp.created_at.date()).days
+                        a_days = max(a_days, 0)
+                    except Exception:
+                        a_days = 0
+                actual.append(a_days)
+            return JsonResponse({"chart": chart, "labels": labels, "promised_days": promised, "actual_days": actual})
+
+        return JsonResponse({"chart": chart, "labels": [], "data": []})
 
 
 @admin.register(m.EducationalStep)
@@ -238,7 +475,6 @@ class EducationalStepAdmin(BaseAdmin):
     mandatory_badge = bool_badge(
         "is_mandatory", true="Mandatory", false="Optional", t_color="danger", f_color="info"
     )
-
     list_display = ("__str__", "expected_duration_days", "mandatory_badge", "created_j")
     list_filter = ("learning_path", "is_mandatory")
     autocomplete_fields = ("learning_path",)
@@ -323,7 +559,6 @@ class LearnerEnrollmentAdmin(BaseAdmin):
     list_filter = ("status", "learning_path")
     autocomplete_fields = ("learner", "learning_path")
     search_fields = ("learner__user__email", "learning_path__name")
-    # inlines = (MentorAssignmentInline,)
 
 
 @admin.register(m.MentorAssignment)
@@ -426,12 +661,14 @@ class TaskSubmissionAdmin(BaseAdmin):
 @admin.register(m.TaskEvaluation)
 class TaskEvaluationAdmin(BaseAdmin):
     submitted_j = jalali_display("evaluated_at", label="Evaluated")
-
     list_display = ("submission", "mentor", "score", "feedback")
     autocomplete_fields = ("mentor", "submission")
     search_fields = ("submission__task__title", "mentor__user")
 
 
+# ──────────────────────────────────────────────────────────────
+# SOCIAL / POSTS
+# ──────────────────────────────────────────────────────────────
 @admin.register(m.SocialMedia)
 class SocialMediaAdmin(BaseAdmin):
     list_display = ("platform",)
@@ -453,7 +690,97 @@ class SocialPostAdmin(BaseAdmin):
 
 
 # ──────────────────────────────────────────────────────────────
-# SUBSCRIPTIONS
+# MENTOR GROUP SESSIONS  ✅ (restored & registered)
+# ──────────────────────────────────────────────────────────────
+@admin.register(m.MentorGroupSessionParticipant)
+class MentorGroupSessionParticipantAdmin(BaseAdmin):
+    list_display = (
+        "mentor_group_session_occurence",
+        "mentor_assignment",
+        "learner_was_present",
+    )
+    list_filter = ("learner_was_present",)
+    autocomplete_fields = (
+        "mentor_group_session_occurence",
+        "mentor_assignment",
+    )
+    search_fields = ("mentor_assignment__mentor__user__email",)
+    list_select_related = ("mentor_group_session_occurence", "mentor_assignment")
+
+
+class MGSParticipantInline(TabularInline):
+    model = m.MentorGroupSessionParticipant
+    tab = True
+    extra = 0
+    autocomplete_fields = ("mentor_assignment",)
+    fields = ("mentor_assignment", "learner_was_present")
+
+
+@admin.register(m.MentorGroupSessionOccurrence)
+class MentorGroupSessionOccurrenceAdmin(BaseAdmin):
+    list_display = (
+        "mentor_group_session",
+        "occurence_datetime",
+        "occurence_datetime_changed",
+        "new_datetime",
+        "session_video_record",
+    )
+    fields = (
+        "mentor_group_session",
+        "occurence_datetime",
+        "occurence_datetime_changed",
+        "new_datetime",
+        "reason_for_change",
+        "session_video_record",
+    )
+    autocomplete_fields = ("mentor_group_session",)
+    search_fields = (
+        "mentor_group_session__learning_path__name",
+        "mentor_group_session__mentor__user__email",
+    )
+    list_select_related = ("mentor_group_session",)
+    inlines = (MGSParticipantInline,)
+    # Unfold conditional display
+    conditional_fields = {
+        "new_datetime": "occurence_datetime_changed == true",
+        "reason_for_change": "occurence_datetime_changed == true",
+    }
+
+
+class MGSOccurrenceInline(TabularInline):
+    model = m.MentorGroupSessionOccurrence
+    tab = True
+    extra = 0
+    fields = (
+        "occurence_datetime",
+        "occurence_datetime_changed",
+        "new_datetime",
+        "reason_for_change",
+        "session_video_record",
+    )
+    conditional_fields = {
+        "new_datetime": "occurence_datetime_changed == true",
+        "reason_for_change": "occurence_datetime_changed == true",
+    }
+
+
+@admin.register(m.MentorGroupSession)
+class MentorGroupSessionAdmin(BaseAdmin):
+    list_display = (
+        "mentor",
+        "learning_path",
+        "session_type",
+        "suppused_day",
+        "suppoused_time",
+    )
+    list_filter = ("mentor", "learning_path", "session_type", "suppused_day")
+    autocomplete_fields = ("mentor", "learning_path", "session_type")
+    inlines = (MGSOccurrenceInline,)
+    search_fields = ("mentor__user__email", "learning_path__name")
+
+
+# ──────────────────────────────────────────────────────────────
+# SUBSCRIPTIONS (financial analytics stay separate)
 # ──────────────────────────────────────────────────────────────
 class SubscriptionTransactionResource(resources.ModelResource):
     class Meta:
@@ -537,15 +864,10 @@ class TransactionInline(admin.TabularInline):
     readonly_fields = ("paid_at", "kind", "status", "amount", "gateway", "ref")
 
 
-# ──────────────────────────────────────────────────────────────
-# MAIN ADMIN: LearnerSubscribePlan + Analytics
-# ──────────────────────────────────────────────────────────────
 @admin.register(m.LearnerSubscribePlan)
 class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
-    # Unfold + Import/Export integration
     export_form_class = ExportForm
     resource_classes = [LearnerSubscribePlanResource]
-
     inlines = (TransactionInline,)
 
     list_select_related = (
@@ -562,7 +884,6 @@ class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
             "subscription_plan",
         )
 
-    # Changelist columns
     list_display = (
         "learner_full_name",
         "plan_name",
@@ -582,19 +903,12 @@ class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
     list_per_page = 50
     readonly_fields = ("end_datetime", "final_cost", "expired_at")
 
-    # List action button (toolbar)
     actions_list = ["go_analytics_dropdown"]
 
-    @action(
-        description=_("Analytics & Export"),
-        icon="query_stats",
-        variant=ActionVariant.PRIMARY,
-    )
+    @action(description=_("Analytics & Export"), icon="query_stats", variant=ActionVariant.PRIMARY)
     def go_analytics_dropdown(self, request: HttpRequest, queryset=None):
-        """Works both as a list-action view and a bulk action (queryset optional)."""
         return redirect(reverse("admin:courses_learnersubscribeplan_analytics"))
 
-    # Pretty accessors
     def learner_full_name(self, obj: m.LearnerSubscribePlan) -> str:
         u = obj.learner_enrollment.learner.user
         return f"{u.first_name} {u.last_name}".strip() or u.email
@@ -632,14 +946,12 @@ class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
     discount_percent.short_description = _("Disc")
     final_cost_h.short_description = _("Final Cost")
 
-    # Export formats
     def get_export_formats(self) -> List[Type[Format]]:
         fmts: List[Type[Format]] = [CSV, JSON, XLSX]
         if getattr(settings, "USE_WEASYPRINT", False):
             fmts.append(PDF)
         return fmts
 
-    # URLs for analytics and JSON data
     def get_urls(self):
         return [
             path(
@@ -656,24 +968,13 @@ class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
 
     def analytics_view(self, request: HttpRequest):
         ctx = dict(self.admin_site.each_context(request), title=_("Subscriptions Analytics"))
-        # Keep your existing template path (this matches your uploaded file)
         return TemplateResponse(
             request,
             "admin/courses/learner_subscribe_plan/analytics.html",
             ctx,
         )
 
-    # ──────────────────────────────────────────────────────────
-    # JSON endpoint — MONTH AFFECTS **ALL** CHARTS
-    # ──────────────────────────────────────────────────────────
     def analytics_data(self, request: HttpRequest):
-        """
-        Query params:
-          - chart: monthly_revenue | plan_counts | paths_pie | age_scatter
-          - year:  YYYY (default: current year)
-          - month: 1..12 (optional; when present, applies to ALL chart types)
-          - scope: 'active' or 'all' (default: all)
-        """
         chart = (request.GET.get("chart") or "monthly_revenue").strip()
         year = int(request.GET.get("year") or timezone.now().year)
         month_str = (request.GET.get("month") or "").strip()
@@ -688,10 +989,8 @@ class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
         if scope == "active":
             qs = qs.filter(status=m.LearnerSubscribePlan.STATUS_ACTIVE)
 
-        # --- Monthly/Daily revenue & count ---
         if chart == "monthly_revenue":
             if month:
-                # DAILY series for selected month
                 rows = (
                     qs.filter(start_datetime__year=year, start_datetime__month=month)
                     .annotate(d=TruncDate("start_datetime"))
@@ -710,7 +1009,7 @@ class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
                         "chart": chart,
                         "year": year,
                         "month": month,
-                        "labels": labels,  # YYYY-MM-DD
+                        "labels": labels,
                         "revenues": revenues,
                         "counts": counts,
                         "total_revenue": sum(revenues),
@@ -718,7 +1017,6 @@ class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
                     }
                 )
             else:
-                # MONTHLY series for the whole year
                 rows = (
                     qs.filter(start_datetime__year=year)
                     .annotate(m=TruncMonth("start_datetime"))
@@ -736,7 +1034,7 @@ class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
                     {
                         "chart": chart,
                         "year": year,
-                        "labels": labels,  # YYYY-MM
+                        "labels": labels,
                         "revenues": revenues,
                         "counts": counts,
                         "total_revenue": sum(revenues),
@@ -744,31 +1042,17 @@ class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
                     }
                 )
 
-        # --- Plan counts (bar) — respects month ---
         if chart == "plan_counts":
             base = qs.filter(start_datetime__year=year)
             if month:
                 base = base.filter(start_datetime__month=month)
-            rows = (
-                base.values("subscription_plan__name")
-                .annotate(c=Count("id"))
-                .order_by("-c")
-            )
+            rows = base.values("subscription_plan__name").annotate(c=Count("id")).order_by("-c")
             labels = [r["subscription_plan__name"] or "—" for r in rows]
             counts = [int(r["c"] or 0) for r in rows]
             return JsonResponse(
-                {
-                    "chart": chart,
-                    "year": year,
-                    "month": month,
-                    "labels": labels,
-                    "counts": counts,
-                    "total": sum(counts),
-                    "total_count": sum(counts),
-                }
+                {"chart": chart, "year": year, "month": month, "labels": labels, "counts": counts, "total": sum(counts)}
             )
 
-        # --- Learners per learning-path (Pie) — respects month ---
         if chart == "paths_pie":
             base = qs.filter(start_datetime__year=year)
             if month:
@@ -782,23 +1066,18 @@ class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
             values = [int(r["c"] or 0) for r in rows]
             return JsonResponse({"chart": chart, "labels": labels, "values": values})
 
-        # --- Age vs revenue (Scatter) — now respects month ---
         if chart == "age_scatter":
             base = qs.filter(start_datetime__year=year)
             if month:
                 base = base.filter(start_datetime__month=month)
-            # revenue per learner in the selected period
             rev = base.values("learner_enrollment__learner_id").annotate(total=Sum("final_cost"))
             rev_map = {
                 r["learner_enrollment__learner_id"]: int(r["total"] or 0)
-                for r in rev
-                if r["learner_enrollment__learner_id"]
+                for r in rev if r["learner_enrollment__learner_id"]
             }
             learner_ids = list(rev_map.keys())
-
             ages, totals = [], []
             if learner_ids:
-                # Pull DOB from Learner.user.birthdate (field from core.CustomUser)
                 learners = m.Learner.objects.filter(id__in=learner_ids).select_related("user")
                 today = timezone.now().date()
                 for lr in learners:
@@ -808,87 +1087,6 @@ class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
                         if 5 <= age <= 100:
                             ages.append(int(age))
                             totals.append(rev_map.get(lr.id, 0))
+            return JsonResponse({"chart": chart, "x": ages, "y": totals, "x_title": "Age", "y_title": "Revenue (T)"})
 
-            return JsonResponse(
-                {"chart": chart, "x": ages, "y": totals, "x_title": "Age", "y_title": "Revenue (T)"}
-            )
-
-        # default (empty)
         return JsonResponse({"chart": chart, "labels": [], "revenues": [], "counts": []})
-
-
-# ──────────────────────────────────────────────────────────────
-# MENTOR GROUP SESSIONS
-# ──────────────────────────────────────────────────────────────
-@admin.register(m.MentorGroupSessionParticipant)
-class MentorGroupSessionParticipantAdmin(BaseAdmin):
-    list_display = ("mentor_group_session_occurence", "mentor_assignment", "learner_was_present")
-    list_filter = ("learner_was_present",)
-    autocomplete_fields = ("mentor_group_session_occurence", "mentor_assignment")
-    search_fields = ("mentor_assignment",)
-    list_select_related = ("mentor_group_session_occurence", "mentor_assignment")
-
-
-class MGSParticipantInline(TabularInline):
-    model = m.MentorGroupSessionParticipant
-    tab = True
-    extra = 0
-    autocomplete_fields = ("mentor_assignment",)
-    fields = ("mentor_assignment", "learner_was_present")
-
-
-@admin.register(m.MentorGroupSessionOccurrence)
-class MentorGroupSessionOccurrenceAdmin(BaseAdmin):
-    list_display = (
-        "mentor_group_session",
-        "occurence_datetime",
-        "occurence_datetime_changed",
-        "new_datetime",
-        "reason_for_change",
-        "session_video_record",
-    )
-    fields = (
-        "mentor_group_session",
-        "occurence_datetime",
-        "occurence_datetime_changed",
-        "new_datetime",
-        "reason_for_change",
-        "session_video_record",
-    )
-    autocomplete_fields = ("mentor_group_session",)
-    search_fields = (
-        "mentor_group_session__learning_path__name",
-        "mentor_group_session__mentor__user__email",
-    )
-    list_select_related = ("mentor_group_session",)
-    inlines = (MGSParticipantInline,)
-    conditional_fields = {
-        "new_datetime": "occurence_datetime_changed == true",
-        "reason_for_change": "occurence_datetime_changed == true",
-    }
-
-
-class MGSOccurrenceInline(TabularInline):
-    model = m.MentorGroupSessionOccurrence
-    tab = True
-    extra = 0
-    fields = (
-        "occurence_datetime",
-        "occurence_datetime_changed",
-        "new_datetime",
-        "reason_for_change",
-        "session_video_record",
-    )
-    conditional_fields = {
-        "new_datetime": "occurence_datetime_changed == true",
-        "reason_for_change": "occurence_datetime_changed == true",
-    }
-
-
-@admin.register(m.MentorGroupSession)
-class MentorGroupSessionAdmin(BaseAdmin):
-    list_display = ("mentor", "learning_path", "session_type", "suppused_day", "suppoused_time")
-    list_filter = ("mentor", "learning_path", "session_type", "suppused_day")
-    autocomplete_fields = ("mentor", "learning_path", "session_type")
-    inlines = (MGSOccurrenceInline,)
-    search_fields = ("mentor",)

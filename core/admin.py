@@ -1,4 +1,4 @@
-# core/admin.py  – Django 5.2 • Unfold 0.24 • crispy‑forms 2.x
+# core/admin.py  – Django 5.2 • Unfold 0.24 • crispy-forms 2.x
 from __future__ import annotations
 
 from django import forms
@@ -22,15 +22,18 @@ from unfold.contrib.import_export.forms import ImportForm, ExportForm
 from unfold.decorators import display
 from unfold.contrib.forms.widgets import UnfoldAdminTextInputWidget
 
-
 from .models import CustomUser
 from . import notify as core_notify
 
 
+# ──────────────────────────────────────────────────────
+#  Widgets
+# ──────────────────────────────────────────────────────
 class UnfoldAdminPasswordInputWidget(UnfoldAdminTextInputWidget):
     """Password field with all Unfold CSS classes."""
     input_type = "password"
-    
+
+
 # ──────────────────────────────────────────────────────
 #  Helpers for coloured badges
 # ──────────────────────────────────────────────────────
@@ -56,7 +59,7 @@ def choice_badge(attr, mapping, *, description="Value"):
 
 
 # ──────────────────────────────────────────────────────
-#  Import‑export resource
+#  Import-export resource
 # ──────────────────────────────────────────────────────
 class CustomUserResource(ModelResource):
     class Meta:
@@ -72,7 +75,10 @@ class CustomUserResource(ModelResource):
 # ──────────────────────────────────────────────────────
 #  Keep Group admin styled like Unfold
 # ──────────────────────────────────────────────────────
-admin.site.unregister(Group)
+try:
+    admin.site.unregister(Group)
+except admin.sites.NotRegistered:
+    pass
 
 
 @admin.register(Group)
@@ -99,7 +105,7 @@ class _AddUserForm(UserCreationForm):
 class CustomUserAdmin(DjangoUserAdmin, ModelAdmin, ImportExportModelAdmin):
     model = CustomUser
 
-    # import‑export
+    # import-export
     resource_class = CustomUserResource
     import_form_class = ImportForm
     export_form_class = ExportForm
@@ -177,8 +183,16 @@ class CustomUserAdmin(DjangoUserAdmin, ModelAdmin, ImportExportModelAdmin):
     formfield_overrides = {models.TextField: {"widget": WysiwygWidget}}
 
 
+# ──────────────────────────────────────────────────────
+#  SubscriptionNotificationConfig (singleton) — optimized
+# ──────────────────────────────────────────────────────
 @admin.register(core_notify.SubscriptionNotificationConfig)
 class SubscriptionNotificationConfigAdmin(ModelAdmin):
+    """
+    Optimization: cache the 'exists()' check per request.
+    Admin/Unfold may call has_add_permission() multiple times while building the UI;
+    without caching, that results in duplicate `SELECT 1 FROM core_subscriptionnotificationconfig`.
+    """
     list_display = ("enable_user_sms", "enable_manager_sms", "updated_at")
     formfield_overrides = {models.TextField: {"widget": WysiwygWidget}}
 
@@ -186,6 +200,16 @@ class SubscriptionNotificationConfigAdmin(ModelAdmin):
         "fields": ("enable_user_sms", "enable_manager_sms", "manager_phones",
                    "user_sms_template", "manager_sms_template")
     }),)
+
+    def get_queryset(self, request):
+        # Only fetch what we show ⇒ smaller rows, better cache locality.
+        qs = super().get_queryset(request)
+        return qs.only("enable_user_sms", "enable_manager_sms", "updated_at")
+
     def has_add_permission(self, request):
-        # keep it single-row
-        return not core_notify.SubscriptionNotificationConfig.objects.exists()
+        # Request-local cache to avoid duplicate EXISTS queries per page render.
+        cached = getattr(request, "_cfg_sub_notif_exists", None)
+        if cached is None:
+            cached = core_notify.SubscriptionNotificationConfig.objects.only("id").exists()
+            setattr(request, "_cfg_sub_notif_exists", cached)
+        return not cached

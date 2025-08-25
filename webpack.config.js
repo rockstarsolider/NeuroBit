@@ -1,3 +1,4 @@
+// webpack.config.js
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const BundleTracker = require('webpack-bundle-tracker');
@@ -9,12 +10,13 @@ module.exports = (env, argv) => {
   return {
     mode: isProd ? 'production' : 'development',
     devtool: isProd ? false : 'eval-cheap-module-source-map',
-    cache: { type: 'filesystem' },                 // ✅ persistent cache (massive speed-up)
+    cache: { type: 'filesystem' },
     context: __dirname,
     entry: {
       main: './static/webpack_entry/js/index.js',
       learning_paths: './static/js/learning_paths.js',
       admin_analytics: './static/webpack_entry/js/admin_analytics.js',
+      admin_progress_analytics: './static/webpack_entry/js/admin_progress_analytics.js',
     },
     output: {
       path: path.resolve('./static/webpack_output/'),
@@ -29,7 +31,11 @@ module.exports = (env, argv) => {
           exclude: /node_modules/,
           use: {
             loader: 'babel-loader',
-            options: { cacheDirectory: true },      // ✅ cache babel transforms
+            options: {
+              cacheDirectory: true,
+              // (optional) if you want preset-env — safe to leave as-is too
+              // presets: [['@babel/preset-env', { targets: 'defaults' }]],
+            },
           },
         },
         {
@@ -47,20 +53,19 @@ module.exports = (env, argv) => {
       splitChunks: {
         chunks: 'all',
         cacheGroups: {
-          // keep Plotly in its own async chunk; we’ll lazy-load it in JS
+          // keep Plotly in its own async chunk; we lazy-load it in the JS
           plotly: { test: /plotly\.js-dist-min/, name: 'plotly', chunks: 'all', priority: 20 },
           vendors: { test: /[\\/]node_modules[\\/]/, name: 'vendors', chunks: 'all', priority: 10 },
         },
       },
       runtimeChunk: { name: 'runtime' },
-      minimize: isProd, // don’t minify in dev => faster rebuilds
+      minimize: isProd,
     },
     plugins: [
       new MiniCssExtractPlugin({ filename: '[name]-[contenthash].css' }),
       new BundleTracker({ path: __dirname, filename: 'webpack-stats.json' }),
       ...(isProd
         ? [
-            // compress only for prod
             new CompressionPlugin({
               algorithm: 'brotliCompress',
               filename: '[path][base].br',
@@ -81,7 +86,7 @@ module.exports = (env, argv) => {
     ],
     resolve: {
       alias: {
-        'maplibre-gl/dist/maplibre-gl.css': false, // avoid accidental heavy css pulls
+        'maplibre-gl/dist/maplibre-gl.css': false,
       },
     },
     performance: { hints: false },

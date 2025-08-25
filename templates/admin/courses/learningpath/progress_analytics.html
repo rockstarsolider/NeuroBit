@@ -1,0 +1,121 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+{% load render_bundle from webpack_loader %}
+
+{% block extrastyle %}
+<style>
+  .pa-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin-bottom:14px}
+  .pa-card{background:var(--body-bg);border:1px solid var(--border-color,#e5e7eb);border-radius:10px}
+  .pa-card__body{padding:14px}
+  .pa-label{display:block;font:500 12px/1.2 system-ui,Segoe UI,Roboto,Helvetica,Arial;color:var(--body-quiet-color,#6b7280);margin-bottom:6px}
+  .pa-select,.pa-input,.pa-button{
+    appearance:none;border-radius:8px;border:1px solid var(--border-color,#e5e7eb);
+    padding:8px 10px;background:var(--darkened-bg,#fff);color:var(--body-fg,#111827);width:100%;
+    font:500 13px/1.2 system-ui,Segoe UI,Roboto,Helvetica,Arial;
+  }
+  .pa-input{width:100%}
+  .pa-button{cursor:pointer;background:var(--primary,#2563eb);color:#fff;border:none}
+  .pa-button.secondary{background:transparent;color:var(--primary,#2563eb);border:1px solid var(--primary,#2563eb)}
+  .pa-chart{height:440px}
+  .pa-muted{color:var(--body-quiet-color,#6b7280);font-size:12px}
+  .pa-help{font-size:11px;color:var(--body-quiet-color,#6b7280);margin-top:6px}
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="pa-root"
+     data-data-url="{% url 'admin:courses_learningpath_progress_analytics_data' %}"
+     data-choices-url="{% url 'admin:courses_learningpath_progress_analytics_choices' %}"
+     data-search-mentors-url="{% url 'admin:courses_learningpath_progress_analytics_search_mentors' %}"
+     data-search-learners-url="{% url 'admin:courses_learningpath_progress_analytics_search_learners' %}"
+     class="unfold-container">
+
+  <h1 style="margin:0 0 12px">Progress Analytics</h1>
+
+  <!-- Controls -->
+  <div class="pa-grid">
+    <div class="pa-card">
+      <div class="pa-card__body">
+        <label class="pa-label">Chart</label>
+        <!-- unique id; was pa-chart -->
+        <select id="pa-chart-type" class="pa-select">
+          <option value="step_funnel">Step completion funnel</option>
+          <option value="avg_score">Average score per step</option>
+          <option value="completions_over_time">Completions over time</option>
+          <option value="learner_progress">Learner progress (promised vs actual)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="pa-card">
+      <div class="pa-card__body">
+        <label class="pa-label">Learning path</label>
+        <select id="pa-lp" class="pa-select"></select>
+      </div>
+    </div>
+
+    <!-- Mentor instant-search -->
+    <div class="pa-card">
+      <div class="pa-card__body">
+        <label class="pa-label">Mentor (optional)</label>
+        <input id="pa-mentor-input" class="pa-input" list="pa-mentor-list" placeholder="Type to search…">
+        <datalist id="pa-mentor-list"></datalist>
+        <input type="hidden" id="pa-mentor-id" value="">
+        <div class="pa-help">Pick a suggestion to lock the mentor. Clear the input to remove the filter.</div>
+      </div>
+    </div>
+
+    <!-- Learner instant-search -->
+    <div class="pa-card">
+      <div class="pa-card__body">
+        <label class="pa-label">Learner (optional)</label>
+        <input id="pa-learner-input" class="pa-input" list="pa-learner-list" placeholder="Type to search…">
+        <datalist id="pa-learner-list"></datalist>
+        <input type="hidden" id="pa-learner-id" value="">
+        <div class="pa-help">Filtered by learning path and (optionally) the chosen mentor.</div>
+      </div>
+    </div>
+
+    <div class="pa-card">
+      <div class="pa-card__body">
+        <label class="pa-label">Year</label>
+        <select id="pa-year" class="pa-select"></select>
+      </div>
+    </div>
+
+    <div class="pa-card">
+      <div class="pa-card__body">
+        <label class="pa-label">Month (optional)</label>
+        <select id="pa-month" class="pa-select">
+          <option value="">All months</option>
+          <option value="1">Jan</option><option value="2">Feb</option><option value="3">Mar</option>
+          <option value="4">Apr</option><option value="5">May</option><option value="6">Jun</option>
+          <option value="7">Jul</option><option value="8">Aug</option><option value="9">Sep</option>
+          <option value="10">Oct</option><option value="11">Nov</option><option value="12">Dec</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="pa-card">
+      <div class="pa-card__body">
+        <label class="pa-label">Actions</label>
+        <div style="display:flex;gap:8px">
+          <button id="pa-refresh" class="pa-button">Refresh</button>
+          <button id="pa-reset" class="pa-button secondary">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <div class="pa-card">
+    <div class="pa-card__body">
+      <!-- unique id; was pa-chart -->
+      <div id="pa-plot" class="pa-chart"></div>
+      <div id="pa-msg" class="pa-muted" style="margin-top:8px"></div>
+    </div>
+  </div>
+</div>
+
+{% render_bundle 'admin_progress_analytics' 'js' %}
+{% endblock %}
