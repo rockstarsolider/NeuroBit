@@ -11,7 +11,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.conf import settings
 from django.db import models
 from django.db.models import Sum, Count, Avg, Q
-from django.db.models.functions import TruncMonth, TruncDate, Concat
+from django.db.models.functions import TruncMonth, TruncDate, TruncDay
 from django.http import HttpResponse, JsonResponse, HttpRequest
 from django.utils import timezone
 from django.utils.html import format_html
@@ -56,7 +56,7 @@ def jalali_display(attr="created_at", *, label=None):
 
     @display(description=label)
     def _fn(self, obj):
-        v = getattr(obj, attr)
+        v = getattr(obj, attr, None)
         return "-" if not v else format_html("<b dir='rtl'>{}</b>", translate_number(_jalali(v)))
     _fn.__name__ = f"{attr}_jalali"
     return _fn
@@ -232,7 +232,6 @@ class LearningPathAdmin(BaseAdmin):
             ),
         ] + super().get_urls()
 
-
     def progress_analytics_view(self, request):
         ctx = dict(self.admin_site.each_context(request), title=_("Progress Analytics"))
         return TemplateResponse(
@@ -241,41 +240,40 @@ class LearningPathAdmin(BaseAdmin):
             ctx,
         )
 
-
     # --- initial choices for dropdowns (used once on page load)
     def progress_analytics_choices(self, request: HttpRequest):
         """
         Initial lists and re-population for LP, mentors, learners.
-        Accepts optional: lp, mentor
+        Accepts optional: lp, mentor, learner
         """
-        from . import models as m
         lp_id = request.GET.get("lp")
         mentor_id = request.GET.get("mentor")
+        learner_id = request.GET.get("learner")
 
+        # Learning Paths
         lps = list(m.LearningPath.objects.order_by("name").values("id", "name"))
 
-        mentors_qs = m.Mentor.objects.select_related("user").order_by("user__first_name", "user__last_name")
+        # Mentors (reverse name is Mentor.assignments)
+        mentors_qs = m.Mentor.objects.select_related("user")
         if lp_id:
-            mentors_qs = mentors_qs.filter(
-                mentorassignment__enrollment__learning_path_id=lp_id
-            ).distinct()
+            mentors_qs = mentors_qs.filter(assignments__enrollment__learning_path_id=lp_id)
+        if learner_id:
+            mentors_qs = mentors_qs.filter(assignments__enrollment__learner_id=learner_id)
+        mentors_qs = mentors_qs.order_by("user__first_name", "user__last_name").distinct()[:50]
         mentors = [
-            {"id": i.id, "name": f"{i.user.first_name} {i.user.last_name}".strip() or i.user.email}
-            for i in mentors_qs[:50]
+            {"id": i.id, "name": (f"{i.user.first_name} {i.user.last_name}".strip() or i.user.email)}
+            for i in mentors_qs
         ]
 
-        learners_qs = m.Learner.objects.select_related("user").order_by("user__first_name", "user__last_name")
+        # Learners (reverse name is Learner.enrollments)
+        learners_qs = m.Learner.objects.select_related("user")
         if lp_id:
-            learners_qs = learners_qs.filter(
-                learnerenrollment__learning_path_id=lp_id
-            )
+            learners_qs = learners_qs.filter(enrollments__learning_path_id=lp_id)
         if mentor_id:
-            learners_qs = learners_qs.filter(
-                learnerenrollment__mentorassignment__mentor_id=mentor_id
-            )
-        learners_qs = learners_qs.distinct()[:50]
+            learners_qs = learners_qs.filter(enrollments__mentor_assignments__mentor_id=mentor_id)
+        learners_qs = learners_qs.order_by("user__first_name", "user__last_name").distinct()[:50]
         learners = [
-            {"id": i.id, "name": f"{i.user.first_name} {i.user.last_name}".strip() or i.user.email}
+            {"id": i.id, "name": (f"{i.user.first_name} {i.user.last_name}".strip() or i.user.email)}
             for i in learners_qs
         ]
 
@@ -284,19 +282,15 @@ class LearningPathAdmin(BaseAdmin):
     # --- instant-search: mentors
     def progress_analytics_search_mentors(self, request: HttpRequest):
         """Search mentors, filtered by lp and (optionally) learner."""
-        from django.db.models import Q
-        from . import models as m
-
         q = (request.GET.get("q") or "").strip()
         lp_id = request.GET.get("lp")
         learner_id = request.GET.get("learner")
 
         qs = m.Mentor.objects.select_related("user")
         if lp_id:
-            qs = qs.filter(mentorassignment__enrollment__learning_path_id=lp_id)
+            qs = qs.filter(assignments__enrollment__learning_path_id=lp_id)
         if learner_id:
-            qs = qs.filter(mentorassignment__enrollment__learner_id=learner_id)
-
+            qs = qs.filter(assignments__enrollment__learner_id=learner_id)
         if q:
             qs = qs.filter(
                 Q(user__first_name__icontains=q) |
@@ -305,25 +299,21 @@ class LearningPathAdmin(BaseAdmin):
             )
 
         qs = qs.order_by("user__first_name", "user__last_name").distinct()[:20]
-        data = [{"id": o.id, "name": f"{o.user.first_name} {o.user.last_name}".strip() or o.user.email} for o in qs]
+        data = [{"id": o.id, "name": (f"{o.user.first_name} {o.user.last_name}".strip() or o.user.email)} for o in qs]
         return JsonResponse({"results": data})
 
     # --- instant-search: learners
     def progress_analytics_search_learners(self, request: HttpRequest):
         """Search learners, filtered by lp and (optionally) mentor."""
-        from django.db.models import Q
-        from . import models as m
-
         q = (request.GET.get("q") or "").strip()
         lp_id = request.GET.get("lp")
         mentor_id = request.GET.get("mentor")
 
         qs = m.Learner.objects.select_related("user")
         if lp_id:
-            qs = qs.filter(learnerenrollment__learning_path_id=lp_id)
+            qs = qs.filter(enrollments__learning_path_id=lp_id)
         if mentor_id:
-            qs = qs.filter(learnerenrollment__mentorassignment__mentor_id=mentor_id)
-
+            qs = qs.filter(enrollments__mentor_assignments__mentor_id=mentor_id)
         if q:
             qs = qs.filter(
                 Q(user__first_name__icontains=q) |
@@ -332,7 +322,7 @@ class LearningPathAdmin(BaseAdmin):
             )
 
         qs = qs.order_by("user__first_name", "user__last_name").distinct()[:20]
-        data = [{"id": o.id, "name": f"{o.user.first_name} {o.user.last_name}".strip() or o.user.email} for o in qs]
+        data = [{"id": o.id, "name": (f"{o.user.first_name} {o.user.last_name}".strip() or o.user.email)} for o in qs]
         return JsonResponse({"results": data})
 
     # --- Data endpoint for charts
@@ -342,10 +332,6 @@ class LearningPathAdmin(BaseAdmin):
         chart: step_funnel | avg_score | completions_over_time | learner_progress
         filters: lp (required), mentor, learner, year, month
         """
-        from django.db.models import Count, Avg
-        from django.db.models.functions import TruncDay
-        from . import models as m
-
         chart = (request.GET.get("chart") or "step_funnel").strip()
         lp_id = request.GET.get("lp")
         mentor_id = request.GET.get("mentor")
@@ -356,7 +342,7 @@ class LearningPathAdmin(BaseAdmin):
         if not lp_id:
             return JsonResponse({"error": "lp required"}, status=400)
 
-        # base StepProgress filter
+        # base StepProgress filter (ensure we never defer fields we traverse)
         sp_base = m.StepProgress.objects.select_related(
             "educational_step",
             "mentor_assignment",
@@ -384,9 +370,9 @@ class LearningPathAdmin(BaseAdmin):
             )
             completed_by_step = dict(
                 sp_base.filter(task_completion_date__isnull=False)
-                    .values("educational_step_id")
-                    .annotate(c=Count("id"))
-                    .values_list("educational_step_id", "c")
+                      .values("educational_step_id")
+                      .annotate(c=Count("id"))
+                      .values_list("educational_step_id", "c")
             )
             labels = [s["title"] for s in steps]
             total = [int(total_by_step.get(sid, 0)) for sid in step_ids]
@@ -395,9 +381,10 @@ class LearningPathAdmin(BaseAdmin):
 
         # AVG SCORE: average TaskEvaluation.score per step
         if chart == "avg_score":
-            # link: StepProgress -> TaskSubmission -> TaskEvaluation
             evals = m.TaskEvaluation.objects.select_related(
-                "submission", "submission__step_progress", "submission__step_progress__educational_step",
+                "submission",
+                "submission__step_progress",
+                "submission__step_progress__educational_step",
                 "submission__step_progress__mentor_assignment__enrollment__learner",
                 "submission__step_progress__mentor_assignment__enrollment__learning_path",
             ).filter(
@@ -408,8 +395,12 @@ class LearningPathAdmin(BaseAdmin):
             if learner_id:
                 evals = evals.filter(submission__step_progress__mentor_assignment__enrollment__learner_id=learner_id)
 
-            rows = (evals.values("submission__step_progress__educational_step__title")
-                        .annotate(score=Avg("score")).order_by("submission__step_progress__educational_step__sequence_no"))
+            rows = (
+                evals.values("submission__step_progress__educational_step__title",
+                             "submission__step_progress__educational_step__sequence_no")
+                     .annotate(score=Avg("score"))
+                     .order_by("submission__step_progress__educational_step__sequence_no")
+            )
             labels = [r["submission__step_progress__educational_step__title"] for r in rows]
             scores = [round(r["score"] or 0, 2) for r in rows]
             return JsonResponse({"chart": chart, "labels": labels, "scores": scores})
@@ -422,9 +413,12 @@ class LearningPathAdmin(BaseAdmin):
             if month:
                 sps = sps.filter(task_completion_date__month=int(month))
 
-            rows = (sps.annotate(d=TruncDay("task_completion_date"))
-                        .values("d").order_by("d")
-                        .annotate(c=Count("id")))
+            rows = (
+                sps.annotate(d=TruncDay("task_completion_date"))
+                   .values("d")
+                   .order_by("d")
+                   .annotate(c=Count("id"))
+            )
             labels = [r["d"].date().isoformat() for r in rows]
             daily = [int(r["c"] or 0) for r in rows]
             cum = []
@@ -439,27 +433,21 @@ class LearningPathAdmin(BaseAdmin):
             if not learner_id:
                 return JsonResponse({"chart": chart, "labels": [], "promised_days": [], "actual_days": []})
             sps = sp_base.filter(mentor_assignment__enrollment__learner_id=learner_id) \
-                        .order_by("educational_step__sequence_no")
+                         .order_by("educational_step__sequence_no")
             labels, promised, actual = [], [], []
             for sp in sps:
                 labels.append(sp.educational_step.title)
-                # promised days (prefer explicit number; otherwise diff between promised date and created)
-                p_days = 0
-                if getattr(sp, "initial_promise_days", None):
-                    p_days = int(sp.initial_promise_days or 0)
-                elif getattr(sp, "initial_promise_date", None):
-                    try:
-                        delta = (sp.initial_promise_date - sp.created_at.date()).days
-                        p_days = max(delta, 0)
-                    except Exception:
-                        p_days = 0
-                promised.append(p_days)
+                # promised days: prefer explicit value; otherwise fall back to step.expected_duration_days
+                p_days = int(getattr(sp, "initial_promise_days", 0) or 0)
+                if p_days <= 0:
+                    p_days = int(getattr(sp.educational_step, "expected_duration_days", 0) or 0)
+                promised.append(max(p_days, 0))
 
-                # actual days (if completed)
+                # actual days: completion_date - initial_promise_date (both datetimes)
                 a_days = 0
                 if sp.task_completion_date:
                     try:
-                        a_days = (sp.task_completion_date - sp.created_at.date()).days
+                        a_days = (sp.task_completion_date.date() - sp.initial_promise_date.date()).days
                         a_days = max(a_days, 0)
                     except Exception:
                         a_days = 0
@@ -690,7 +678,7 @@ class SocialPostAdmin(BaseAdmin):
 
 
 # ──────────────────────────────────────────────────────────────
-# MENTOR GROUP SESSIONS  ✅ (restored & registered)
+# MENTOR GROUP SESSIONS  ✅ (present & registered)
 # ──────────────────────────────────────────────────────────────
 @admin.register(m.MentorGroupSessionParticipant)
 class MentorGroupSessionParticipantAdmin(BaseAdmin):
@@ -740,7 +728,6 @@ class MentorGroupSessionOccurrenceAdmin(BaseAdmin):
     )
     list_select_related = ("mentor_group_session",)
     inlines = (MGSParticipantInline,)
-    # Unfold conditional display
     conditional_fields = {
         "new_datetime": "occurence_datetime_changed == true",
         "reason_for_change": "occurence_datetime_changed == true",
