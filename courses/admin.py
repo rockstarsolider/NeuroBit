@@ -667,9 +667,11 @@ class SocialMediaAdmin(BaseAdmin):
 class SocialPostAdmin(BaseAdmin):
     posted_j = jalali_display("posted_at", label="Posted")
 
-    @display(description="Platforms")
+    @display(description="Platform")
     def platforms_disp(self, obj):
-        return ", ".join(obj.platform.values_list("platform", flat=True))
+        if obj.platform:
+            return obj.platform.platform
+        return "—" # Display a dash if no platform is set
 
     list_display = ("platforms_disp", "learner", "step_progress", "posted_j")
     list_filter = ("platform",)
@@ -813,11 +815,10 @@ class SubscriptionTransactionAdmin(SimpleHistoryAdmin, ModelAdmin):
         return intcomma(obj.amount)
 
 
-class PlanFeatureInline(TabularInline):
-    model = m.PlanFeature
-    extra = 0
-    autocomplete_fields = ("feature",)
-    fields = ("feature",)
+@admin.register(m.Feature)
+class FeatureAdmin(BaseAdmin):
+    list_display = ("name",)
+    search_fields = ("name",)
 
 
 @admin.register(m.SubscriptionPlan)
@@ -828,14 +829,8 @@ class SubscriptionPlanAdmin(BaseAdmin):
 
     list_display = ("name", "price_disp", "dur_disp", "active_badge")
     list_filter = ("is_active", "duration_in_days")
-    inlines = (PlanFeatureInline,)
     search_fields = ("name",)
-
-
-@admin.register(m.Feature)
-class FeatureAdmin(BaseAdmin):
-    list_display = ("name",)
-    search_fields = ("name",)
+    filter_horizontal = ("features",)
 
 
 class FreezeInline(TabularInline):

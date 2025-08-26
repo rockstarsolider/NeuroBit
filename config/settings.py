@@ -16,8 +16,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = os.environ.get('DEBUG') == 'true'
-print("Deubug:", DEBUG)
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,0.0.0.0").split(",")
 
 # Application definition
 INSTALLED_APPS = [
@@ -294,12 +293,11 @@ AUTH_USER_MODEL = 'core.CustomUser'
 IMPORT_EXPORT_USE_TRANSACTIONS = True
 
 # Optional: toggle WeasyPrint on/off (dev default: off on Windows)
-USE_WEASYPRINT = os.getenv("USE_WEASYPRINT", "0").lower() in ("1","true","yes")
+USE_WEASYPRINT = os.getenv("USE_WEASYPRINT") == "true"
 # Optional: hide PDF unless WeasyPrint is usable (you already have USE_WEASYPRINT)
-try:
-    from weasyprint import HTML  # noqa
-    IMPORT_EXPORT_ENABLE_PDF = bool(USE_WEASYPRINT)
-except Exception:
+if USE_WEASYPRINT:
+    IMPORT_EXPORT_ENABLE_PDF = True
+else:
     IMPORT_EXPORT_ENABLE_PDF = False
 
 

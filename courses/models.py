@@ -453,6 +453,8 @@ class SubscriptionPlan(models.Model):
     duration_in_days = models.PositiveSmallIntegerField(default=30, validators=[MinValueValidator(1)])
     is_active = models.BooleanField(default=True)
     
+    features = models.ManyToManyField(Feature, blank=True, related_name="plans")
+    
     class Meta: 
         ordering = ("name",)
     
@@ -492,16 +494,6 @@ class SubscriptionTransaction(models.Model):
     
     def __str__(self): 
         return f"{self.learner_enrollment} / {self.subscription_plan} / {self.amount}T @ {self.paid_at:%Y-%m-%d}"
-
-
-
-
-class PlanFeature(models.Model):
-    plan = models.ForeignKey(SubscriptionPlan, on_delete=models.CASCADE, related_name="plan_features")
-    feature = models.ManyToManyField(Feature, related_name="feature_plans")
-    
-    def __str__(self): 
-        return f"{self.plan} ↔ {self.feature}"
     
 
 class LearnerSubscribePlanQuerySet(models.QuerySet):
@@ -610,7 +602,7 @@ class LearnerSubscribePlan(models.Model):
         return shamsi_verbose(self.end_datetime)
 
     def __str__(self):
-        return f"{self.learner_enrollment.learner.full_name()} → {self.subscription_plan.name}"
+        return f"{self.learner_enrollment.learner} → {self.subscription_plan.name}"
 
 
 @receiver(post_save, sender=LearnerSubscribePlan)
