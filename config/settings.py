@@ -15,11 +15,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
-DEBUG = os.getenv("DEBUG", "True").lower() in ("1","true","yes","y","on")
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+DEBUG = os.environ.get('DEBUG') == 'true'
+print("Deubug:", DEBUG)
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
 # Application definition
-
 INSTALLED_APPS = [
     "unfold",  # before django.contrib.admin
     "unfold.contrib.filters",  # optional, if special filters are needed
@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     "import_export",
     "simple_history",
     "crispy_forms",
-    "debug_toolbar",
     'webpack_loader',
     "django_extensions",
 
@@ -51,6 +50,7 @@ INSTALLED_APPS = [
 
 # whitenoise
 WHITENOISE_MAX_AGE = 60 * 60 * 24 * 180  # 180 days
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 STORAGES = {
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
@@ -71,11 +71,6 @@ WEBPACK_LOADER = {
     }
 }
 
-# debug-toolbar
-INTERNAL_IPS = ["127.0.0.1", "localhost", "::1"]
-# Show toolbar on every DEBUG request
-DEBUG_TOOLBAR_CONFIG = {"SHOW_TOOLBAR_CALLBACK": lambda request: True}
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -88,7 +83,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     "simple_history.middleware.HistoryRequestMiddleware",
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 
@@ -114,14 +108,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # Database
-DATABASE_URL = os.getenv("DATABASE_URL")
-if DATABASE_URL:
-    DATABASES = {"default": dj_database_url.parse(DATABASE_URL, conn_max_age=0 if DEBUG else 60)}
-else:
-    DATABASES = {"default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }}
+DATABASES = {'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))}
 
 
 # Password validation
@@ -301,8 +288,6 @@ UNFOLD = {
     },
 }
 
-from django.conf import settings
-
 AUTH_USER_MODEL = 'core.CustomUser'
 
 # --- django-import-export ---
@@ -316,3 +301,12 @@ try:
     IMPORT_EXPORT_ENABLE_PDF = bool(USE_WEASYPRINT)
 except Exception:
     IMPORT_EXPORT_ENABLE_PDF = False
+
+
+# debug-toolbar
+if DEBUG:
+    INSTALLED_APPS += ["debug_toolbar",]
+    MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware",]
+    INTERNAL_IPS = ["127.0.0.1", "localhost", "::1"]
+    # Show toolbar on every DEBUG request
+    DEBUG_TOOLBAR_CONFIG = {"SHOW_TOOLBAR_CALLBACK": lambda request: True}
