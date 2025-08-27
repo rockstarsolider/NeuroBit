@@ -537,7 +537,7 @@ class LearnerSubscribePlan(models.Model):
         LearnerEnrollment, on_delete=models.CASCADE, related_name="subscriptions"
     )
     subscription_plan = models.ForeignKey(
-        SubscriptionPlan, on_delete=models.PROTECT, related_name="subscriptions"
+        SubscriptionPlan, on_delete=models.PROTECT, related_name="subscriptions", blank=False, null=False,
     )
     start_datetime = models.DateTimeField(default=timezone.now, db_index=True)
     end_datetime = models.DateTimeField(db_index=True)

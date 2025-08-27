@@ -140,12 +140,13 @@ class CustomUserAdmin(DjangoUserAdmin, ModelAdmin, ImportExportModelAdmin):
     )
 
     list_display = (
-        "avatar", "username", "email", "phone_number",
+        "avatar", "first_name", "last_name", "username", "phone_number",
         "gender_badge",
         "staff_badge", "active_badge", "super_badge",
     )
+    list_display_links = ["first_name", "last_name"]
     list_filter  = ("is_active", "is_staff", "is_superuser", "gender")
-    search_fields = ("username", "email", "phone_number")
+    search_fields = ("first_name", "last_name", "username", "email", "phone_number")
     ordering = ("username",)
     readonly_fields = ("last_login", "date_joined")
 

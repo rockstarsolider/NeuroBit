@@ -509,10 +509,14 @@ class MentorAdmin(BaseAdmin):
 @admin.register(m.Learner)
 class LearnerAdmin(BaseAdmin):
     status_badge = bool_badge("status", true="Active", false="Inactive")
-    list_display = ("user", "status_badge")
+    list_display = ("heading", "status_badge")
     search_fields = ("user__first_name", "user__last_name", "user__email")
     autocomplete_fields = ("user",)
 
+    @display(header=True, description=_("Fullname"), image=True)
+    def heading(self, obj):
+        initials = "".join([obj.user.first_name[:1], obj.user.last_name[:1]])
+        return [obj.user.get_full_name(), obj.user.phone_number, initials]
 
 # ──────────────────────────────────────────────────────────────
 # ENROLMENT & MENTORING
@@ -851,6 +855,7 @@ class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
     export_form_class = ExportForm
     resource_classes = [LearnerSubscribePlanResource]
     inlines = (TransactionInline,)
+    autocomplete_fields = ['learner_enrollment']
 
     list_select_related = (
         "learner_enrollment__learner__user",

@@ -15,7 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
-DEBUG = os.environ.get('DEBUG') == 'true'
+DEBUG = os.environ.get('DEBUG') == 'True' or os.environ.get('DEBUG') == 'true'
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,0.0.0.0").split(",")
 
 # Application definition
@@ -300,7 +300,7 @@ if USE_WEASYPRINT:
 else:
     IMPORT_EXPORT_ENABLE_PDF = False
 
-
+print("DEBUG", DEBUG)
 # debug-toolbar
 if DEBUG:
     INSTALLED_APPS += ["debug_toolbar",]
