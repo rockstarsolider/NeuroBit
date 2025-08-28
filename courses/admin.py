@@ -797,6 +797,11 @@ class SubscriptionTransactionResource(resources.ModelResource):
 @admin.register(m.SubscriptionTransaction)
 class SubscriptionTransactionAdmin(SimpleHistoryAdmin, ModelAdmin):
     resource_class = SubscriptionTransactionResource
+    list_select_related = (
+        "learner_enrollment__learner__user",
+        "learner_enrollment__learning_path",
+        "subscription_plan",
+    )
     list_display = (
         "learner_enrollment",
         "subscription_plan",
@@ -814,6 +819,14 @@ class SubscriptionTransactionAdmin(SimpleHistoryAdmin, ModelAdmin):
     )
     date_hierarchy = "paid_at"
     autocomplete_fields = ("learner_enrollment", "subscription", "subscription_plan")
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.select_related(
+            "learner_enrollment__learner__user",
+            "learner_enrollment__learning_path",
+            "subscription_plan",
+        )
 
     @display(description=_("Amount (T)"))
     def amount_disp(self, obj):
@@ -844,11 +857,38 @@ class FreezeInline(TabularInline):
     fields = ("duration",)
 
 
+# courses/admin.py
+
 class TransactionInline(admin.TabularInline):
     model = m.SubscriptionTransaction
     extra = 0
     fields = ("paid_at", "kind", "status", "amount", "gateway", "ref", "note")
     readonly_fields = ("paid_at", "kind", "status", "amount", "gateway", "ref")
+    ordering = ("-paid_at", "-id")  # align with model Meta
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        # ✅ Inline labels call SubscriptionTransaction.__str__()
+        # so we pull in everything that __str__ touches, plus the fields we display.
+        return (
+            qs.select_related(
+                "subscription_plan",
+                "learner_enrollment__learner__user",
+                "learner_enrollment__learning_path",
+            )
+            .only(
+                # shown fields
+                "id", "paid_at", "kind", "status", "amount", "gateway", "ref", "note",
+                # __str__ chain: enrollment → learner → user; plan name
+                "subscription_plan__name",
+                "learner_enrollment__id",
+                "learner_enrollment__learning_path__name",
+                "learner_enrollment__learner__user__first_name",
+                "learner_enrollment__learner__user__last_name",
+                "learner_enrollment__learner__user__email",
+            )
+        )
+
 
 
 @admin.register(m.LearnerSubscribePlan)
@@ -890,47 +930,59 @@ class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
             "learner_enrollment__learning_path",
             "subscription_plan",
         )
+    
+    # ✅ eliminate duplicate lookups in FK widgets on the change form
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "learner_enrollment":
+            kwargs["queryset"] = m.LearnerEnrollment.objects.select_related(
+                "learner__user", "learning_path"
+            )
+        elif db_field.name == "subscription_plan":
+            # only the columns you actually show/use
+            kwargs["queryset"] = m.SubscriptionPlan.objects.only(
+                "id", "name", "duration_in_days", "price_amount", "is_active"
+            )
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     @action(description=_("Analytics & Export"), icon="query_stats", variant=ActionVariant.PRIMARY)
     def go_analytics_dropdown(self, request: HttpRequest, queryset=None):
         return redirect(reverse("admin:courses_learnersubscribeplan_analytics"))
 
+    @display(ordering="learner_enrollment.learner.user", description=_("Learner"))
     def learner_full_name(self, obj: m.LearnerSubscribePlan) -> str:
         u = obj.learner_enrollment.learner.user
         return f"{u.first_name} {u.last_name}".strip() or u.email
 
+    @display(ordering="subscription_plan__name", description=_("Plan"))
     def plan_name(self, obj: m.LearnerSubscribePlan) -> str:
         return obj.subscription_plan.name
 
+    @display(ordering="start_datetime", description=_("Start (Shamsi)"))
     def start_shamsi(self, obj: m.LearnerSubscribePlan) -> str:
         return _format_shamsi(obj.start_datetime)
 
+    @display(ordering="end_datetime", description=_("End (Shamsi)"))
     def end_shamsi(self, obj: m.LearnerSubscribePlan) -> str:
         return _format_shamsi(obj.end_datetime)
 
+    @display(ordering="discount", description=_("Disc"))
     def discount_percent(self, obj: m.LearnerSubscribePlan) -> str:
         try:
             return f"{int(Decimal(obj.discount))}%"
         except Exception:
             return f"{obj.discount}%"
 
+    @display(ordering="final_cost", description=_("Final Cost"))
     def final_cost_h(self, obj: m.LearnerSubscribePlan) -> str:
         return f"{intcomma(obj.final_cost)}"
 
+    @display(ordering="status", description=_("Status"))
     def status_badge(self, obj: m.LearnerSubscribePlan) -> str:
         if obj.status == m.LearnerSubscribePlan.STATUS_ACTIVE:
             return format_html(badge(_("Active"), "success"))
         elif obj.status == m.LearnerSubscribePlan.STATUS_EXPIRED:
             return format_html(badge(_("Expired"), "danger"))
         return format_html(badge(str(obj.status), "default"))
-
-    status_badge.short_description = _("Status")
-    learner_full_name.short_description = _("Learner")
-    plan_name.short_description = _("Plan")
-    start_shamsi.short_description = _("Start (Shamsi)")
-    end_shamsi.short_description = _("End (Shamsi)")
-    discount_percent.short_description = _("Disc")
-    final_cost_h.short_description = _("Final Cost")
 
     def get_export_formats(self) -> List[Type[Format]]:
         fmts: List[Type[Format]] = [CSV, JSON, XLSX]

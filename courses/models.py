@@ -489,8 +489,11 @@ class SubscriptionTransaction(models.Model):
     note    = models.TextField(blank=True)
     history = HistoricalRecords()
     
-    class Meta: 
+    class Meta:
         ordering = ("-paid_at", "-id")
+        indexes = [
+            models.Index(fields=("subscription", "paid_at", "id")),  # ✅ speeds inline query
+        ]
     
     def __str__(self): 
         return f"{self.learner_enrollment} / {self.subscription_plan} / {self.amount}T @ {self.paid_at:%Y-%m-%d}"
