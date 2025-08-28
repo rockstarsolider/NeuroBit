@@ -508,6 +508,7 @@ class MentorAdmin(BaseAdmin):
 
 @admin.register(m.Learner)
 class LearnerAdmin(BaseAdmin):
+    list_select_related = ['user']
     status_badge = bool_badge("status", true="Active", false="Inactive")
     list_display = ("heading", "status_badge")
     search_fields = ("user__first_name", "user__last_name", "user__email")
@@ -855,22 +856,13 @@ class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
     export_form_class = ExportForm
     resource_classes = [LearnerSubscribePlanResource]
     inlines = (TransactionInline,)
-    autocomplete_fields = ['learner_enrollment']
-
+    autocomplete_fields = ['learner_enrollment', "subscription_plan"]
+    show_full_result_count = False
     list_select_related = (
         "learner_enrollment__learner__user",
         "learner_enrollment__learning_path",
         "subscription_plan",
     )
-
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        return qs.select_related(
-            "learner_enrollment__learner__user",
-            "learner_enrollment__learning_path",
-            "subscription_plan",
-        )
-
     list_display = (
         "learner_full_name",
         "plan_name",
@@ -888,9 +880,16 @@ class LearnerSubscribePlanAdmin(ModelAdmin, ImportExportModelAdmin):
     )
     ordering = ("-start_datetime", "-id")
     list_per_page = 50
-    readonly_fields = ("end_datetime", "final_cost", "expired_at")
-
+    readonly_fields = ("end_datetime", "expired_at")
     actions_list = ["go_analytics_dropdown"]
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.select_related(
+            "learner_enrollment__learner__user",
+            "learner_enrollment__learning_path",
+            "subscription_plan",
+        )
 
     @action(description=_("Analytics & Export"), icon="query_stats", variant=ActionVariant.PRIMARY)
     def go_analytics_dropdown(self, request: HttpRequest, queryset=None):
