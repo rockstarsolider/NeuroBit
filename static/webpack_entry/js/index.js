@@ -20,6 +20,8 @@ PowerGlitch.glitch('.glitch',{ playMode: 'hover' });
 
 import '/static/css/tailwind.css';
 
+import 'material-symbols';
+
 
 // handle theming
 const root = document.documentElement;

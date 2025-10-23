@@ -40,28 +40,19 @@ The other base file should be deleted before production
         {# ============ STYLE ============ #}
         {% render_bundle 'main' 'css' %}
         {% block extra_style %}{% endblock extra_style %}
+
+        <style>
+            :root {
+              --primary-color: #137fec;
+            }
+        </style>
     </head>
     <body>
         {# ============ HEADER ============ #}
-        <header>
-            <a href='{% url "home" %}' class="logo-square" aria-label="Home"><img src='{% static "images/neurobit_main_logo.webp" %}' alt=""><span data-i18n="logo_text" class="logo-text">neurobit</span></a>
-            <nav class="desktop-nav">
-            <a href="{% url "home" %}#manifesto" data-i18n="nav_manifesto">What Neurobit do?</a>
-            <a href="{% url "home" %}#process" data-i18n="nav_process">Process</a>
-            <a href='{% url "courses" %}' data-i18n="nav_learning_paths">Learning Paths</a>
-            <a href='{% url "mentoring" %}' data-i18n="nav_mentorship">Mentorship</a>
-            <a href='{% url "pricing" %}' data-i18n="nav_pricing">Prices</a>
-            <a href='{% url "apply" %}'>
-                <button class="btn-apply" data-i18n="nav_apply" onclick="document.getElementById('apply').scrollIntoView({behavior:'smooth'})">Apply</button>
-            </a>
-            <button id="langToggle" class="lang-toggle">FA</button>
-            <button class="theme-toggle" aria-label="Switch theme"><span>🌙</span></button>
-            </nav>
-            <button class="menu-icon" id="openMenu" aria-label="Open menu"><span></span><span></span></button>
-        </header>
+        
         
         {# ============ MOBILE MENU ============ #}
-        <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+        {% comment %} <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
             <button class="close-btn" id="closeMenu" aria-label="Close menu">&times;</button>
             <div class="mobile-menu-inner">
             <div style="text-align: center;">
@@ -78,7 +69,7 @@ The other base file should be deleted before production
                     onclick="document.getElementById('apply').scrollIntoView({behavior:'smooth'});document.getElementById('mobileMenu').classList.remove('open');">Apply</button>
             </a>
             </div>
-        </div>
+        </div> {% endcomment %}
 
         
         {% block content %}{% endblock content %}            

@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "chart.js": "^4.5.0",
+    "material-symbols": "^0.38.0",
     "motion": "^12.18.1",
     "plotly.js": "^3.1.0",
     "plotly.js-cartesian-dist-min": "^3.1.0",

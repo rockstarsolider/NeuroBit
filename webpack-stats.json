@@ -11,25 +11,88 @@
       "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\admin_progress_analytics-6895ff7a73a31ecca81a.js",
       "publicPath": "/static/webpack_output/admin_progress_analytics-6895ff7a73a31ecca81a.js"
     },
+    "fonts/material-symbols-outlined.woff2a9611f63": {
+      "name": "fonts/material-symbols-outlined.woff2a9611f63",
+      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\fonts\\material-symbols-outlined.woff2a9611f63",
+      "publicPath": "/static/webpack_output/fonts/material-symbols-outlined.woff2a9611f63",
+      "sourceFilename": "node_modules/material-symbols/material-symbols-outlined.woff2"
+    },
+    "fonts/material-symbols-rounded.woff2735a5c4f": {
+      "name": "fonts/material-symbols-rounded.woff2735a5c4f",
+      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\fonts\\material-symbols-rounded.woff2735a5c4f",
+      "publicPath": "/static/webpack_output/fonts/material-symbols-rounded.woff2735a5c4f",
+      "sourceFilename": "node_modules/material-symbols/material-symbols-rounded.woff2"
+    },
+    "fonts/material-symbols-sharp.woff259bc53f3": {
+      "name": "fonts/material-symbols-sharp.woff259bc53f3",
+      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\fonts\\material-symbols-sharp.woff259bc53f3",
+      "publicPath": "/static/webpack_output/fonts/material-symbols-sharp.woff259bc53f3",
+      "sourceFilename": "node_modules/material-symbols/material-symbols-sharp.woff2"
+    },
     "learning_paths-c2eabbc246f4022b0cf6.js": {
       "name": "learning_paths-c2eabbc246f4022b0cf6.js",
       "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\learning_paths-c2eabbc246f4022b0cf6.js",
       "publicPath": "/static/webpack_output/learning_paths-c2eabbc246f4022b0cf6.js"
     },
-    "main-164710b5a3e3c5167c09.css": {
-      "name": "main-164710b5a3e3c5167c09.css",
-      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-164710b5a3e3c5167c09.css",
-      "publicPath": "/static/webpack_output/main-164710b5a3e3c5167c09.css"
+    "main-1540239e8e932b6b8d57.css": {
+      "name": "main-1540239e8e932b6b8d57.css",
+      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-1540239e8e932b6b8d57.css",
+      "publicPath": "/static/webpack_output/main-1540239e8e932b6b8d57.css"
     },
-    "main-7184a8754289bb63f41c.css": {
-      "name": "main-7184a8754289bb63f41c.css",
-      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-7184a8754289bb63f41c.css",
-      "publicPath": "/static/webpack_output/main-7184a8754289bb63f41c.css"
+    "main-2cefb8b8e018eae9e864.css": {
+      "name": "main-2cefb8b8e018eae9e864.css",
+      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-2cefb8b8e018eae9e864.css",
+      "publicPath": "/static/webpack_output/main-2cefb8b8e018eae9e864.css"
+    },
+    "main-2e29cb31bfed14379051.css": {
+      "name": "main-2e29cb31bfed14379051.css",
+      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-2e29cb31bfed14379051.css",
+      "publicPath": "/static/webpack_output/main-2e29cb31bfed14379051.css"
+    },
+    "main-335b07aaae014b19ff5b.css": {
+      "name": "main-335b07aaae014b19ff5b.css",
+      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-335b07aaae014b19ff5b.css",
+      "publicPath": "/static/webpack_output/main-335b07aaae014b19ff5b.css"
+    },
+    "main-4ffa3c0b174c483740c2.css": {
+      "name": "main-4ffa3c0b174c483740c2.css",
+      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-4ffa3c0b174c483740c2.css",
+      "publicPath": "/static/webpack_output/main-4ffa3c0b174c483740c2.css"
+    },
+    "main-60a58c11f066d58ec3fe.js": {
+      "name": "main-60a58c11f066d58ec3fe.js",
+      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-60a58c11f066d58ec3fe.js",
+      "publicPath": "/static/webpack_output/main-60a58c11f066d58ec3fe.js"
+    },
+    "main-9a8817b10f125e371aca.css": {
+      "name": "main-9a8817b10f125e371aca.css",
+      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-9a8817b10f125e371aca.css",
+      "publicPath": "/static/webpack_output/main-9a8817b10f125e371aca.css"
+    },
+    "main-9b99e284b01bed8650cc.css": {
+      "name": "main-9b99e284b01bed8650cc.css",
+      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-9b99e284b01bed8650cc.css",
+      "publicPath": "/static/webpack_output/main-9b99e284b01bed8650cc.css"
+    },
+    "main-a016c3837d1a97622810.css": {
+      "name": "main-a016c3837d1a97622810.css",
+      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-a016c3837d1a97622810.css",
+      "publicPath": "/static/webpack_output/main-a016c3837d1a97622810.css"
+    },
+    "main-bf72e1967fb7c157b51a.js": {
+      "name": "main-bf72e1967fb7c157b51a.js",
+      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-bf72e1967fb7c157b51a.js",
+      "publicPath": "/static/webpack_output/main-bf72e1967fb7c157b51a.js"
     },
     "main-c5916ed1a69465de491b.js": {
       "name": "main-c5916ed1a69465de491b.js",
       "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-c5916ed1a69465de491b.js",
       "publicPath": "/static/webpack_output/main-c5916ed1a69465de491b.js"
+    },
+    "main-fb7c29e7a26158c8fd49.js": {
+      "name": "main-fb7c29e7a26158c8fd49.js",
+      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-fb7c29e7a26158c8fd49.js",
+      "publicPath": "/static/webpack_output/main-fb7c29e7a26158c8fd49.js"
     },
     "plotly-048a583c630733d133e2.js": {
       "name": "plotly-048a583c630733d133e2.js",
@@ -45,6 +108,11 @@
       "name": "vendors-762c1150ac50ee9350e3.js",
       "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\vendors-762c1150ac50ee9350e3.js",
       "publicPath": "/static/webpack_output/vendors-762c1150ac50ee9350e3.js"
+    },
+    "vendors-ec3e0d84a89b5db8d029.js": {
+      "name": "vendors-ec3e0d84a89b5db8d029.js",
+      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\vendors-ec3e0d84a89b5db8d029.js",
+      "publicPath": "/static/webpack_output/vendors-ec3e0d84a89b5db8d029.js"
     }
   },
   "chunks": {
@@ -60,14 +128,14 @@
     ],
     "learning_paths": [
       "runtime-0a1d7751042834c98a40.js",
-      "vendors-762c1150ac50ee9350e3.js",
+      "vendors-ec3e0d84a89b5db8d029.js",
       "learning_paths-c2eabbc246f4022b0cf6.js"
     ],
     "main": [
       "runtime-0a1d7751042834c98a40.js",
-      "vendors-762c1150ac50ee9350e3.js",
-      "main-164710b5a3e3c5167c09.css",
-      "main-c5916ed1a69465de491b.js"
+      "vendors-ec3e0d84a89b5db8d029.js",
+      "main-9a8817b10f125e371aca.css",
+      "main-bf72e1967fb7c157b51a.js"
     ]
   },
   "publicPath": "/static/webpack_output/"
