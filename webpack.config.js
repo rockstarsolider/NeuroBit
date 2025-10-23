@@ -40,7 +40,21 @@ module.exports = (env, argv) => {
         },
         {
           test: /\.css$/,
-          use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader'],
+          use: [
+            MiniCssExtractPlugin.loader, 
+            'css-loader', 'postcss-loader',
+            {
+              loader: 'postcss-loader',
+              options: {
+                postcssOptions: {
+                  plugins: {
+                    '@tailwindcss/postcss': {},
+                    autoprefixer: {},
+                  },
+                }
+              },
+            },
+          ],
         },
         {
           test: /\.(woff|woff2|eot|ttf|svg)$/i,

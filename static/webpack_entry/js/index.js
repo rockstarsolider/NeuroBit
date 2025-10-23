@@ -18,6 +18,7 @@ PowerGlitch.glitch('.glitch',{ playMode: 'hover' });
 // import htmx from 'htmx.org';
 // window.htmx = htmx;
 
+import '/static/css/tailwind.css';
 
 
 // handle theming
