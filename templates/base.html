@@ -4,7 +4,7 @@
 
 {% comment %} 
 This base file is used in new pages. 
-The other base file should be deleted before production
+The other base file can be deleted before production
 {% endcomment %}
 
 <!DOCTYPE html>
@@ -14,20 +14,6 @@ The other base file should be deleted before production
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <title>{% block title %}{% endblock title %}</title>
-
-        <script>
-            (function () {
-            const saved = localStorage.getItem('theme');
-            if (saved) {
-                document.documentElement.setAttribute('data-theme', saved);
-            }
-            /* If nothing saved yet you can also respect the user’s OS preference: */
-            else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                localStorage.setItem('theme', saved);
-                document.documentElement.setAttribute('data-theme', 'dark');
-            }
-            })();
-        </script>
 
         {# ============ FONTS ============ #}
         <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -44,38 +30,19 @@ The other base file should be deleted before production
         <style>
             :root {
               --primary-color: #137fec;
+              --secondary-color: #e7f2fe;
+              --text-primary: #1a202c;
+              --text-secondary: #718096;
             }
         </style>
     </head>
     <body>
-        {# ============ HEADER ============ #}
-        
-        
-        {# ============ MOBILE MENU ============ #}
-        {% comment %} <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
-            <button class="close-btn" id="closeMenu" aria-label="Close menu">&times;</button>
-            <div class="mobile-menu-inner">
-            <div style="text-align: center;">
-                <button  class="lang-toggle lang-btn-mobile" style="margin-left: 0;">FA</button>
-                <button class="theme-toggle" aria-label="Switch theme"><span>🌙</span></button>
-            </div>
-            <a href="{% url "home" %}#manifesto" class="mobile-link" data-i18n="nav_manifesto">Manifesto</a>
-            <a href="{% url "home" %}#process" class="mobile-link" data-i18n="nav_process">Process</a>
-            <a href='{% url "courses" %}' class="mobile-link" data-i18n="nav_learning_paths">Learning Paths</a>
-            <a href='{% url "mentoring" %}' class="mobile-link" data-i18n="nav_mentorship">Mentorship</a>
-            <a href='{% url "pricing" %}' class="mobile-link" data-i18n="nav_pricing">Prices</a>
-            <a href='{% url "apply" %}'>
-                <button class="btn-apply mobile-apply" data-i18n="nav_apply"
-                    onclick="document.getElementById('apply').scrollIntoView({behavior:'smooth'});document.getElementById('mobileMenu').classList.remove('open');">Apply</button>
-            </a>
-            </div>
-        </div> {% endcomment %}
-
+        {% include "partials/head/header.html" %}
         
         {% block content %}{% endblock content %}            
         
         {# ============ FOOTER ============ #}
-        <footer>
+        <footer class='max-w-7xl px-4 sm:px-6 lg:px-0 mx-auto flex flex-col xl:flex-row justify-between font-medium py-6'>
             <span data-i18n="footer_copy">© 2025 – All rights neurobit-reserved.</span>
             <span data-i18n="footer_made">Crafted with ❤️ for Iranian youth</span>
         </footer>

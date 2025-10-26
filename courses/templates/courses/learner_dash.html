@@ -1,198 +1,179 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
 {% block content %}
-<div class="flex min-h-screen w-full flex-col">
-    <header class="sticky top-0 z-10 flex items-center justify-between whitespace-nowrap border-b border-slate-200 bg-slate-50 px-10 py-4 shadow-sm">
-        <div class="flex items-center gap-4">
-        <div class="text-(--primary-color)">
-        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="32" xmlns="http://www.w3.org/2000/svg">
-        <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path>
-        </svg>
-        </div>
-        <h1 class="text-2xl font-bold tracking-tighter">EduPath</h1>
-        </div>
-        <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
-        <a class="hover:text-(--primary-color) transition-colors" href="#">Home</a>
-        <a class="hover:text-(--primary-color) transition-colors" href="#">Learning Paths</a>
-        <a class="hover:text-(--primary-color) transition-colors" href="#">Weekly Tasks</a>
-        <a class="hover:text-(--primary-color) transition-colors" href="#">Support</a>
-        </nav>
-        <div class="flex items-center gap-4">
-            <button class="relative">
-            <span class="material-symbols-outlined text-2xl text-slate-600 hover:text-(--primary-color) transition-colors"> notifications </span>
-            <span class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">2</span>
-            </button>
-            <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-slate-200" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDWAE-zF-QB9aw8Qw7wiUjHsMSGUPd1stGDdoTSKlMAdreSHy4ZMC_lLgHA3Imkyw-PByex3ukbq6kZL-hA_z_F-UOrq7voSLWsw4NfLDHkQLkZbKGiNsd5eZmrv10wX3znQJk8kNHQgJBrUcBsRxsZXfNHr3VBCipv4fE_RLabeODrFGoTWBubHvZLYDeqsoBfWKr9UU8fYLzMc4Yz1_9HByE7ZAcN9CMNnfrfbh62LuUzIcHn6eEukWiS4iFhbzmJSCRsXt7DTIo");'></div>
-        </div>
-    </header>
-
-
+  <div class="flex min-h-screen w-full flex-col bg-slate-50">
     <main class="flex-1 px-4 sm:px-6 lg:px-10 py-8">
-        <div class="max-w-7xl mx-auto">
+      <div class="max-w-7xl mx-auto">
         <div class="mb-8">
-        <h2 class="text-4xl font-bold tracking-tight">Welcome back, Sarah! 👋</h2>
-        <p class="text-slate-500 mt-2">Let's continue your learning journey and make some progress today.</p>
+          <h2 class="text-4xl font-bold tracking-tight">Welcome back, Sarah! 👋</h2>
+          <p class="text-slate-500 mt-2">Let's continue your learning journey and make some progress today.</p>
         </div>
         <div class="bg-white p-6 rounded-lg shadow-sm mb-8">
-        <h3 class="text-xl font-bold mb-6">Your Progress Overview</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div class="flex flex-col items-center justify-center text-center">
-        <div class="relative size-32">
-        <svg class="size-full" fill="none" stroke-width="10" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <circle class="text-slate-200" cx="50" cy="50" r="45" stroke="currentColor"></circle>
-        <circle class="text-(--primary-color)" cx="50" cy="50" r="45" stroke="currentColor" stroke-dasharray="282.6" stroke-dashoffset="113.04" stroke-linecap="round" transform="rotate(-90 50 50)"></circle>
-        </svg>
-        <div class="absolute inset-0 flex flex-col items-center justify-center">
-        <span class="text-3xl font-bold text-(--primary-color)">60%</span>
-        </div>
-        </div>
-        <p class="mt-3 font-semibold">Overall Progress</p>
-        <p class="text-sm text-slate-500">Data Science Path</p>
-        </div>
-        <div class="flex flex-col items-center justify-center text-center p-6 bg-slate-50 rounded-lg">
-        <span class="material-symbols-outlined text-5xl text-green-500">task_alt</span>
-        <p class="text-4xl font-bold mt-2">42</p>
-        <p class="mt-1 font-semibold">Tasks Completed</p>
-        </div>
-        <div class="md:col-span-2 lg:col-span-1 flex flex-col items-center justify-center text-center p-6 bg-slate-50 rounded-lg">
-        <h4 class="font-semibold mb-3">Achievements</h4>
-        <div class="flex gap-4">
-        <span class="material-symbols-outlined text-5xl text-yellow-500" title="Fast Learner">emoji_events</span>
-        <span class="material-symbols-outlined text-5xl text-slate-400" title="Consistent Performer">emoji_events</span>
-        <span class="material-symbols-outlined text-5xl text-orange-400" title="Project Milestone">emoji_events</span>
-        </div>
-        <p class="text-sm text-slate-500 mt-3">3 Badges Earned</p>
-        </div>
-        <div class="col-span-1 md:col-span-2 lg:col-span-4 bg-slate-50 p-6 rounded-lg">
-        <h4 class="font-semibold mb-4 text-center lg:text-left">Weekly Activity</h4>
-        <div class="flex justify-around items-end h-40 gap-2">
-        <div class="flex flex-col items-center gap-2 flex-1">
-        <div class="w-full bg-slate-200 rounded-t-md" style="height: 40%;">
-        <div class="w-full h-full bg-(--primary-color) rounded-t-md"></div>
-        </div>
-        <p class="text-sm font-medium">Mon</p>
-        </div>
-        <div class="flex flex-col items-center gap-2 flex-1">
-        <div class="w-full bg-slate-200 rounded-t-md" style="height: 70%;">
-        <div class="w-full h-full bg-(--primary-color) rounded-t-md"></div>
-        </div>
-        <p class="text-sm font-medium">Tue</p>
-        </div>
-        <div class="flex flex-col items-center gap-2 flex-1">
-        <div class="w-full bg-slate-200 rounded-t-md" style="height: 55%;">
-        <div class="w-full h-full bg-(--primary-color) rounded-t-md"></div>
-        </div>
-        <p class="text-sm font-medium">Wed</p>
-        </div>
-        <div class="flex flex-col items-center gap-2 flex-1">
-        <div class="w-full bg-slate-200 rounded-t-md" style="height: 85%;">
-        <div class="w-full h-full bg-(--primary-color) rounded-t-md"></div>
-        </div>
-        <p class="text-sm font-medium">Thu</p>
-        </div>
-        <div class="flex flex-col items-center gap-2 flex-1">
-        <div class="w-full bg-slate-200 rounded-t-md" style="height: 30%;">
-        <div class="w-full h-full bg-(--primary-color) rounded-t-md"></div>
-        </div>
-        <p class="text-sm font-medium">Fri</p>
-        </div>
-        <div class="flex flex-col items-center gap-2 flex-1">
-        <div class="w-full bg-slate-200 rounded-t-md" style="height: 15%;">
-        <div class="w-full h-full bg-(--primary-color) rounded-t-md"></div>
-        </div>
-        <p class="text-sm font-medium">Sat</p>
-        </div>
-        <div class="flex flex-col items-center gap-2 flex-1">
-        <div class="w-full bg-slate-200 rounded-t-md" style="height: 50%;">
-        <div class="w-full h-full bg-(--primary-color) rounded-t-md"></div>
-        </div>
-        <p class="text-sm font-medium">Sun</p>
-        </div>
-        </div>
-        </div>
-        </div>
+          <h3 class="text-xl font-bold mb-6">Your Progress Overview</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="flex flex-col items-center justify-center text-center">
+              <div class="relative size-32">
+                <svg class="size-full" fill="none" stroke-width="10" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                  <circle class="text-slate-200" cx="50" cy="50" r="45" stroke="currentColor"></circle>
+                  <circle class="text-(--primary-color)" cx="50" cy="50" r="45" stroke="currentColor" stroke-dasharray="282.6" stroke-dashoffset="113.04" stroke-linecap="round" transform="rotate(-90 50 50)"></circle>
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                  <span class="text-3xl font-bold text-(--primary-color)">60%</span>
+                </div>
+              </div>
+              <p class="mt-3 font-semibold">Overall Progress</p>
+              <p class="text-sm text-slate-500">Data Science Path</p>
+            </div>
+            <div class="flex flex-col items-center justify-center text-center p-6 bg-slate-50 rounded-lg">
+              <span class="material-symbols-outlined text-5xl text-green-500">task_alt</span>
+              <p class="text-4xl font-bold mt-2">42</p>
+              <p class="mt-1 font-semibold">Tasks Completed</p>
+            </div>
+            <div class="md:col-span-2 lg:col-span-1 flex flex-col items-center justify-center text-center p-6 bg-slate-50 rounded-lg">
+              <h4 class="font-semibold mb-3">Achievements</h4>
+              <div class="flex gap-4">
+                <span class="material-symbols-outlined text-5xl text-yellow-500" title="Fast Learner">emoji_events</span>
+                <span class="material-symbols-outlined text-5xl text-slate-400" title="Consistent Performer">emoji_events</span>
+                <span class="material-symbols-outlined text-5xl text-orange-400" title="Project Milestone">emoji_events</span>
+              </div>
+              <p class="text-sm text-slate-500 mt-3">3 Badges Earned</p>
+            </div>
+            <div class="col-span-1 md:col-span-2 lg:col-span-4 bg-slate-50 p-6 rounded-lg">
+              <h4 class="font-semibold mb-4 text-center lg:text-left">Weekly Activity</h4>
+              <div class="flex justify-around items-end h-40 gap-2">
+                <div class="flex flex-col items-center gap-2 flex-1">
+                  <div class="w-full bg-slate-200 rounded-t-md" style="height: 40%;">
+                    <div class="w-full h-full bg-(--primary-color) rounded-t-md"></div>
+                  </div>
+                  <p class="text-sm font-medium">Mon</p>
+                </div>
+                <div class="flex flex-col items-center gap-2 flex-1">
+                  <div class="w-full bg-slate-200 rounded-t-md" style="height: 70%;">
+                    <div class="w-full h-full bg-(--primary-color) rounded-t-md"></div>
+                  </div>
+                  <p class="text-sm font-medium">Tue</p>
+                </div>
+                <div class="flex flex-col items-center gap-2 flex-1">
+                  <div class="w-full bg-slate-200 rounded-t-md" style="height: 55%;">
+                    <div class="w-full h-full bg-(--primary-color) rounded-t-md"></div>
+                  </div>
+                  <p class="text-sm font-medium">Wed</p>
+                </div>
+                <div class="flex flex-col items-center gap-2 flex-1">
+                  <div class="w-full bg-slate-200 rounded-t-md" style="height: 85%;">
+                    <div class="w-full h-full bg-(--primary-color) rounded-t-md"></div>
+                  </div>
+                  <p class="text-sm font-medium">Thu</p>
+                </div>
+                <div class="flex flex-col items-center gap-2 flex-1">
+                  <div class="w-full bg-slate-200 rounded-t-md" style="height: 30%;">
+                    <div class="w-full h-full bg-(--primary-color) rounded-t-md"></div>
+                  </div>
+                  <p class="text-sm font-medium">Fri</p>
+                </div>
+                <div class="flex flex-col items-center gap-2 flex-1">
+                  <div class="w-full bg-slate-200 rounded-t-md" style="height: 15%;">
+                    <div class="w-full h-full bg-(--primary-color) rounded-t-md"></div>
+                  </div>
+                  <p class="text-sm font-medium">Sat</p>
+                </div>
+                <div class="flex flex-col items-center gap-2 flex-1">
+                  <div class="w-full bg-slate-200 rounded-t-md" style="height: 50%;">
+                    <div class="w-full h-full bg-(--primary-color) rounded-t-md"></div>
+                  </div>
+                  <p class="text-sm font-medium">Sun</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div class="lg:col-span-2 space-y-8">
-        <div class="bg-white p-6 rounded-lg shadow-sm">
-        <h3 class="text-xl font-bold mb-4">Continue Learning Path</h3>
-        <div class="space-y-4">
-        <p class="text-lg font-semibold">Data Science Fundamentals</p>
-        <div class="flex items-center gap-4">
-        <div class="flex-1 bg-slate-200 rounded-full h-3">
-        <div class="h-3 rounded-full bg-(--primary-color)" style="width: 60%;"></div>
+          <div class="lg:col-span-2 space-y-8">
+            <div class="bg-white p-6 rounded-lg shadow-sm">
+              <h3 class="text-xl font-bold mb-4">Continue Learning Path</h3>
+              <div class="space-y-4">
+                <p class="text-lg font-semibold">Data Science Fundamentals</p>
+                <div class="flex items-center gap-4">
+                  <div class="flex-1 bg-slate-200 rounded-full h-3">
+                    <div class="h-3 rounded-full bg-(--primary-color)" style="width: 60%;"></div>
+                  </div>
+                  <p class="text-base font-bold text-(--primary-color)">60%</p>
+                </div>
+                <button class="inline-flex items-center gap-2 mt-4 text-sm font-semibold text-(--primary-color) hover:underline">Continue Learning <span class="material-symbols-outlined">arrow_forward</span></button>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div class="bg-white p-6 rounded-lg shadow-sm">
+                <h3 class="text-xl font-bold mb-4">Upcoming Deadlines</h3>
+                <ul class="space-y-4">
+                  <li class="flex items-start gap-4">
+                    <div class="mt-1 flex size-6 items-center justify-center rounded-full bg-yellow-100 text-yellow-600">
+                      <span class="material-symbols-outlined text-base">schedule</span>
+                    </div>
+                    <div>
+                      <p class="font-medium">Complete Module 3: Data Visualization</p>
+                      <p class="text-sm text-slate-500">Due in 2 days</p>
+                    </div>
+                  </li>
+                  <li class="flex items-start gap-4">
+                    <div class="mt-1 flex size-6 items-center justify-center rounded-full bg-yellow-100 text-yellow-600">
+                      <span class="material-symbols-outlined text-base">schedule</span>
+                    </div>
+                    <div>
+                      <p class="font-medium">Submit Project Proposal</p>
+                      <p class="text-sm text-slate-500">Due in 5 days</p>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              <div class="bg-white p-6 rounded-lg shadow-sm">
+                <h3 class="text-xl font-bold mb-4">Recent Activities</h3>
+                <ul class="space-y-4">
+                  <li class="flex items-start gap-4">
+                    <div class="mt-1 flex size-6 items-center justify-center rounded-full bg-green-100 text-green-600">
+                      <span class="material-symbols-outlined text-base">check_circle</span>
+                    </div>
+                    <div>
+                      <p class="font-medium">Lesson 2: Introduction to Python</p>
+                      <p class="text-sm text-slate-500">Completed yesterday</p>
+                    </div>
+                  </li>
+                  <li class="flex items-start gap-4">
+                    <div class="mt-1 flex size-6 items-center justify-center rounded-full bg-blue-100 text-(--primary-color)">
+                      <span class="material-symbols-outlined text-base">chat_bubble</span>
+                    </div>
+                    <div>
+                      <p class="font-medium">Feedback on Module 2 Assignment</p>
+                      <p class="text-sm text-slate-500">New feedback received</p>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white p-6 rounded-lg shadow-sm">
+            <h3 class="text-xl font-bold mb-4">Quick Access</h3>
+            <div class="grid grid-cols-2 gap-4">
+              <a class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors" href="#">
+                <span class="material-symbols-outlined text-3xl text-slate-700">calendar_clock</span>
+                <span class="text-sm font-medium">Weekly Tasks</span>
+              </a>
+              <a class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors" href="#">
+                <span class="material-symbols-outlined text-3xl text-slate-700">school</span>
+                <span class="text-sm font-medium">Learning Paths</span>
+              </a>
+              <a class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors" href="#">
+                <span class="material-symbols-outlined text-3xl text-slate-700">person</span>
+                <span class="text-sm font-medium">Profile</span>
+              </a>
+              <a class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors" href="#">
+                <span class="material-symbols-outlined text-3xl text-slate-700">support_agent</span>
+                <span class="text-sm font-medium">Support</span>
+              </a>
+            </div>
+          </div>
         </div>
-        <p class="text-base font-bold text-(--primary-color)">60%</p>
-        </div>
-        <button class="inline-flex items-center gap-2 mt-4 text-sm font-semibold text-(--primary-color) hover:underline">
-        Continue Learning <span class="material-symbols-outlined">arrow_forward</span>
-        </button>
-        </div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="bg-white p-6 rounded-lg shadow-sm">
-        <h3 class="text-xl font-bold mb-4">Upcoming Deadlines</h3>
-        <ul class="space-y-4">
-        <li class="flex items-start gap-4">
-        <div class="mt-1 flex size-6 items-center justify-center rounded-full bg-yellow-100 text-yellow-600"><span class="material-symbols-outlined text-base">schedule</span></div>
-        <div>
-        <p class="font-medium">Complete Module 3: Data Visualization</p>
-        <p class="text-sm text-slate-500">Due in 2 days</p>
-        </div>
-        </li>
-        <li class="flex items-start gap-4">
-        <div class="mt-1 flex size-6 items-center justify-center rounded-full bg-yellow-100 text-yellow-600"><span class="material-symbols-outlined text-base">schedule</span></div>
-        <div>
-        <p class="font-medium">Submit Project Proposal</p>
-        <p class="text-sm text-slate-500">Due in 5 days</p>
-        </div>
-        </li>
-        </ul>
-        </div>
-        <div class="bg-white p-6 rounded-lg shadow-sm">
-        <h3 class="text-xl font-bold mb-4">Recent Activities</h3>
-        <ul class="space-y-4">
-        <li class="flex items-start gap-4">
-        <div class="mt-1 flex size-6 items-center justify-center rounded-full bg-green-100 text-green-600"><span class="material-symbols-outlined text-base">check_circle</span></div>
-        <div>
-        <p class="font-medium">Lesson 2: Introduction to Python</p>
-        <p class="text-sm text-slate-500">Completed yesterday</p>
-        </div>
-        </li>
-        <li class="flex items-start gap-4">
-        <div class="mt-1 flex size-6 items-center justify-center rounded-full bg-blue-100 text-(--primary-color)"><span class="material-symbols-outlined text-base">chat_bubble</span></div>
-        <div>
-        <p class="font-medium">Feedback on Module 2 Assignment</p>
-        <p class="text-sm text-slate-500">New feedback received</p>
-        </div>
-        </li>
-        </ul>
-        </div>
-        </div>
-        </div>
-        <div class="bg-white p-6 rounded-lg shadow-sm">
-        <h3 class="text-xl font-bold mb-4">Quick Access</h3>
-        <div class="grid grid-cols-2 gap-4">
-        <a class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors" href="#">
-        <span class="material-symbols-outlined text-3xl text-slate-700">calendar_clock</span>
-        <span class="text-sm font-medium">Weekly Tasks</span>
-        </a>
-        <a class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors" href="#">
-        <span class="material-symbols-outlined text-3xl text-slate-700">school</span>
-        <span class="text-sm font-medium">Learning Paths</span>
-        </a>
-        <a class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors" href="#">
-        <span class="material-symbols-outlined text-3xl text-slate-700">person</span>
-        <span class="text-sm font-medium">Profile</span>
-        </a>
-        <a class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors" href="#">
-        <span class="material-symbols-outlined text-3xl text-slate-700">support_agent</span>
-        <span class="text-sm font-medium">Support</span>
-        </a>
-        </div>
-        </div>
-        </div>
-        </div>
+      </div>
     </main>
-</div>
+  </div>
 {% endblock %}

@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden bg-slate-50">
+    <div class="layout-container flex h-full grow flex-col">
+      <main class="flex-1 px-4 sm:px-6 lg:px-8 py-12">
+        <div class="mx-auto max-w-4xl">
+          <div class="mb-10 text-center">
+            <h1 class="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">Your Learning Path</h1>
+            <p class="mt-4 text-lg text-slate-600">Follow these steps to master new skills and complete your course.</p>
+          </div>
+          
+          <div class="space-y-4">
+            <div class="flex items-center gap-4 rounded-xl border border-green-200 bg-green-50 p-4 shadow-sm transition-all hover:shadow-md">
+              <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-green-500 text-white">
+                <span class="material-symbols-outlined">check</span>
+              </div>
+              <div class="flex-1">
+                <p class="text-base font-medium text-green-800">Step 1: Course Overview</p>
+                <p class="text-sm text-green-700">Introduction to the course and its objectives.</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button class="flex items-center justify-center rounded-lg bg-green-100 px-4 py-2 text-sm font-semibold text-green-700 hover:bg-green-200">View Mentor Feedback</button>
+                <div class="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 text-green-600">
+                  <span class="material-symbols-outlined text-xl">done_all</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-4 rounded-xl border border-green-200 bg-green-50 p-4 shadow-sm transition-all hover:shadow-md">
+              <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-green-500 text-white">
+                <span class="material-symbols-outlined">check</span>
+              </div>
+              <div class="flex-1">
+                <p class="text-base font-medium text-green-800">Step 2: Module 1 - Foundations</p>
+                <p class="text-sm text-green-700">Learn the basics of the first module.</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button class="flex items-center justify-center rounded-lg bg-green-100 px-4 py-2 text-sm font-semibold text-green-700 hover:bg-green-200">View Mentor Feedback</button>
+                <div class="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 text-green-600">
+                  <span class="material-symbols-outlined text-xl">done_all</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="rounded-xl border border-(--primary-color)/30 bg-white p-4 shadow-lg ring-2 ring-(--primary-color)/20">
+              <div class="flex items-center gap-4">
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-(--primary-color) text-white">
+                  <span class="material-symbols-outlined animate-spin">autorenew</span>
+                </div>
+                <div class="flex-1">
+                  <p class="text-base font-medium text-slate-800">Step 3: Module 2 - Intermediate Concepts</p>
+                  <p class="text-sm text-slate-600">Dive deeper into the second module.</p>
+                </div>
+                <div class="flex shrink-0 items-center gap-3">
+                  <div class="flex items-center gap-2 rounded-full bg-orange-100 px-3 py-1 text-sm font-medium text-orange-600">
+                    <span class="material-symbols-outlined text-base">timer</span>
+                    <span>5 days left</span>
+                  </div>
+                  <button class="flex items-center justify-center rounded-lg bg-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-300">Continue</button>
+                </div>
+              </div>
+              <div class="mt-4 flex items-center gap-3">
+                <div class="w-full overflow-hidden rounded-full bg-slate-200">
+                  <div class="h-2 rounded-full bg-(--primary-color)" style="width: 60%;"></div>
+                </div>
+                <p class="text-sm font-medium text-slate-700">60%</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-all hover:border-slate-300 hover:shadow-md">
+              <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+                <span class="material-symbols-outlined">code</span>
+              </div>
+              <div class="flex-1">
+                <p class="text-base font-medium text-slate-500">Step 4: Practical Application</p>
+                <p class="text-sm text-slate-500">Apply your knowledge in practical exercises.</p>
+              </div>
+              <div class="shrink-0">
+                <button class="flex items-center justify-center rounded-lg bg-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-300">Start</button>
+              </div>
+            </div>
+            <div class="flex items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-all hover:border-slate-300 hover:shadow-md">
+              <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+                <span class="material-symbols-outlined">assignment</span>
+              </div>
+              <div class="flex-1">
+                <p class="text-base font-medium text-slate-500">Step 5: Final Assessment</p>
+                <p class="text-sm text-slate-500">Test your understanding with the final assessment.</p>
+              </div>
+              <div class="shrink-0">
+                <button class="flex items-center justify-center rounded-lg bg-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-300">Start</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+{% endblock %}
