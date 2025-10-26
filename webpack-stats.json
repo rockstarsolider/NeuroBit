@@ -59,6 +59,11 @@
       "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-bfba7bb8fdc664b1d168.css",
       "publicPath": "/static/webpack_output/main-bfba7bb8fdc664b1d168.css"
     },
+    "main-c8bf4d28495b5902503c.css": {
+      "name": "main-c8bf4d28495b5902503c.css",
+      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-c8bf4d28495b5902503c.css",
+      "publicPath": "/static/webpack_output/main-c8bf4d28495b5902503c.css"
+    },
     "main-e878c2a689fd023c317c.css": {
       "name": "main-e878c2a689fd023c317c.css",
       "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-e878c2a689fd023c317c.css",
@@ -99,7 +104,7 @@
     "main": [
       "runtime-0a1d7751042834c98a40.js",
       "vendors-ec3e0d84a89b5db8d029.js",
-      "main-9f1e548149eeaf55739c.css",
+      "main-c8bf4d28495b5902503c.css",
       "main-bf72e1967fb7c157b51a.js"
     ]
   },

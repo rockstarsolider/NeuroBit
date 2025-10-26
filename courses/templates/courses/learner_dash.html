@@ -1,15 +1,16 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
 {% block content %}
   <div class="flex min-h-screen w-full flex-col bg-slate-50">
     <main class="flex-1 px-4 sm:px-6 lg:px-10 py-8">
       <div class="max-w-7xl mx-auto">
         <div class="mb-8">
-          <h2 class="text-4xl font-bold tracking-tight">Welcome back, Sarah! 👋</h2>
-          <p class="text-slate-500 mt-2">Let's continue your learning journey and make some progress today.</p>
+          <h2 class="text-4xl font-bold tracking-tight">{% trans "Welcome back, " %}Sarah! 👋</h2>
+          <p class="text-slate-500 mt-2">{% trans "Let's continue your learning journey and make some progress today." %}</p>
         </div>
         <div class="bg-white p-6 rounded-lg shadow-sm mb-8">
-          <h3 class="text-xl font-bold mb-6">Your Progress Overview</h3>
+          <h3 class="text-xl font-bold mb-6">{% trans "Your Progress Overview" %}</h3>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="flex flex-col items-center justify-center text-center">
               <div class="relative size-32">
@@ -21,16 +22,16 @@
                   <span class="text-3xl font-bold text-(--primary-color)">60%</span>
                 </div>
               </div>
-              <p class="mt-3 font-semibold">Overall Progress</p>
+              <p class="mt-3 font-semibold">{% trans "Overall Progress"%}</p>
               <p class="text-sm text-slate-500">Data Science Path</p>
             </div>
             <div class="flex flex-col items-center justify-center text-center p-6 bg-slate-50 rounded-lg">
               <span class="material-symbols-outlined text-5xl text-green-500">task_alt</span>
               <p class="text-4xl font-bold mt-2">42</p>
-              <p class="mt-1 font-semibold">Tasks Completed</p>
+              <p class="mt-1 font-semibold">{% trans "Tasks Completed"%}</p>
             </div>
             <div class="md:col-span-2 lg:col-span-1 flex flex-col items-center justify-center text-center p-6 bg-slate-50 rounded-lg">
-              <h4 class="font-semibold mb-3">Achievements</h4>
+              <h4 class="font-semibold mb-3">{% trans "Achievements"%}</h4>
               <div class="flex gap-4">
                 <span class="material-symbols-outlined text-5xl text-yellow-500" title="Fast Learner">emoji_events</span>
                 <span class="material-symbols-outlined text-5xl text-slate-400" title="Consistent Performer">emoji_events</span>
@@ -39,49 +40,49 @@
               <p class="text-sm text-slate-500 mt-3">3 Badges Earned</p>
             </div>
             <div class="col-span-1 md:col-span-2 lg:col-span-4 bg-slate-50 p-6 rounded-lg">
-              <h4 class="font-semibold mb-4 text-center lg:text-left">Weekly Activity</h4>
+              <h4 class="font-semibold mb-4 text-center lg:text-left">{% trans "Weekly Activity"%}</h4>
               <div class="flex justify-around items-end h-40 gap-2">
                 <div class="flex flex-col items-center gap-2 flex-1">
                   <div class="w-full bg-slate-200 rounded-t-md" style="height: 40%;">
                     <div class="w-full h-full bg-(--primary-color) rounded-t-md"></div>
                   </div>
-                  <p class="text-sm font-medium">Mon</p>
+                  <p class="text-sm font-medium">{% trans "Mon"%}</p>
                 </div>
                 <div class="flex flex-col items-center gap-2 flex-1">
                   <div class="w-full bg-slate-200 rounded-t-md" style="height: 70%;">
                     <div class="w-full h-full bg-(--primary-color) rounded-t-md"></div>
                   </div>
-                  <p class="text-sm font-medium">Tue</p>
+                  <p class="text-sm font-medium">{% trans "Tue"%}</p>
                 </div>
                 <div class="flex flex-col items-center gap-2 flex-1">
                   <div class="w-full bg-slate-200 rounded-t-md" style="height: 55%;">
                     <div class="w-full h-full bg-(--primary-color) rounded-t-md"></div>
                   </div>
-                  <p class="text-sm font-medium">Wed</p>
+                  <p class="text-sm font-medium">{% trans "Wed"%}</p>
                 </div>
                 <div class="flex flex-col items-center gap-2 flex-1">
                   <div class="w-full bg-slate-200 rounded-t-md" style="height: 85%;">
                     <div class="w-full h-full bg-(--primary-color) rounded-t-md"></div>
                   </div>
-                  <p class="text-sm font-medium">Thu</p>
+                  <p class="text-sm font-medium">{% trans "Thu"%}</p>
                 </div>
                 <div class="flex flex-col items-center gap-2 flex-1">
                   <div class="w-full bg-slate-200 rounded-t-md" style="height: 30%;">
                     <div class="w-full h-full bg-(--primary-color) rounded-t-md"></div>
                   </div>
-                  <p class="text-sm font-medium">Fri</p>
+                  <p class="text-sm font-medium">{% trans "Fri"%}</p>
                 </div>
                 <div class="flex flex-col items-center gap-2 flex-1">
                   <div class="w-full bg-slate-200 rounded-t-md" style="height: 15%;">
                     <div class="w-full h-full bg-(--primary-color) rounded-t-md"></div>
                   </div>
-                  <p class="text-sm font-medium">Sat</p>
+                  <p class="text-sm font-medium">{% trans "Sat"%}</p>
                 </div>
                 <div class="flex flex-col items-center gap-2 flex-1">
                   <div class="w-full bg-slate-200 rounded-t-md" style="height: 50%;">
                     <div class="w-full h-full bg-(--primary-color) rounded-t-md"></div>
                   </div>
-                  <p class="text-sm font-medium">Sun</p>
+                  <p class="text-sm font-medium">{% trans "Sun"%}</p>
                 </div>
               </div>
             </div>
@@ -90,7 +91,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div class="lg:col-span-2 space-y-8">
             <div class="bg-white p-6 rounded-lg shadow-sm">
-              <h3 class="text-xl font-bold mb-4">Continue Learning Path</h3>
+              <h3 class="text-xl font-bold mb-4">{% trans "Continue Learning Path"%}</h3>
               <div class="space-y-4">
                 <p class="text-lg font-semibold">Data Science Fundamentals</p>
                 <div class="flex items-center gap-4">
@@ -99,12 +100,12 @@
                   </div>
                   <p class="text-base font-bold text-(--primary-color)">60%</p>
                 </div>
-                <button class="inline-flex items-center gap-2 mt-4 text-sm font-semibold text-(--primary-color) hover:underline">Continue Learning <span class="material-symbols-outlined">arrow_forward</span></button>
+                <button class="inline-flex items-center gap-2 mt-4 text-sm font-semibold text-(--primary-color) hover:underline">{% trans "Continue Learning"%} <span class="material-symbols-outlined">arrow_forward</span></button>
               </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div class="bg-white p-6 rounded-lg shadow-sm">
-                <h3 class="text-xl font-bold mb-4">Upcoming Deadlines</h3>
+                <h3 class="text-xl font-bold mb-4">{% trans "Upcoming Deadlines"%}</h3>
                 <ul class="space-y-4">
                   <li class="flex items-start gap-4">
                     <div class="mt-1 flex size-6 items-center justify-center rounded-full bg-yellow-100 text-yellow-600">
@@ -127,7 +128,7 @@
                 </ul>
               </div>
               <div class="bg-white p-6 rounded-lg shadow-sm">
-                <h3 class="text-xl font-bold mb-4">Recent Activities</h3>
+                <h3 class="text-xl font-bold mb-4">{% trans "Recent Activities"%}</h3>
                 <ul class="space-y-4">
                   <li class="flex items-start gap-4">
                     <div class="mt-1 flex size-6 items-center justify-center rounded-full bg-green-100 text-green-600">
@@ -152,23 +153,23 @@
             </div>
           </div>
           <div class="bg-white p-6 rounded-lg shadow-sm">
-            <h3 class="text-xl font-bold mb-4">Quick Access</h3>
+            <h3 class="text-xl font-bold mb-4">{% trans "Quick Access"%}</h3>
             <div class="grid grid-cols-2 gap-4">
               <a class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors" href="#">
                 <span class="material-symbols-outlined text-3xl text-slate-700">calendar_clock</span>
-                <span class="text-sm font-medium">Weekly Tasks</span>
+                <span class="text-sm font-medium">{% trans "Weekly Tasks"%}</span>
               </a>
               <a class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors" href="#">
                 <span class="material-symbols-outlined text-3xl text-slate-700">school</span>
-                <span class="text-sm font-medium">Learning Paths</span>
+                <span class="text-sm font-medium">{% trans "Learning Paths"%}</span>
               </a>
               <a class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors" href="#">
                 <span class="material-symbols-outlined text-3xl text-slate-700">person</span>
-                <span class="text-sm font-medium">Profile</span>
+                <span class="text-sm font-medium">{% trans "Profile"%}</span>
               </a>
               <a class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors" href="#">
                 <span class="material-symbols-outlined text-3xl text-slate-700">support_agent</span>
-                <span class="text-sm font-medium">Support</span>
+                <span class="text-sm font-medium">{% trans "Support"%}</span>
               </a>
             </div>
           </div>

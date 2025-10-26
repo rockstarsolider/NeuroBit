@@ -1,0 +1,281 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-26 23:05+0330\n"
+"PO-Revision-Date: 2025-10-26 23:06+0330\n"
+"Last-Translator: پوریا غیاثی <pouriaghiasi3@gmail.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Translated-Using: django-rosetta 0.10.2\n"
+
+#: .\config\settings.py:183 .\templates\partials\head\header.html:13
+msgid "Home"
+msgstr "خانه"
+
+#: .\config\settings.py:188
+msgid "about us"
+msgstr ""
+
+#: .\config\settings.py:205
+msgid "Navigation"
+msgstr ""
+
+#: .\config\settings.py:210
+msgid "Dashboard"
+msgstr ""
+
+#: .\config\settings.py:215
+msgid "Users"
+msgstr ""
+
+#: .\config\settings.py:220
+msgid "Mentors"
+msgstr ""
+
+#: .\config\settings.py:225
+msgid "Learners"
+msgstr ""
+
+#: .\config\settings.py:230 .\courses\admin.py:1008
+msgid "Subscriptions Analytics"
+msgstr ""
+
+#: .\config\settings.py:240
+msgid "SMS Notifications"
+msgstr ""
+
+#: .\config\settings.py:248 .\config\settings.py:253
+msgid "Courses"
+msgstr ""
+
+#: .\config\settings.py:258
+msgid "LearnerSubscribePlan"
+msgstr ""
+
+#: .\config\settings.py:263
+msgid "Mentor Assignment"
+msgstr ""
+
+#: .\config\settings.py:268
+msgid "Educational Steps"
+msgstr ""
+
+#: .\config\settings.py:273
+msgid "Task Evaluation"
+msgstr ""
+
+#: .\config\settings.py:278
+msgid "Social Post"
+msgstr ""
+
+#: .\config\settings.py:283
+msgid "MentorGroupSessionParticipant"
+msgstr ""
+
+#: .\config\settings.py:290 .\config\settings.py:295
+msgid "Applications"
+msgstr ""
+
+#: .\core\admin.py:127
+msgid "Avatar"
+msgstr ""
+
+#: .\core\admin.py:139
+msgid "Gender"
+msgstr ""
+
+#: .\core\admin.py:156
+msgid "Permissions"
+msgstr ""
+
+#: .\core\admin.py:157
+msgid "Important dates"
+msgstr ""
+
+#: .\core\admin.py:173
+msgid "Activate selected users"
+msgstr ""
+
+#: .\core\admin.py:177
+msgid "Deactivate selected users"
+msgstr ""
+
+#: .\courses\admin.py:201 .\courses\admin.py:236
+msgid "Progress Analytics"
+msgstr ""
+
+#: .\courses\admin.py:498
+msgid "Mentor"
+msgstr ""
+
+#: .\courses\admin.py:517
+msgid "Fullname"
+msgstr ""
+
+#: .\courses\admin.py:831
+msgid "Amount (T)"
+msgstr ""
+
+#: .\courses\admin.py:845
+msgid "Price (T)"
+msgstr ""
+
+#: .\courses\admin.py:846
+msgid "Duration (d)"
+msgstr ""
+
+#: .\courses\admin.py:947
+msgid "Analytics & Export"
+msgstr ""
+
+#: .\courses\admin.py:951
+msgid "Learner"
+msgstr ""
+
+#: .\courses\admin.py:956
+msgid "Plan"
+msgstr ""
+
+#: .\courses\admin.py:960
+msgid "Start (Shamsi)"
+msgstr ""
+
+#: .\courses\admin.py:964
+msgid "End (Shamsi)"
+msgstr ""
+
+#: .\courses\admin.py:968
+msgid "Disc"
+msgstr ""
+
+#: .\courses\admin.py:975
+msgid "Final Cost"
+msgstr ""
+
+#: .\courses\admin.py:979
+msgid "Status"
+msgstr ""
+
+#: .\courses\admin.py:982
+msgid "Active"
+msgstr ""
+
+#: .\courses\admin.py:984
+msgid "Expired"
+msgstr ""
+
+#: .\courses\templates\courses\learner_dash.html:9
+msgid "Welcome back, "
+msgstr "خوش آمدی، "
+
+#: .\courses\templates\courses\learner_dash.html:10
+msgid "Let's continue your learning journey and make some progress today."
+msgstr "بیایید امروز سفر یادگیری شما را ادامه دهیم و کمی پیشرفت کنیم."
+
+#: .\courses\templates\courses\learner_dash.html:13
+msgid "Your Progress Overview"
+msgstr "نمای کلی پیشرفت شما"
+
+#: .\courses\templates\courses\learner_dash.html:25
+msgid "Overall Progress"
+msgstr "پیشرفت کلی"
+
+#: .\courses\templates\courses\learner_dash.html:31
+msgid "Tasks Completed"
+msgstr "تسک های کامل شده"
+
+#: .\courses\templates\courses\learner_dash.html:34
+msgid "Achievements"
+msgstr "دستاورد ها"
+
+#: .\courses\templates\courses\learner_dash.html:43
+msgid "Weekly Activity"
+msgstr "فعالیت هفتگی"
+
+#: .\courses\templates\courses\learner_dash.html:49
+msgid "Mon"
+msgstr "دوشنبه"
+
+#: .\courses\templates\courses\learner_dash.html:55
+msgid "Tue"
+msgstr "سه شنبه"
+
+#: .\courses\templates\courses\learner_dash.html:61
+msgid "Wed"
+msgstr "چهارشنبه"
+
+#: .\courses\templates\courses\learner_dash.html:67
+msgid "Thu"
+msgstr "پنج شنبه"
+
+#: .\courses\templates\courses\learner_dash.html:73
+msgid "Fri"
+msgstr "جمعه"
+
+#: .\courses\templates\courses\learner_dash.html:79
+msgid "Sat"
+msgstr "شنبه"
+
+#: .\courses\templates\courses\learner_dash.html:85
+msgid "Sun"
+msgstr "یکشنبه"
+
+#: .\courses\templates\courses\learner_dash.html:94
+msgid "Continue Learning Path"
+msgstr "ادامه مسیر یادگیری"
+
+#: .\courses\templates\courses\learner_dash.html:103
+msgid "Continue Learning"
+msgstr "ادامه یادگیری"
+
+#: .\courses\templates\courses\learner_dash.html:108
+msgid "Upcoming Deadlines"
+msgstr "مهلت‌های پیش رو"
+
+#: .\courses\templates\courses\learner_dash.html:131
+msgid "Recent Activities"
+msgstr "فعالیت های اخیر"
+
+#: .\courses\templates\courses\learner_dash.html:156
+msgid "Quick Access"
+msgstr "دسترسی سریع"
+
+#: .\courses\templates\courses\learner_dash.html:160
+#: .\templates\partials\head\header.html:15
+msgid "Weekly Tasks"
+msgstr "تسک های هفتگی"
+
+#: .\courses\templates\courses\learner_dash.html:164
+#: .\templates\partials\head\header.html:14
+msgid "Learning Paths"
+msgstr "مسیر های یادگیری"
+
+#: .\courses\templates\courses\learner_dash.html:168
+msgid "Profile"
+msgstr "پروفایل"
+
+#: .\courses\templates\courses\learner_dash.html:172
+#: .\templates\partials\head\header.html:16
+msgid "Support"
+msgstr "پشتیبانی"
+
+#: .\pages\admin.py:16
+msgid "created_at"
+msgstr "ساخته شده در"
+
+#~ msgid "schedule"
+#~ msgstr "برنامه"
+
+#~ msgid "Submit Project Proposal"
+#~ msgstr "ارسال پیشنهاد پروژه"

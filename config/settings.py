@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "crispy_forms",
     'webpack_loader',
     "django_extensions",
+    'rosetta',
 
     "core.apps.CoreConfig",
     'pages',
@@ -75,6 +76,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",  # static files
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -139,6 +141,19 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
+# Define the languages your site supports
+LANGUAGES = (
+    ('en', 'English'),
+    ('fa', 'Farsi'),
+)
+
+# Path to store translation files (.po, .mo)
+LOCALE_PATHS = (
+    BASE_DIR / 'locale',
+)
+
+ROSETTA_REQUIRES_AUTH = True
+ROSETTA_ACCESS_CONTROL_FUNCTION = 'core.utility.can_access_rosetta'
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [

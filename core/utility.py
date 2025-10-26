@@ -17,3 +17,7 @@ def shamsi_text(dt):
     if not dt: return "-"
     j = jdt.fromgregorian(datetime=dt)
     return f"{j.year}-{_MONTHS[j.month-1]}-{j.day:02d}"
+
+def can_access_rosetta(user):
+    # Return True if this user is allowed to access Rosetta.
+    return user.is_active and user.is_staff
