@@ -38,6 +38,8 @@ The other base file can be deleted before production
     </head>
     <body dir="{% get_current_language_bidi as BIDI %}{% if BIDI %}rtl{% else %}ltr{% endif %}">
         {% include "partials/head/header.html" %}
+
+        {% include "partials/body/toast.html" %}
         
         {% block content %}{% endblock content %}            
         

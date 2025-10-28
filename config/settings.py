@@ -323,3 +323,5 @@ if DEBUG:
     INTERNAL_IPS = ["127.0.0.1", "localhost", "::1"]
     # Show toolbar on every DEBUG request
     DEBUG_TOOLBAR_CONFIG = {"SHOW_TOOLBAR_CALLBACK": lambda request: True}
+
+LOGIN_URL = '/auth/'

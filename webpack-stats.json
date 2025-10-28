@@ -34,40 +34,15 @@
       "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\learning_paths-c2eabbc246f4022b0cf6.js",
       "publicPath": "/static/webpack_output/learning_paths-c2eabbc246f4022b0cf6.js"
     },
-    "main-820658b103b9b6cc8ba0.css": {
-      "name": "main-820658b103b9b6cc8ba0.css",
-      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-820658b103b9b6cc8ba0.css",
-      "publicPath": "/static/webpack_output/main-820658b103b9b6cc8ba0.css"
+    "main-6b8c0d34aafe837b3c8c.js": {
+      "name": "main-6b8c0d34aafe837b3c8c.js",
+      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-6b8c0d34aafe837b3c8c.js",
+      "publicPath": "/static/webpack_output/main-6b8c0d34aafe837b3c8c.js"
     },
-    "main-8b5128c2e3ec3e0f635a.css": {
-      "name": "main-8b5128c2e3ec3e0f635a.css",
-      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-8b5128c2e3ec3e0f635a.css",
-      "publicPath": "/static/webpack_output/main-8b5128c2e3ec3e0f635a.css"
-    },
-    "main-9f1e548149eeaf55739c.css": {
-      "name": "main-9f1e548149eeaf55739c.css",
-      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-9f1e548149eeaf55739c.css",
-      "publicPath": "/static/webpack_output/main-9f1e548149eeaf55739c.css"
-    },
-    "main-bf72e1967fb7c157b51a.js": {
-      "name": "main-bf72e1967fb7c157b51a.js",
-      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-bf72e1967fb7c157b51a.js",
-      "publicPath": "/static/webpack_output/main-bf72e1967fb7c157b51a.js"
-    },
-    "main-bfba7bb8fdc664b1d168.css": {
-      "name": "main-bfba7bb8fdc664b1d168.css",
-      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-bfba7bb8fdc664b1d168.css",
-      "publicPath": "/static/webpack_output/main-bfba7bb8fdc664b1d168.css"
-    },
-    "main-c8bf4d28495b5902503c.css": {
-      "name": "main-c8bf4d28495b5902503c.css",
-      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-c8bf4d28495b5902503c.css",
-      "publicPath": "/static/webpack_output/main-c8bf4d28495b5902503c.css"
-    },
-    "main-e878c2a689fd023c317c.css": {
-      "name": "main-e878c2a689fd023c317c.css",
-      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-e878c2a689fd023c317c.css",
-      "publicPath": "/static/webpack_output/main-e878c2a689fd023c317c.css"
+    "main-b74d2da26b4c94a46d84.css": {
+      "name": "main-b74d2da26b4c94a46d84.css",
+      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-b74d2da26b4c94a46d84.css",
+      "publicPath": "/static/webpack_output/main-b74d2da26b4c94a46d84.css"
     },
     "plotly-048a583c630733d133e2.js": {
       "name": "plotly-048a583c630733d133e2.js",
@@ -79,10 +54,10 @@
       "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\runtime-0a1d7751042834c98a40.js",
       "publicPath": "/static/webpack_output/runtime-0a1d7751042834c98a40.js"
     },
-    "vendors-ec3e0d84a89b5db8d029.js": {
-      "name": "vendors-ec3e0d84a89b5db8d029.js",
-      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\vendors-ec3e0d84a89b5db8d029.js",
-      "publicPath": "/static/webpack_output/vendors-ec3e0d84a89b5db8d029.js"
+    "vendors-0aa8efed7a8655b7ed18.js": {
+      "name": "vendors-0aa8efed7a8655b7ed18.js",
+      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\vendors-0aa8efed7a8655b7ed18.js",
+      "publicPath": "/static/webpack_output/vendors-0aa8efed7a8655b7ed18.js"
     }
   },
   "chunks": {
@@ -98,14 +73,14 @@
     ],
     "learning_paths": [
       "runtime-0a1d7751042834c98a40.js",
-      "vendors-ec3e0d84a89b5db8d029.js",
+      "vendors-0aa8efed7a8655b7ed18.js",
       "learning_paths-c2eabbc246f4022b0cf6.js"
     ],
     "main": [
       "runtime-0a1d7751042834c98a40.js",
-      "vendors-ec3e0d84a89b5db8d029.js",
-      "main-c8bf4d28495b5902503c.css",
-      "main-bf72e1967fb7c157b51a.js"
+      "vendors-0aa8efed7a8655b7ed18.js",
+      "main-b74d2da26b4c94a46d84.css",
+      "main-6b8c0d34aafe837b3c8c.js"
     ]
   },
   "publicPath": "/static/webpack_output/"

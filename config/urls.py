@@ -10,6 +10,7 @@ urlpatterns = [
     
     path('', include('pages.urls')),
     path('', include('courses.urls')),
+    path('', include('core.urls')),
 ]
 
 # serve media in development

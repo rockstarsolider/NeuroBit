@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class='w-full bg-slate-50 flex flex-col justify-center items-center h-200'>
+  <h2 class="text-2xl font-semibold mb-4 text-center">{% trans "Enter verification code" %}</h2>
+
+  <form method="post" class="space-y-4 max-w-6xl">
+    {% csrf_token %}
+    <input
+      type="text"
+      name="otp"
+      placeholder="{% trans '6-digit OTP' %}"
+      required
+      class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+    >
+    <button
+      type="submit"
+      class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+    >
+      {% trans "Verify" %}
+    </button>
+  </form>
+
+  <p class="text-center text-sm text-gray-600 mt-4">
+    {% trans "Didn’t receive the code?" %} 
+    <a href="{% url 'phone_view' %}" class="text-blue-600 hover:underline">{% trans "Resend" %}</a>
+  </p>
+</div
+{% endblock %}

@@ -6,7 +6,7 @@
     <main class="flex-1 px-4 sm:px-6 lg:px-10 py-8">
       <div class="max-w-7xl mx-auto">
         <div class="mb-8">
-          <h2 class="text-4xl font-bold tracking-tight">{% trans "Welcome back, " %}Sarah! 👋</h2>
+          <h2 class="text-4xl font-bold tracking-tight">{% trans "Welcome back, " %}{{user.first_name}}! 👋</h2>
           <p class="text-slate-500 mt-2">{% trans "Let's continue your learning journey and make some progress today." %}</p>
         </div>
         <div class="bg-white p-6 rounded-lg shadow-sm mb-8">
@@ -37,7 +37,7 @@
                 <span class="material-symbols-outlined text-5xl text-slate-400" title="Consistent Performer">emoji_events</span>
                 <span class="material-symbols-outlined text-5xl text-orange-400" title="Project Milestone">emoji_events</span>
               </div>
-              <p class="text-sm text-slate-500 mt-3">3 Badges Earned</p>
+              <p class="text-sm text-slate-500 mt-3">3 {% trans "Badges Earned"%}</p>
             </div>
             <div class="col-span-1 md:col-span-2 lg:col-span-4 bg-slate-50 p-6 rounded-lg">
               <h4 class="font-semibold mb-4 text-center lg:text-left">{% trans "Weekly Activity"%}</h4>
