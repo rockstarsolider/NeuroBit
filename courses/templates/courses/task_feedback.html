@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+    <div class="layout-container flex h-full grow flex-col">
+        <main class="flex flex-1 justify-center p-8">
+            <div class="w-full max-w-4xl">
+                <nav class="mb-8 flex items-center gap-2 text-sm text-slate-500">
+                    <a class="hover:text-slate-700" href="#">My Path</a>
+                    <span class="material-symbols-outlined text-base">chevron_right</span>
+                    <span class="font-medium text-slate-800">Task 1: Introduction to Programming</span>
+                </nav>
+                <div class="rounded-lg border border-slate-200 bg-white shadow-sm">
+                    <div class="border-b border-slate-200 p-6">
+                        <h1 class="text-3xl font-bold tracking-tight">Task 1: Introduction to Programming</h1>
+                        <p class="mt-1 text-base text-slate-500">Mentor Feedback</p>
+                    </div>
+                    <div class="flex flex-col gap-8 p-6 md:flex-row">
+                        <div class="flex flex-col items-center text-center md:w-1/4 md:items-start md:text-left">
+                            <div class="mb-4 h-32 w-32 rounded-full bg-cover bg-center bg-no-repeat"
+                                style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBrMCsaigWnjqMAavx-NsVijFFBSz4lhvhsLH0UNfpn_MuSklfHv7qEnTf8lFrfA2GzNXMwsj2dBo_e06vWABqOBIhZMIvAHdQqa2oCIqa4mOqDpbjxkYNe85aSBrTb4IDardSjAIsrcrCN5SZE4I6Jz0s14oXsJNykDv1NIgTThiU_eNTxmCIjNSmqz-fPYYZrCQwRVYjZwiwcLZvkQHqr5hsgr76Hik5UCSy80vs2dYfbuzXQJjeDQudkge3y3eJR7Yd5mKQCsDI");'>
+                            </div>
+                            <h3 class="text-xl font-bold">Dr. Robert Smith</h3>
+                            <p class="text-slate-500">Mentor</p>
+                            <p class="mt-2 text-sm text-slate-400">July 26, 2024</p>
+                        </div>
+                        <div class="flex-1 md:pl-8">
+                            <div class="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                                <h2 class="text-2xl font-bold">Feedback</h2>
+                                <div class="flex flex-col items-start gap-2 sm:items-end">
+                                    <p class="text-sm font-medium text-slate-600">Task Score</p>
+                                    <div class="flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-2xl text-yellow-400">star</span>
+                                        <span class="material-symbols-outlined text-2xl text-yellow-400">star</span>
+                                        <span class="material-symbols-outlined text-2xl text-yellow-400">star</span>
+                                        <span class="material-symbols-outlined text-2xl text-yellow-400">star</span>
+                                        <span
+                                            class="material-symbols-outlined text-2xl text-slate-300">star_outline</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="prose max-w-none text-slate-700">
+                                <p> Great job on completing the introduction to programming module! Your understanding
+                                    of basic concepts like variables, loops, and conditional statements is evident in
+                                    your submitted code. I particularly liked how you used comments to explain your code
+                                    logic, making it easy to follow. </p>
+                                <p>Here are a few suggestions for improvement:</p>
+                                <ul>
+                                    <li>
+                                        <strong>Code Readability:</strong> Consider using more descriptive variable
+                                        names to enhance code readability. For example, instead of 'x' and 'y', use
+                                        names that reflect the purpose of the variables.
+                                    </li>
+                                    <li>
+                                        <strong>Error Handling:</strong> While your code handles the main functionality
+                                        well, adding error handling for potential edge cases would make it more robust.
+                                        For instance, what happens if the user inputs invalid data?
+                                    </li>
+                                    <li>
+                                        <strong>Practice Problems:</strong> To solidify your understanding, I recommend
+                                        working on additional practice problems. Focus on problems that involve applying
+                                        the concepts you've learned in different contexts.
+                                    </li>
+                                </ul>
+                                <p>Overall, you're off to a strong start. Keep up the good work, and don't hesitate to
+                                    reach out if you have any questions!</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border-t border-slate-200 p-6">
+                        <h2 class="mb-4 text-2xl font-bold">Mentor Attachments</h2>
+                        <div class="space-y-3">
+                            <div
+                                class="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 p-3">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-2xl text-slate-500">description</span>
+                                    <span class="text-sm font-medium text-slate-800">Code_Review_Notes.pdf</span>
+                                </div>
+                                <a class="flex h-8 items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-3 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                                    href="#">
+                                    <span class="material-symbols-outlined text-base">download</span>
+                                    <span>Download</span>
+                                </a>
+                            </div>
+                            <div
+                                class="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 p-3">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-2xl text-slate-500">code</span>
+                                    <span class="text-sm font-medium text-slate-800">Example_Solution.py</span>
+                                </div>
+                                <a class="flex h-8 items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-3 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                                    href="#">
+                                    <span class="material-symbols-outlined text-base">download</span>
+                                    <span>Download</span>
+                                </a>
+                            </div>
+                            <div
+                                class="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 p-3">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-2xl text-slate-500">link</span>
+                                    <span class="text-sm font-medium text-slate-800">Additional_Resources.url</span>
+                                </div>
+                                <a class="flex h-8 items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-3 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                                    href="#">
+                                    <span class="material-symbols-outlined text-base">open_in_new</span>
+                                    <span>View</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-4 border-t border-slate-200 p-6 sm:flex-row sm:justify-between">
+                        <button
+                            class="flex h-10 items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                            <span class="material-symbols-outlined">arrow_back</span>
+                            <span>Back to Task List</span>
+                        </button>
+                        <div class="flex gap-4">
+                            <button
+                                class="flex h-10 flex-1 items-center justify-center gap-2 rounded-md bg-slate-200 px-4 text-sm font-medium text-slate-600 hover:bg-slate-300">
+                                <span class="material-symbols-outlined">chevron_left</span>
+                                <span>Previous</span>
+                            </button>
+                            <button
+                                class="flex h-10 flex-1 items-center justify-center gap-2 rounded-md bg-(--primary-color) px-4 text-sm font-medium text-white hover:bg-blue-700">
+                                <span>Next</span>
+                                <span class="material-symbols-outlined">chevron_right</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}

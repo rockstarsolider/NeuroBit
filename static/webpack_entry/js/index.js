@@ -6,14 +6,7 @@ window.animate = animate;
 window.scroll = scroll;
 window.inView = inView;
 
-import ScrambleText from 'scramble-text';
-window.ScrambleText = ScrambleText;
-
-import { PowerGlitch } from 'powerglitch';
-
-PowerGlitch.glitch('.glitch',{ playMode: 'hover' });
-
-import '/static/css/tailwind.css';
+import '../../css/tailwind.css';
 
 import 'material-symbols';
 

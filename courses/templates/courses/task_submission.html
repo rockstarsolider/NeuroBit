@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden bg-slate-50">
+    <main class="flex-1 px-4 xl:px-10 py-8">
+        <div class="mx-auto max-w-4xl">
+            <div class="mb-10 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+                <div class="flex flex-col gap-6">
+                    <div>
+                        <h1 class="text-2xl font-bold tracking-tight text-slate-900">Task Submission: Advanced Calculus
+                        </h1>
+                        <p class="mt-2 text-slate-600">Submit your work for the assigned task. This might involve
+                            uploading files, providing links to online documents, and adding a descriptive note for your
+                            instructor.</p>
+                    </div>
+                    <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
+                        <div class="flex items-center gap-3 rounded-md bg-slate-100 p-3">
+                            <span class="material-symbols-outlined text-slate-600">numbers</span>
+                            <div>
+                                <p class="text-sm font-medium text-slate-700">Task Number</p>
+                                <p class="text-sm font-semibold text-slate-900">Task #3</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 rounded-md bg-slate-100 p-3">
+                            <span class="material-symbols-outlined text-slate-600">calendar_today</span>
+                            <div>
+                                <p class="text-sm font-medium text-slate-700">Due Date</p>
+                                <p class="text-sm font-semibold text-slate-900">October 26, 2024</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <form class="space-y-10 rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
+                <div class="grid grid-cols-1 gap-10 md:grid-cols-2">
+                    <div class="space-y-6">
+                        <h3 class="text-lg font-semibold leading-tight text-slate-900">Links</h3>
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700" for="link1">Link 1</label>
+                                <input
+                                    class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                                    id="link1" name="link1" placeholder="https://example.com" type="url" />
+                                <p class="mt-2 text-xs text-red-600" id="link1-error">Invalid URL format.</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700" for="link2">Link 2
+                                    (Optional)</label>
+                                <input
+                                    class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                                    id="link2" name="link2" placeholder="https://another-example.com" type="url" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <h3 class="text-lg font-semibold leading-tight text-slate-900">Attachments</h3>
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700" for="attachment1">File 1 <span
+                                        class="text-red-500">*</span></label>
+                                <div
+                                    class="mt-1 flex justify-center rounded-md border-2 border-dashed border-slate-300 px-6 pt-5 pb-6">
+                                    <div class="space-y-1 text-center">
+                                        <span
+                                            class="material-symbols-outlined text-4xl text-slate-400">cloud_upload</span>
+                                        <div class="flex text-sm text-slate-600">
+                                            <label
+                                                class="relative cursor-pointer rounded-md bg-white font-medium text-blue-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 hover:text-blue-500"
+                                                for="file-upload1">
+                                                <span>Upload a file</span>
+                                                <input class="sr-only" id="file-upload1" name="file-upload1"
+                                                    type="file" />
+                                            </label>
+                                            <p class="pl-1">or drag and drop</p>
+                                        </div>
+                                        <p class="text-xs text-slate-500">PDF, DOCX, etc. up to 10MB</p>
+                                    </div>
+                                </div>
+                                <p class="mt-2 text-xs text-red-600" id="file1-error">File size too large.</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700" for="attachment2">File 2
+                                    (Optional)</label>
+                                <div
+                                    class="mt-1 flex justify-center rounded-md border-2 border-dashed border-slate-300 px-6 pt-5 pb-6">
+                                    <div class="space-y-1 text-center">
+                                        <span
+                                            class="material-symbols-outlined text-4xl text-slate-400">cloud_upload</span>
+                                        <div class="flex text-sm text-slate-600">
+                                            <label
+                                                class="relative cursor-pointer rounded-md bg-white font-medium text-blue-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 hover:text-blue-500"
+                                                for="file-upload2">
+                                                <span>Upload a file</span>
+                                                <input class="sr-only" id="file-upload2" name="file-upload2"
+                                                    type="file" />
+                                            </label>
+                                            <p class="pl-1">or drag and drop</p>
+                                        </div>
+                                        <p class="text-xs text-slate-500">PDF, DOCX, etc. up to 10MB</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="border-t border-slate-200 pt-8">
+                    <div class="space-y-2">
+                        <label class="block text-lg font-semibold text-slate-900" for="comments">Description</label>
+                        <p class="text-sm text-slate-500">Provide a brief description of your submission. You can
+                            include any notes for your instructor here.</p>
+                        <textarea
+                            class="mt-2 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                            id="comments" name="comments"
+                            placeholder="E.g., I've attached the final draft of my essay and a link to my research notes."
+                            rows="5"></textarea>
+                        <p class="mt-2 text-xs text-red-600" id="description-error">Description cannot be empty.</p>
+                    </div>
+                </div>
+                <div class="border-t border-slate-200 pt-8">
+                    <div class="space-y-6">
+                        <h3 class="text-lg font-semibold leading-tight text-slate-900">Social Media Posts</h3>
+                        <div class="space-y-6 rounded-md border border-slate-200 p-4">
+                            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700" for="platform1">Platform
+                                        Name</label>
+                                    <select
+                                        class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                                        id="platform1" name="platform1">
+                                        <option>Instagram</option>
+                                        <option>Twitter</option>
+                                        <option>LinkedIn</option>
+                                        <option>Facebook</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700" for="post-date1">Post
+                                        Date</label>
+                                    <input
+                                        class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                                        id="post-date1" name="post-date1" type="date" />
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700" for="post-link1">Post
+                                    Link</label>
+                                <input
+                                    class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                                    id="post-link1" name="post-link1" placeholder="https://platform.com/post/123"
+                                    type="url" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700" for="description1">Short
+                                    Description</label>
+                                <textarea
+                                    class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                                    id="description1" name="description1" placeholder="Briefly describe the post..."
+                                    rows="3"></textarea>
+                            </div>
+                            <div class="flex justify-end">
+                                <button
+                                    class="inline-flex items-center justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                                    type="button">
+                                    <span class="material-symbols-outlined mr-2 text-base">delete</span>
+                                    Remove
+                                </button>
+                            </div>
+                        </div>
+                        <button
+                            class="inline-flex items-center justify-center rounded-md border border-dashed border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                            type="button">
+                            <span class="material-symbols-outlined mr-2 text-base">add</span>
+                            Add New Post
+                        </button>
+                    </div>
+                </div>
+                <div class="flex justify-end border-t border-slate-200 pt-6">
+                    <button
+                        class="inline-flex justify-center rounded-md border border-transparent bg-blue-600 py-3 px-6 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        type="submit">
+                        Submit Assignment
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+{% endblock %}
