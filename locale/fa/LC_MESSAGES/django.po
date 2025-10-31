@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-26 23:05+0330\n"
-"PO-Revision-Date: 2025-10-26 23:06+0330\n"
+"POT-Creation-Date: 2025-10-31 14:54+0330\n"
+"PO-Revision-Date: 2025-10-31 14:58+0330\n"
 "Last-Translator: پوریا غیاثی <pouriaghiasi3@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -111,6 +111,54 @@ msgstr ""
 msgid "Deactivate selected users"
 msgstr ""
 
+#: .\core\templates\core\phone.html:6
+msgid "Enter your phone number"
+msgstr "شماره تلفن خود را وارد کنید"
+
+#: .\core\templates\core\phone.html:13
+msgid "Phone number"
+msgstr "شماره تلفن"
+
+#: .\core\templates\core\phone.html:21
+msgid "Send OTP"
+msgstr "ارسال کد تایید"
+
+#: .\core\templates\core\verify.html:6
+msgid "Enter verification code"
+msgstr "کد تایید را وارد کنید"
+
+#: .\core\templates\core\verify.html:13
+msgid "6-digit OTP"
+msgstr "کد تایید 6 رقمی"
+
+#: .\core\templates\core\verify.html:21
+msgid "Verify"
+msgstr "تایید"
+
+#: .\core\templates\core\verify.html:26
+msgid "Didn’t receive the code?"
+msgstr "کد را دریافت نکردید؟"
+
+#: .\core\templates\core\verify.html:27
+msgid "Resend"
+msgstr "ارسال مجدد"
+
+#: .\core\views.py:33
+msgid "OTP has expired. Please request a new one."
+msgstr "کد تایید منقضی شده است. "
+
+#: .\core\views.py:42
+msgid "Signed up!"
+msgstr "ثبت نام انجام شد!"
+
+#: .\core\views.py:42
+msgid "Signed in!"
+msgstr "ورود با موفقیت انجام شد!"
+
+#: .\core\views.py:45
+msgid "Invalid OTP"
+msgstr "کد تایید معتبر نیست"
+
 #: .\courses\admin.py:201 .\courses\admin.py:236
 msgid "Progress Analytics"
 msgstr ""
@@ -195,77 +243,73 @@ msgstr "پیشرفت کلی"
 msgid "Tasks Completed"
 msgstr "تسک های کامل شده"
 
-#: .\courses\templates\courses\learner_dash.html:34
-msgid "Achievements"
-msgstr "دستاورد ها"
-
-#: .\courses\templates\courses\learner_dash.html:43
+#: .\courses\templates\courses\learner_dash.html:46
 msgid "Weekly Activity"
 msgstr "فعالیت هفتگی"
 
-#: .\courses\templates\courses\learner_dash.html:49
+#: .\courses\templates\courses\learner_dash.html:52
 msgid "Mon"
 msgstr "دوشنبه"
 
-#: .\courses\templates\courses\learner_dash.html:55
+#: .\courses\templates\courses\learner_dash.html:58
 msgid "Tue"
 msgstr "سه شنبه"
 
-#: .\courses\templates\courses\learner_dash.html:61
+#: .\courses\templates\courses\learner_dash.html:64
 msgid "Wed"
 msgstr "چهارشنبه"
 
-#: .\courses\templates\courses\learner_dash.html:67
+#: .\courses\templates\courses\learner_dash.html:70
 msgid "Thu"
 msgstr "پنج شنبه"
 
-#: .\courses\templates\courses\learner_dash.html:73
+#: .\courses\templates\courses\learner_dash.html:76
 msgid "Fri"
 msgstr "جمعه"
 
-#: .\courses\templates\courses\learner_dash.html:79
+#: .\courses\templates\courses\learner_dash.html:82
 msgid "Sat"
 msgstr "شنبه"
 
-#: .\courses\templates\courses\learner_dash.html:85
+#: .\courses\templates\courses\learner_dash.html:88
 msgid "Sun"
 msgstr "یکشنبه"
 
-#: .\courses\templates\courses\learner_dash.html:94
+#: .\courses\templates\courses\learner_dash.html:97
 msgid "Continue Learning Path"
 msgstr "ادامه مسیر یادگیری"
 
-#: .\courses\templates\courses\learner_dash.html:103
+#: .\courses\templates\courses\learner_dash.html:106
 msgid "Continue Learning"
 msgstr "ادامه یادگیری"
 
-#: .\courses\templates\courses\learner_dash.html:108
+#: .\courses\templates\courses\learner_dash.html:111
 msgid "Upcoming Deadlines"
 msgstr "مهلت‌های پیش رو"
 
-#: .\courses\templates\courses\learner_dash.html:131
+#: .\courses\templates\courses\learner_dash.html:134
 msgid "Recent Activities"
 msgstr "فعالیت های اخیر"
 
-#: .\courses\templates\courses\learner_dash.html:156
+#: .\courses\templates\courses\learner_dash.html:159
 msgid "Quick Access"
 msgstr "دسترسی سریع"
 
-#: .\courses\templates\courses\learner_dash.html:160
+#: .\courses\templates\courses\learner_dash.html:163
 #: .\templates\partials\head\header.html:15
 msgid "Weekly Tasks"
 msgstr "تسک های هفتگی"
 
-#: .\courses\templates\courses\learner_dash.html:164
+#: .\courses\templates\courses\learner_dash.html:167
 #: .\templates\partials\head\header.html:14
 msgid "Learning Paths"
 msgstr "مسیر های یادگیری"
 
-#: .\courses\templates\courses\learner_dash.html:168
+#: .\courses\templates\courses\learner_dash.html:171
 msgid "Profile"
 msgstr "پروفایل"
 
-#: .\courses\templates\courses\learner_dash.html:172
+#: .\courses\templates\courses\learner_dash.html:175
 #: .\templates\partials\head\header.html:16
 msgid "Support"
 msgstr "پشتیبانی"
@@ -273,6 +317,9 @@ msgstr "پشتیبانی"
 #: .\pages\admin.py:16
 msgid "created_at"
 msgstr "ساخته شده در"
+
+#~ msgid "Achievements"
+#~ msgstr "دستاورد ها"
 
 #~ msgid "schedule"
 #~ msgstr "برنامه"

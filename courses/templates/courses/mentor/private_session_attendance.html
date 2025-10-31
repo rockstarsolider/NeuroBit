@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+    <main class="flex-1 px-10 py-8">
+        <div class="mx-auto max-w-7xl">
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold tracking-tight text-slate-900">Private Code Review Sessions</h1>
+                <p class="mt-1 text-slate-600">Manage your upcoming and past sessions with learners.</p>
+            </div>
+            <div class="flex items-center justify-between gap-4 mb-6">
+                <div class="relative w-full max-w-sm">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                        search </span>
+                    <input
+                        class="w-full rounded-md border-slate-300 bg-white py-2 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500"
+                        placeholder="Search sessions by learner" type="text" />
+                </div>
+                <div class="flex items-center gap-2">
+                    <button
+                        class="flex items-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50">
+                        <span class="material-symbols-outlined text-base"> calendar_month </span>
+                        Sort by Day
+                    </button>
+                    <button
+                        class="flex items-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50">
+                        <span class="material-symbols-outlined text-base"> person </span>
+                        Filter by Learner
+                    </button>
+                </div>
+            </div>
+            <div class="overflow-hidden rounded-md border border-slate-200 bg-white">
+                <table class="w-full text-left">
+                    <thead class="border-b border-slate-200 bg-slate-50 text-sm font-medium text-slate-600">
+                        <tr>
+                            <th class="px-6 py-3">Learner</th>
+                            <th class="px-6 py-3">Day</th>
+                            <th class="px-6 py-3">Time</th>
+                            <th class="px-6 py-3 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 text-sm text-slate-900">
+                        <tr>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-4">
+                                    <img alt="Ethan Carter's profile picture"
+                                        class="h-10 w-10 rounded-full object-cover"
+                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwI0sJ7cQBCc2flhw4WlWarGLo_z6wpgUWQ3Ws6q_4-ZY-3EaFqzH8xwspRdFw3me-_fyRflCQm90oAQ1hBZEXsI7KMduaf3h_tg-2s9XMVEO6d2wfx99Xo7ZD_P8BFgGZe2puN9hMw7pOVF9eCP6w-U9uz2ZP-YQRRz5fvAFXAL6H6Zd1M1W3PJCXXZetNcox_grQ61QrMmOVh6Q19SORPNXjnxDmwvWm3w0mcF7X_vCKPfNV_F5gqYZ8gh854zk0MnTCtYQDRDg" />
+                                    <span class="font-medium">Ethan Carter</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-slate-600">Saturday</td>
+                            <td class="px-6 py-4 text-slate-600">10:00 AM</td>
+                            <td class="px-6 py-4 text-right space-x-2">
+                                <button
+                                    class="rounded-md bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-200">View
+                                    Attendance</button>
+                                <button
+                                    class="rounded-md bg-blue-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-600">Manage
+                                    Attendance</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-4">
+                                    <img alt="Olivia Bennett's profile picture"
+                                        class="h-10 w-10 rounded-full object-cover"
+                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmgm7iZGZ7smi-WH11WzbeUuk9o2LJo1oVKtletrFa0RODOIpoVeGXvWOTK1nY4XpFN2MraDL-QmsnronFa25lslKoJ4qw5GPmPOl82On2p_2v9otJJAo1cf9Jw4I7xsfd3jkvPjIfeiRLN5RF0BFs9aaW8Qyh-W5UYkAyF25qQUkrh6n5J6Gw17XKmHNbAJSEZOoBpgfkTHwQD8iVJ4ApyZ9h0ZxdqFr7R2zF9kdnM-QapAViLuUrsj_CtPZ0iAjso7szpvJkzoA" />
+                                    <span class="font-medium">Olivia Bennett</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-slate-600">Sunday</td>
+                            <td class="px-6 py-4 text-slate-600">2:00 PM</td>
+                            <td class="px-6 py-4 text-right space-x-2">
+                                <button
+                                    class="rounded-md bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-200">View
+                                    Attendance</button>
+                                <button
+                                    class="rounded-md bg-blue-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-600">Manage
+                                    Attendance</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-4">
+                                    <img alt="Noah Thompson's profile picture"
+                                        class="h-10 w-10 rounded-full object-cover"
+                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSGGUbaiFoHjvEV284sx_47_A7RjKkznweVXjA9XucnjmK-T33io64yNRO8rd28QPm2-GLM8rKeJpAcnXaLMkk__Aqux0-BjJIkA2XLibM4Nz0-1EFmIVUcLvOgWmPAycQDE_sdqspN0mamnVa6ZJVHIZ2T0YY1SMokP-Ezv_NA8LcmzLGsi0SKetlGM4SD76tR7olBSpbuo8JEfg6OH7vPoHeQIE1zg2sl4ZZB4YkBUXW6MiBSYuoJuA_gXL1ALsQeD6sTaylzpA" />
+                                    <span class="font-medium">Noah Thompson</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-slate-600">Monday</td>
+                            <td class="px-6 py-4 text-slate-600">11:00 AM</td>
+                            <td class="px-6 py-4 text-right space-x-2">
+                                <button
+                                    class="rounded-md bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-200">View
+                                    Attendance</button>
+                                <button
+                                    class="rounded-md bg-blue-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-600">Manage
+                                    Attendance</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-4">
+                                    <img alt="Ava Harper's profile picture" class="h-10 w-10 rounded-full object-cover"
+                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDC6CoboKzQ52iqOjqW7y-9t4qXSxLsgwGMTuA1e0l85Iz77E9sdPSY0sFn572mo0TucIWr-utKhmFn-YEECC3lEj6bnBJpFqR8y1BipbCZiDlbMkcPBTt7uw_U1SR2REZV80Akx8fnqbtqkp8Xumqg-DvQsRRNHqze54F8Bhl8OZjr5j9rnaYUOku4geJom_zsT1psz5YYNSYmF2T1oxq7dp2GdrVAH2mWeyxgzy3v6JBYEyoWzx17ujTHHSJV6lkihZihzy-cnyg" />
+                                    <span class="font-medium">Ava Harper</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-slate-600">Tuesday</td>
+                            <td class="px-6 py-4 text-slate-600">3:00 PM</td>
+                            <td class="px-6 py-4 text-right space-x-2">
+                                <button
+                                    class="rounded-md bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-200">View
+                                    Attendance</button>
+                                <button
+                                    class="rounded-md bg-blue-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-600">Manage
+                                    Attendance</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-4">
+                                    <img alt="Liam Foster's profile picture" class="h-10 w-10 rounded-full object-cover"
+                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmAyZLTwJg-35o9frTaA8QY_OI5CGhQG6aPmS49cr4mwNM5_4wWJYxS_1QbdLOLY2ZiKAisJe9WKrHdwM9ygg52DtFePmhnDuIMOdgR4oCCwKXYKDpuEDKMWFHA9pcymByRkh9IEWxylATfUTVutfVU3AeEEX_TwJWiSWGei5h0edX4hU77stHwBHXu6FD-q6Ohx1UfWPtDE6wEumLi_TmCszlixZSChgL9GCfgKVz8eP0FV0uOgvfv7xJYI_ZoeigQdExdLpWtpI" />
+                                    <span class="font-medium">Liam Foster</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-slate-600">Wednesday</td>
+                            <td class="px-6 py-4 text-slate-600">9:00 AM</td>
+                            <td class="px-6 py-4 text-right space-x-2">
+                                <button
+                                    class="rounded-md bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-200">View
+                                    Attendance</button>
+                                <button
+                                    class="rounded-md bg-blue-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-600">Manage
+                                    Attendance</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+    <div class="layout-container flex h-full grow flex-col">
+        <main class="flex-1 bg-slate-50 py-12 px-6 lg:px-8">
+            <div class="mx-auto max-w-7xl">
+                <div class="mb-10 text-center">
+                    <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl">Attendance Hub</h1>
+                    <p class="mt-4 text-xl text-gray-600">Your central point for managing session attendance.</p>
+                </div>
+                <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
+                    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:col-span-2 lg:grid-cols-2">
+                        <div
+                            class="group relative flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md transition-all hover:shadow-xl hover:-translate-y-1">
+                            <div class="flex flex-col p-6">
+                                <div
+                                    class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary-100 text-primary-600">
+                                    <span class="material-symbols-outlined text-3xl">groups</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-900">Manage Group Session Attendance</h3>
+                                <p class="mt-2 text-base text-gray-600">Access and manage attendance records for all
+                                    your group mentoring sessions.</p>
+                            </div>
+                            <div class="mt-auto p-6 pt-0">
+                                <a class="inline-flex items-center gap-2 text-sm font-semibold text-primary-600 hover:text-primary-800"
+                                    href="#">
+                                    Go to Group Sessions
+                                    <span class="material-symbols-outlined">arrow_forward</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div
+                            class="group relative flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md transition-all hover:shadow-xl hover:-translate-y-1">
+                            <div class="flex flex-col p-6">
+                                <div
+                                    class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary-100 text-primary-600">
+                                    <span class="material-symbols-outlined text-3xl">person</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-900">Manage Private Session Attendance</h3>
+                                <p class="mt-2 text-base text-gray-600">Manage attendance for individual code review
+                                    sessions with your mentees.</p>
+                            </div>
+                            <div class="mt-auto p-6 pt-0">
+                                <a class="inline-flex items-center gap-2 text-sm font-semibold text-primary-600 hover:text-primary-800"
+                                    href="#">
+                                    Go to Private Sessions
+                                    <span class="material-symbols-outlined">arrow_forward</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div
+                            class="group relative flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md transition-all hover:shadow-xl hover:-translate-y-1 md:col-span-2 lg:col-span-2">
+                            <div class="flex flex-col p-6">
+                                <div
+                                    class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary-100 text-primary-600">
+                                    <span class="material-symbols-outlined text-3xl">history</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-900">View Attendance History</h3>
+                                <p class="mt-2 text-base text-gray-600">Review historical attendance data for all your
+                                    mentoring activities.</p>
+                            </div>
+                            <div class="mt-auto p-6 pt-0">
+                                <a class="inline-flex items-center gap-2 text-sm font-semibold text-primary-600 hover:text-primary-800"
+                                    href="#">
+                                    View History
+                                    <span class="material-symbols-outlined">arrow_forward</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col rounded-xl border border-gray-200 bg-white p-6 shadow-md">
+                        <h2 class="text-2xl font-bold text-gray-900">Upcoming Sessions</h2>
+                        <p class="mt-1 text-gray-600">A quick look at your next sessions.</p>
+                        <div class="mt-6 space-y-4">
+                            <div class="flex items-start gap-4 rounded-lg p-4 transition-colors hover:bg-gray-50">
+                                <div
+                                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-100 text-primary-600">
+                                    <span class="material-symbols-outlined text-xl">groups</span>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-900">Group Session: Advanced CSS</h3>
+                                    <p class="text-sm text-gray-600">Oct 26, 2023 - 3:00 PM</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4 rounded-lg p-4 transition-colors hover:bg-gray-50">
+                                <div
+                                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-100 text-primary-600">
+                                    <span class="material-symbols-outlined text-xl">person</span>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-900">Private Code Review: React Hooks</h3>
+                                    <p class="text-sm text-gray-600">Oct 27, 2023 - 10:00 AM</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4 rounded-lg p-4 transition-colors hover:bg-gray-50">
+                                <div
+                                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-100 text-primary-600">
+                                    <span class="material-symbols-outlined text-xl">groups</span>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-900">Group Session: JS Fundamentals</h3>
+                                    <p class="text-sm text-gray-600">Oct 28, 2023 - 1:00 PM</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <a class="flex w-full items-center justify-center gap-2 rounded-lg bg-(--primary-color) px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-600"
+                                href="#">
+                                <span>View All Sessions</span>
+                                <span class="material-symbols-outlined text-base">arrow_forward</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}

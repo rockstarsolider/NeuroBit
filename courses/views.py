@@ -48,6 +48,38 @@ class MnetorFeedbackListView(LoginRequiredMixin, ListView):
     def get(self, request):
         return render(request, 'courses/mentor/mentor_feedback_list.html')
     
-class MnetorFeedbackView(LoginRequiredMixin, ListView):
+class MnetorFeedbackView(LoginRequiredMixin, View):
     def get(self, request):
         return render(request, 'courses/mentor/mentor_feedback.html')
+    
+class AttendaceHubView(LoginRequiredMixin, View):
+    def get(self, request):
+        return render(request, 'courses/mentor/attendance_hub.html')
+    
+class LearnersListView(LoginRequiredMixin, ListView):
+    def get(self, request):
+        return render(request, 'courses/mentor/learners_list.html')
+    
+class SessionListView(LoginRequiredMixin, ListView):
+    def get(self, request):
+        return render(request, 'courses/mentor/session_list.html')
+    
+class GroupSessionAttendanceView(LoginRequiredMixin, ListView):
+    def get(self, request):
+        return render(request, 'courses/mentor/group_session_attendance.html')
+    
+class PrivateSessionAttendanceView(LoginRequiredMixin, ListView):
+    def get(self, request):
+        return render(request, 'courses/mentor/private_session_attendance.html')
+    
+class PrivateSessionManageView(LoginRequiredMixin, View):
+    def get(self, request):
+        return render(request, 'courses/mentor/private_session_manage.html')
+
+class LearnerAttendanceHistoryView(LoginRequiredMixin, ListView):
+    def get(self, request):
+        return render(request, 'courses/mentor/learner_attendance_history.html')
+    
+class GroupAttendanceHistoryView(LoginRequiredMixin, ListView):
+    def get(self, request):
+        return render(request, 'courses/mentor/group_attend_history.html')

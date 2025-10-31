@@ -15,4 +15,12 @@ urlpatterns = [
 
     path('mentor_feedback_list/', views.MnetorFeedbackListView.as_view(), name='mentor-feedback-list'),
     path('mentor_feedback/', views.MnetorFeedbackView.as_view(), name='mentor-feedback'),
+    path('attendance_hub/', views.AttendaceHubView.as_view(), name='attendance-hub'),
+    path('learners_list/', views.LearnersListView.as_view(), name='learners-list'),
+    path('session_list/', views.SessionListView.as_view(), name='session-list'),
+    path('group_session_attendance/', views.GroupSessionAttendanceView.as_view(), name='group-session-attendance'),
+    path('private_session_attendance/', views.PrivateSessionAttendanceView.as_view(), name='private-session-attendance'),
+    path('private_session_manage/', views.PrivateSessionManageView.as_view(), name='private-session-manage'),
+    path('learner_attendance_history/', views.LearnerAttendanceHistoryView.as_view(), name='learner-attendance-history'),
+    path('group_attendance_history/', views.GroupAttendanceHistoryView.as_view(), name='group-attendance-history'),
 ]

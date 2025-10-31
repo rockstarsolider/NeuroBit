@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex h-screen flex-col">
+    <main class="flex-1 overflow-y-auto bg-gray-100">
+        <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+            <div class="flex flex-col gap-8">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-3xl font-bold text-gray-900">My Learners</h2>
+                    <button
+                        class="flex items-center gap-2 rounded-md bg-[var(--primary-color)] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-600">
+                        <span class="material-symbols-outlined"> add </span>
+                        <span>Add Learner</span>
+                    </button>
+                </div>
+                <div class="flex flex-col gap-4">
+                    <div class="relative w-full max-w-xs">
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                            <span class="material-symbols-outlined text-gray-400"> search </span>
+                        </div>
+                        <input
+                            class="w-full rounded-md border-gray-300 bg-white py-2 pl-10 pr-4 text-sm text-gray-800 focus:border-[var(--primary-color)] focus:ring-[var(--primary-color)]"
+                            placeholder="Search learners..." type="text" />
+                    </div>
+                    <div class="border-b border-gray-200">
+                        <nav aria-label="Tabs" class="-mb-px flex space-x-8">
+                            <a class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium"
+                                href="#"> All Learners </a>
+                            <a aria-current="page"
+                                class="border-[var(--primary-color)] text-[var(--primary-color)] whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium"
+                                href="#"> Active Learners </a>
+                            <a class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium"
+                                href="#"> Inactive Learners </a>
+                        </nav>
+                    </div>
+                </div>
+                <div class="overflow-x-auto rounded-lg border border-gray-200 bg-white">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500"
+                                    scope="col">
+                                    <div class="flex items-center gap-1">
+                                        Name
+                                        <span
+                                            class="material-symbols-outlined text-base text-gray-400">arrow_upward</span>
+                                    </div>
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500"
+                                    scope="col">
+                                    <div class="flex items-center gap-1">
+                                        Learning Path
+                                        <span
+                                            class="material-symbols-outlined text-base text-gray-400">unfold_more</span>
+                                    </div>
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500"
+                                    scope="col">
+                                    <div class="flex items-center gap-1">
+                                        Start Date
+                                        <span
+                                            class="material-symbols-outlined text-base text-gray-400">unfold_more</span>
+                                    </div>
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500"
+                                    scope="col">
+                                    <div class="flex items-center gap-1">
+                                        User Type
+                                        <span
+                                            class="material-symbols-outlined text-base text-gray-400">unfold_more</span>
+                                    </div>
+                                </th>
+                                <th class="relative px-6 py-3" scope="col">
+                                    <span class="sr-only">Actions</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 bg-white">
+                            <tr>
+                                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
+                                    <div class="flex items-center gap-3">
+                                        <img alt="Sophia Clark's profile picture" class="h-8 w-8 rounded-full"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDlEQo-5Ijpcy-_9AC4RD3KupTFfE1rN8ZJtA7Az957F6yXQAn9-WNe-I0GcOJuDlYuOKmSRq_ylclVJ2iC3wMgYJW46LxR4SGv85NIOqP7Yvd24CQktEuVjRGQRODPDoxK9jFzRbiFj-o_O6sPaY09c3XHZMJIBmEola9DjjP1aejgvuuzeY5gV5ID20f0w-SJptu_ylzWlNNgIId9nPY4N1H9eUcp3IQzTeDdF9TD9o7TNZlYgxTZV9fu6Ua_3uZMkb1REJ8HmM" />
+                                        <a class="hover:text-[var(--primary-color)] hover:underline" href="#">Sophia
+                                            Clark</a>
+                                    </div>
+                                </td>
+                                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">Data Science Fundamentals
+                                </td>
+                                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">September 15, 2023</td>
+                                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">Basic</td>
+                                <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                                    <a class="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                                        href="#">View Profile</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
+                                    <div class="flex items-center gap-3">
+                                        <img alt="Ethan Miller's profile picture" class="h-8 w-8 rounded-full"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhXyEnwfTZE97BFJSQkPJvGXGfvgljb3VFmO5NAQ_47HV6DBlnAQpBiPUzwt3TX0-hWhtaOMCoeTjYNB8Vvv-7gJ_iWP1E-QexJyi91HYbREHO1RqqriIKaxot_tXuQyusOZC3iwrq2iG6MzK2XWF5yulk6LH7-gCcRUPXsVWstWGJX_4Jtm6bwjEt8SCallnaKCvYm2W2dFtI2w9RP2AToYgqgi7L8IUTxV0X5SPK4z1oawfLGpXkUG0sJxoXMKBdT0nPLO0UMcw" />
+                                        <a class="hover:text-[var(--primary-color)] hover:underline" href="#">Ethan
+                                            Miller</a>
+                                    </div>
+                                </td>
+                                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">Web Development Bootcamp
+                                </td>
+                                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">October 20, 2023</td>
+                                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">Plus</td>
+                                <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                                    <a class="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                                        href="#">View Profile</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
+                                    <div class="flex items-center gap-3">
+                                        <img alt="Olivia Davis's profile picture" class="h-8 w-8 rounded-full"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBauYwXOPFQPch3Q67oaj2yOjwYX1VnXS-zHTjMbKso-kj-rFl2wX05TG4SUp4Ks1c_nXNMxY-zr7tDHbdTR0MtqJHS9I3XmuA3i_QwS0GBvjSJ3VJM_27B2uJekPTsG_uYc-Vw8V0enbp4ZEyt04r0OTOFro-ZA-wR3JlMDsDVGPUTf3EyaJQNo93w-PYTcKwtognIShG9eSx3ZTdYfQKPBcfm1FFBoLnm1T4vyBxVYF2kOemPFMjpCIbYYo2vVMBDa2q4XNXfzhk" />
+                                        <a class="hover:text-[var(--primary-color)] hover:underline" href="#">Olivia
+                                            Davis</a>
+                                    </div>
+                                </td>
+                                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">UX/UI Design Masterclass
+                                </td>
+                                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">November 05, 2023</td>
+                                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">Pro</td>
+                                <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                                    <a class="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                                        href="#">View Profile</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
+                                    <div class="flex items-center gap-3">
+                                        <img alt="Liam Wilson's profile picture" class="h-8 w-8 rounded-full"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5t08bZAhyCbB4mo-xX67FM7UHoHNqWPClQZ6PYD-CBjsJtsCT-loO52kpeYJLETdASmgqKp86oaLwz3kt1UZKnDV77ZFmaJ0Kv-sm3saQUhWsfWdvkzknubMECxzbg7Tcy-SOOj-SiFTWziQAuQUAUTMboTODY6TVMMo-tbK3cPvFBjFt34h5QzZHZULiN9EQT_Cb27l0qQKmlr88n1riNiFP5O0JsVAAjY_Niy-LA33hZ-yC2Le2CZM8pSMfGTi4gtNAq4WDNHY" />
+                                        <a class="hover:text-[var(--primary-color)] hover:underline" href="#">Liam
+                                            Wilson</a>
+                                    </div>
+                                </td>
+                                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">Mobile App Development
+                                </td>
+                                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">December 10, 2023</td>
+                                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">Plus</td>
+                                <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                                    <a class="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                                        href="#">View Profile</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
+                                    <div class="flex items-center gap-3">
+                                        <img alt="Ava Martinez's profile picture" class="h-8 w-8 rounded-full"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLtPbtIccM_-Srm6G-5wS-J6Q4zYoN1f_uu5sESkFXR_0dI9VsX8KVW571fQn7ra8549PVp5_EkOn420IAhJTkHtU9pNuIjwJLbD2SbQCANDpwqvuBibPkkZyNrmMhSlIGYKCYDIGPEaqIx-byzHE1Jlmg28ijKfzutrhEOuwiE_Cf_6_SzcbreEImWQNQnZvIokwV1mmIToL2YenA070DvjBZM9LmhTP6g6rKBvtC3kh68zEPcDlst_TiMB-MD9SbB-7VZ9V59yA" />
+                                        <a class="hover:text-[var(--primary-color)] hover:underline" href="#">Ava
+                                            Martinez</a>
+                                    </div>
+                                </td>
+                                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">Digital Marketing Strategy
+                                </td>
+                                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">January 15, 2024</td>
+                                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">Basic</td>
+                                <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                                    <a class="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                                        href="#">View Profile</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
