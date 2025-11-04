@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-31 14:54+0330\n"
-"PO-Revision-Date: 2025-10-31 14:58+0330\n"
+"POT-Creation-Date: 2025-11-04 01:13+0330\n"
+"PO-Revision-Date: 2025-11-04 01:17+0330\n"
 "Last-Translator: پوریا غیاثی <pouriaghiasi3@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -221,7 +221,80 @@ msgstr ""
 
 #: .\courses\admin.py:984
 msgid "Expired"
-msgstr ""
+msgstr "منقضی شده"
+
+#: .\courses\forms.py:9
+msgid "Hire Date"
+msgstr "تاریخ استخدام"
+
+#: .\courses\forms.py:19
+msgid "Address"
+msgstr "آدرس"
+
+#: .\courses\forms.py:27
+msgid "Bio"
+msgstr "درباره من"
+
+#: .\courses\forms.py:36
+msgid "Specialties"
+msgstr "تخصص ها "
+
+#: .\courses\forms.py:45
+#| msgid "Enter your phone number"
+msgid "Mother phone number"
+msgstr "شماره مادر"
+
+#: .\courses\forms.py:54
+#| msgid "Enter your phone number"
+msgid "Father phone number"
+msgstr "شماره پدر"
+
+#: .\courses\forms.py:66
+msgid "Username"
+msgstr "نام کاربری"
+
+#: .\courses\forms.py:67
+msgid "First Name"
+msgstr "نام"
+
+#: .\courses\forms.py:68
+msgid "Last Name"
+msgstr "نام خانوادگی"
+
+#: .\courses\forms.py:69
+msgid "Email"
+msgstr "ایمیل"
+
+#: .\courses\forms.py:70
+msgid "Birthdate"
+msgstr "تاریخ تولد"
+
+#: .\courses\forms.py:71
+#| msgid "Profile"
+msgid "Profile Image"
+msgstr "تصویر پروفایل"
+
+#: .\courses\templates\courses\edit_profile.html:10
+#: .\courses\templates\courses\profile_overview.html:27
+msgid "Edit Profile"
+msgstr "ویرایش پروفایل"
+
+#: .\courses\templates\courses\edit_profile.html:11
+msgid "Update your personal information and profile picture."
+msgstr "اطلاعات و تصویر پروفایل خود را ویرایش کنید"
+
+#: .\courses\templates\courses\edit_profile.html:18
+#| msgid "Profile"
+msgid "Profile Picture"
+msgstr "تصویر پروفایل"
+
+#: .\courses\templates\courses\edit_profile.html:58
+msgid "Cancel"
+msgstr "بازگشت به داشبورد"
+
+#: .\courses\templates\courses\edit_profile.html:62
+msgid "Save Changes"
+msgstr "ثبت تغییرات"
 
 #: .\courses\templates\courses\learner_dash.html:9
 msgid "Welcome back, "
@@ -313,6 +386,18 @@ msgstr "پروفایل"
 #: .\templates\partials\head\header.html:16
 msgid "Support"
 msgstr "پشتیبانی"
+
+#: .\courses\templates\courses\profile_overview.html:34
+#, fuzzy
+#| msgid "Continue Learning Path"
+msgid "Completed Learning Paths"
+msgstr "ادامه مسیر یادگیری"
+
+#: .\courses\templates\courses\profile_overview.html:55
+#, fuzzy
+#| msgid "Learning Paths"
+msgid "In Progress Learning Paths"
+msgstr "مسیر های یادگیری"
 
 #: .\pages\admin.py:16
 msgid "created_at"

@@ -1,6 +1,13 @@
-from django.shortcuts import render
-from django.views.generic import View, ListView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import render, get_object_or_404, redirect
+from django.views.generic import View, ListView, TemplateView, UpdateView
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from .models import Learner, Learner
+from core.models import CustomUser
+from django.db.models import Max, Count, Q
+from django.urls import reverse_lazy
+from .forms import ProfileForm
+from django.contrib import messages
+from django.utils.translation import gettext_lazy as _
 
 # Learner side Views
 class LearnerDashboardView(LoginRequiredMixin, View):
@@ -21,11 +28,50 @@ class TaskSubmissionView(LoginRequiredMixin, View):
     
 class ProfileOverviewView(LoginRequiredMixin, View):
     def get(self, request):
-        return render(request, 'courses/profile_overview.html')
+        learner = get_object_or_404(Learner, user=request.user)
+        enrollments = (
+            learner.enrollments
+            .select_related("learning_path")
+            .annotate(
+                total=Count("learning_path__steps", distinct=True),
+                done=Count(
+                    "learning_path__steps__step_progresses",
+                    filter=Q(learning_path__steps__step_progresses__task_completion_date__isnull=False),
+                    distinct=True
+                ),
+                last_done=Max("learning_path__steps__step_progresses__task_completion_date")
+            )
+        )
+
+        ongoing, completed = [], []
+        for e in enrollments:
+            print(e, e.done)
+            p = round((e.done / e.total * 100), 1) if e.total else 0
+            data = {"path": e.learning_path, "status": e.status, "progress": p, "completed_date": e.last_done or e.unenroll_date}
+            (completed if e.status == "graduated" else ongoing).append(data)
+
+        return render(request, "courses/profile_overview.html", {
+            "learner": learner,
+            "ongoing_paths": ongoing,
+            "completed_paths": completed,
+        })
     
-class EditProfileView(LoginRequiredMixin, View):
-    def get(self, request):
-        return render(request, 'courses/edit_profile.html')
+class EditProfileView(LoginRequiredMixin, UpdateView):
+    model = CustomUser
+    template_name = "courses/edit_profile.html"
+    form_class = ProfileForm
+    success_url = reverse_lazy("learner-dashboard")
+
+    def get_object(self):
+        return self.request.user
+    
+    def form_valid(self, form):
+        messages.success(self.request, _("Your profile has been updated successfully."))
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, _("There was an error updating your profile. Please check the form."))
+        return super().form_invalid(form)
     
 class LearningPathView(LoginRequiredMixin, View):
     def get(self, request):

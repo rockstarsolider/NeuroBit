@@ -233,6 +233,19 @@ class LearnerEnrollment(models.Model):
 
     def __str__(self):
         return f"{self.learner} → {self.learning_path}"
+    
+    def get_progress_percent(self) -> float:
+        """Return the completion percentage of this enrollment."""
+        total_steps = self.learning_path.steps.count()
+        if not total_steps:
+            return 0.0
+
+        completed_steps = StepProgress.objects.filter(
+            mentor_assignment__enrollment=self,
+            task_completion_date__isnull=False
+        ).count()
+
+        return round((completed_steps / total_steps) * 100, 1)
 
 
 class MentorAssignment(models.Model):
@@ -242,7 +255,7 @@ class MentorAssignment(models.Model):
     end_date = models.DateField(null=True, blank=True)
     reason_for_change = models.TextField(blank=True)
     # if the learner was pro
-    code_review_pro_session_datetime = models.DateTimeField(blank=True, null=True)
+    code_review_pro_session_datetime = models.DateTimeField(blank=True, null=True) # Private
     code_review_session_day = models.PositiveSmallIntegerField(choices=Weekday, default=Weekday.SAT)
     code_review_session_time = models.TimeField(default=timezone.now)
 

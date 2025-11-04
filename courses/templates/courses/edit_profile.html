@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block content %}
 <div class="relative flex min-h-screen w-full flex-col group/design-root overflow-x-hidden bg-slate-50">
@@ -6,144 +7,60 @@
         <main class="flex-1 px-4 sm:px-6 lg:px-8 py-12">
             <div class="max-w-3xl mx-auto">
                 <div class="bg-white rounded-lg shadow-sm p-8">
-                    <h1 class="text-3xl font-bold leading-tight tracking-tight mb-2">Edit Mentor Profile</h1>
-                    <p class="text-gray-500 mb-8">Update your personal information and profile picture.</p>
-                    <form class="space-y-6">
+                    <h1 class="text-3xl font-bold leading-tight tracking-tight mb-2">{% trans "Edit Profile" %}</h1>
+                    <p class="text-gray-500 mb-8">{% trans "Update your personal information and profile picture." %}</p>
+
+                    <form method="post" enctype="multipart/form-data" class="space-y-6">
+                        {% csrf_token %}
+
+                        <!-- Profile Image -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Profile Picture</label>
+                            <label class="block text-sm font-medium text-gray-700">{% trans "Profile Picture" %}</label>
                             <div class="mt-2 flex items-center space-x-4">
-                                <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-16"
-                                    style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDLDw2lOs8TJ0MRUCV85ztzrC4gDhnIJnaryPY8EOJn4ucZfNuaHj_a9DkHqEz16w3b5XJKlLpmKGpJhogtyH82t8LihF3G0OJXUbxAVfQ7FzhjPOhe2wUIs1UormgUgHEajGPVWzLS-5N-1xpFxKsLryJOOSWXm8LwG-nkaegk8Yl-pWCnlzTkrkDTLGuQUzbrlyRKYAJiKK6m6Jrz4By1cuwMcERZ9kgYb2O71T-aK0PUE_CjXHDviithtdWDP_zJeZ7DRJyCuUg");'>
-                                </div>
-                                <label
-                                    class="relative cursor-pointer rounded-md bg-white font-medium text-[var(--primary-color)] hover:text-green-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-[var(--primary-color)]"
-                                    for="file-upload">
-                                    <span>Upload a file</span>
-                                    <input class="sr-only" id="file-upload" name="file-upload" type="file" />
-                                </label>
+                                {% if user.image %}
+                                    <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-16"
+                                         style='background-image: url("{{ user.image.url }}");'></div>
+                                {% else %}
+                                    <div class="bg-gray-200 rounded-full size-16 flex items-center justify-center text-gray-500">
+                                        <span class="material-symbols-outlined">person</span>
+                                    </div>
+                                {% endif %}
+                                {{ form.image }}
                             </div>
                         </div>
+
+                        <!-- Auto fields -->
                         <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700" for="username">Username</label>
-                                <input
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--primary-color)] focus:ring-[var(--primary-color)] sm:text-sm h-12 px-4 bg-gray-100 cursor-not-allowed"
-                                    id="username" readonly="" type="text" value="mentor.doe" />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700" for="password">Password</label>
-                                <input
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--primary-color)] focus:ring-[var(--primary-color)] sm:text-sm h-12 px-4 bg-gray-100 cursor-not-allowed"
-                                    id="password" readonly="" type="password" value="**********" />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700" for="first-name">First
-                                    Name</label>
-                                <input
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--primary-color)] focus:ring-[var(--primary-color)] sm:text-sm h-12 px-4"
-                                    id="first-name" type="text" value="Mentor" />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700" for="last-name">Last Name</label>
-                                <input
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--primary-color)] focus:ring-[var(--primary-color)] sm:text-sm h-12 px-4"
-                                    id="last-name" type="text" value="Doe" />
-                            </div>
-                            <div class="sm:col-span-2">
-                                <label class="block text-sm font-medium text-gray-700" for="email">Email Address</label>
-                                <input
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--primary-color)] focus:ring-[var(--primary-color)] sm:text-sm h-12 px-4"
-                                    id="email" type="email" value="mentor.doe@example.com" />
-                            </div>
-                            <div class="sm:col-span-2">
-                                <label class="block text-sm font-medium text-gray-700" for="phone-number">Phone
-                                    Number</label>
-                                <input
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--primary-color)] focus:ring-[var(--primary-color)] sm:text-sm h-12 px-4"
-                                    id="phone-number" type="tel" value="+1 123-456-7890" />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700" for="birth-date">Birth
-                                    Date</label>
-                                <input
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--primary-color)] focus:ring-[var(--primary-color)] sm:text-sm h-12 px-4"
-                                    id="birth-date" type="date" />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700" for="hire-date">Hire Date</label>
-                                <input
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--primary-color)] focus:ring-[var(--primary-color)] sm:text-sm h-12 px-4 bg-gray-100 cursor-not-allowed"
-                                    id="hire-date" readonly="" type="date" value="2023-01-15" />
-                            </div>
-                            <div class="sm:col-span-2">
-                                <label class="block text-sm font-medium text-gray-700" for="address">Address</label>
-                                <input
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--primary-color)] focus:ring-[var(--primary-color)] sm:text-sm h-12 px-4"
-                                    id="address" type="text" value="123 Education Lane, Knowledge City" />
-                            </div>
-                            <div class="sm:col-span-2">
-                                <label class="block text-sm font-medium text-gray-700" for="bio">Bio</label>
-                                <textarea
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--primary-color)] focus:ring-[var(--primary-color)] sm:text-sm p-4"
-                                    id="bio" rows="4"></textarea>
-                            </div>
-                            <div class="sm:col-span-2 pt-6 border-t border-gray-200">
-                                <label class="block text-sm font-medium text-gray-700"
-                                    for="specialties">Specialties/Subjects Taught</label>
-                                <p class="text-sm text-gray-500 mt-1">Add subjects or skills you specialize in.</p>
-                                <div class="mt-2 flex items-center space-x-2">
-                                    <input
-                                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--primary-color)] focus:ring-[var(--primary-color)] sm:text-sm h-12 px-4"
-                                        id="specialties" placeholder="e.g., Mathematics, Guitar, Public Speaking"
-                                        type="text" />
-                                    <button
-                                        class="inline-flex items-center justify-center rounded-md border border-transparent bg-[var(--primary-color)] py-3 px-4 text-sm font-bold text-white shadow-sm hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary-color)]"
-                                        type="button">
-                                        <span class="material-symbols-outlined -ml-1 mr-2">add</span>
-                                        Add
-                                    </button>
-                                </div>
-                                <div class="mt-4 flex flex-wrap gap-2">
-                                    <span
-                                        class="inline-flex items-center rounded-full bg-green-100 py-1.5 px-3 text-sm font-medium text-green-800">
-                                        Mathematics
-                                        <button
-                                            class="ml-2 flex-shrink-0 rounded-full text-green-500 hover:text-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-green-100"
-                                            type="button">
-                                            <span class="sr-only">Remove Mathematics</span>
-                                            <span class="material-symbols-outlined text-base">close</span>
-                                        </button>
-                                    </span>
-                                    <span
-                                        class="inline-flex items-center rounded-full bg-green-100 py-1.5 px-3 text-sm font-medium text-green-800">
-                                        Creative Writing
-                                        <button
-                                            class="ml-2 flex-shrink-0 rounded-full text-green-500 hover:text-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-green-100"
-                                            type="button">
-                                            <span class="sr-only">Remove Creative Writing</span>
-                                            <span class="material-symbols-outlined text-base">close</span>
-                                        </button>
-                                    </span>
-                                    <span
-                                        class="inline-flex items-center rounded-full bg-green-100 py-1.5 px-3 text-sm font-medium text-green-800">
-                                        Physics
-                                        <button
-                                            class="ml-2 flex-shrink-0 rounded-full text-green-500 hover:text-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-green-100"
-                                            type="button">
-                                            <span class="sr-only">Remove Physics</span>
-                                            <span class="material-symbols-outlined text-base">close</span>
-                                        </button>
-                                    </span>
-                                </div>
-                            </div>
+                            {% for field in form.visible_fields %}
+                                {% if field.name != 'image' %}
+                                    <div class="{% if field.name in 'email address bio specialties' %}sm:col-span-2{% endif %}">
+                                        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                                            {{ field.label }}
+                                        </label>
+                                        <div class="mt-1">
+                                            {{ field }}
+                                            {% if field.help_text %}
+                                                <p class="text-sm text-gray-500 mt-1">{{ field.help_text }}</p>
+                                            {% endif %}
+                                            {% for error in field.errors %}
+                                                <p class="text-sm text-red-600 mt-1">{{ error }}</p>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
                         </div>
+
+                        <!-- Buttons -->
                         <div class="border-t border-gray-200 mt-8 pt-6 flex justify-end gap-3">
-                            <button
-                                class="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary-color)]"
-                                type="button">Cancel</button>
-                            <button
-                                class="inline-flex justify-center rounded-md border border-transparent bg-[var(--primary-color)] py-2 px-4 text-sm font-bold text-white shadow-sm hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary-color)]"
-                                type="submit">Save Changes</button>
+                            <a href="{% url 'learner-dashboard' %}"
+                               class="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-(--primary-color)">
+                                {% trans "Cancel" %}
+                            </a>
+                            <button type="submit"
+                                    class="rounded-md border bg-(--primary-color) border-gray-300 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-600 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-(--primary-color)">
+                                {% trans "Save Changes" %}
+                            </button>
                         </div>
                     </form>
                 </div>

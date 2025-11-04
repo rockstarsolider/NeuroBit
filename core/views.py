@@ -35,7 +35,7 @@ def verify_otp(request):
 
         if otp == session_otp:
             user, created = User.objects.get_or_create(
-                phone_number=phone, defaults={"username": phone}
+                phone_number=phone
             )
             login(request, user)
             for k in ("otp", "phone", "otp_time"): request.session.pop(k, None)
