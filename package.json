@@ -33,6 +33,7 @@
   "dependencies": {
     "alpinejs": "^3.15.1",
     "chart.js": "^4.5.0",
+    "htmx.org": "^2.0.8",
     "material-symbols": "^0.38.0",
     "motion": "^12.18.1",
     "plotly.js": "^3.1.0",

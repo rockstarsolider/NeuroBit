@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block content %}
 <div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden bg-slate-50">
@@ -6,232 +7,45 @@
         <main class="flex flex-1 justify-center px-4 py-10 sm:px-6 lg:px-8">
             <div class="w-full max-w-7xl">
                 <div class="mb-8 flex flex-col gap-2">
-                    <h1 class="text-4xl font-bold tracking-tight text-slate-900">Weekly Tasks</h1>
-                    <p class="text-base font-normal leading-normal text-slate-500">Manage your tasks for the week ahead
-                        and stay on track.</p>
+                    <h1 class="text-4xl font-bold tracking-tight text-slate-900">{% trans "Weekly Tasks"%}</h1>
+                    <p class="text-base font-normal leading-normal text-slate-500">{% trans "Manage your tasks for the week ahead and stay on track."%}</p>
                 </div>
                 <div class="mb-8 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
                     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div class="flex flex-col gap-1">
-                            <h3 class="text-lg font-semibold text-slate-800">Weekly Progress</h3>
-                            <p class="text-sm text-slate-500">2 of 4 tasks completed</p>
+                            <h3 class="text-lg font-semibold text-slate-800">{% trans 'Weekly Progress'%}</h3>
+                            <p class="text-sm text-slate-500">
+                                {% if due_date %} 
+                                    {% trans 'Due date:'%} {{due_date}} 
+                                    <a class='text-(--primary-color) hover:underline' href='{%url 'step-promise'%}'>{% trans 'Edit Promise'%}</a>
+                                {%else%} 
+                                    <a class='text-(--primary-color) hover:underline' href='{%url 'step-promise'%}'>{% trans 'Set Promise'%}</a>
+                                {% endif %}
+                            </p>
                         </div>
                         <div class="w-full sm:w-64">
                             <div class="h-2.5 w-full rounded-full bg-slate-100">
-                                <div class="h-2.5 w-1/2 rounded-full bg-[var(--primary-color)]"></div>
+                                <div class="h-2.5 w-[{{progress_percent}}%] {%if progress_percent == 0%} w-0 {%endif%} rounded-full bg-[var(--primary-color)]"></div>
                             </div>
                         </div>
                         <div class="flex items-center gap-4">
                             <div class="flex items-center gap-2">
                                 <div class="h-3 w-3 rounded-full bg-emerald-500"></div>
-                                <span class="text-sm font-medium text-slate-600">2 Completed</span>
+                                <span class="text-sm font-medium text-slate-600">{{completed_count}} {% trans 'Completed'%}</span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <div class="h-3 w-3 rounded-full bg-amber-500"></div>
-                                <span class="text-sm font-medium text-slate-600">2 To-Do</span>
+                                <span class="text-sm font-medium text-slate-600">{{remaining_count}} {% trans 'To-Do'%}</span>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="mb-8 flex flex-wrap items-center justify-between gap-4">
-                    <div class="flex items-center gap-2 rounded-lg bg-slate-100 p-1">
-                        <button
-                            class="flex h-9 min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-md bg-[var(--primary-color)] px-4 text-sm font-semibold leading-normal text-white transition-colors duration-300">
-                            <span class="truncate">All</span>
-                        </button>
-                        <button
-                            class="flex h-9 min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-md bg-transparent px-4 text-sm font-semibold leading-normal text-slate-600 transition-colors duration-300 hover:bg-slate-200">
-                            <span class="truncate">Completed</span>
-                        </button>
-                        <button
-                            class="flex h-9 min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-md bg-transparent px-4 text-sm font-semibold leading-normal text-slate-600 transition-colors duration-300 hover:bg-slate-200">
-                            <span class="truncate">To Do</span>
-                        </button>
-                    </div>
-                    <div class="relative w-full sm:w-auto">
-                        <input
-                            class="h-11 w-full rounded-lg border border-slate-200 py-2 pl-10 pr-4 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] sm:w-64"
-                            placeholder="Search tasks..." type="text" />
-                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-                            search </span>
-                    </div>
+
+                {% comment %} Tasks, Resources and the form itself are in this partial {% endcomment %}
+                <div id="task-container" class="flex flex-col gap-6 lg:col-span-2">
+                    {% include "courses/partials/task_list_partial.html" %}
                 </div>
-                <div class="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-12">
-                    <div class="flex flex-col gap-6 lg:col-span-2">
-                        <div
-                            class="card-hover flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 ease-in-out sm:flex-row sm:items-center sm:justify-between">
-                            <div class="flex items-start gap-4">
-                                <div
-                                    class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-slate-100 text-base font-bold text-slate-600">
-                                    1</div>
-                                <div class="flex flex-col gap-2">
-                                    <h3 class="text-lg font-semibold leading-tight text-slate-800">Math Assignment</h3>
-                                    <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-                                        <div class="flex items-center gap-2 text-sm">
-                                            <span class="material-symbols-outlined text-base text-slate-500"> event
-                                            </span>
-                                            <p class="font-normal text-slate-500">Due: <span
-                                                    class="font-medium text-slate-600">Friday, Oct 27th</span></p>
-                                        </div>
-                                        <div class="flex items-center gap-2 text-sm">
-                                            <span class="material-symbols-outlined text-base text-slate-500"> check
-                                            </span>
-                                            <p class="font-normal text-slate-500">Submitted: <span
-                                                    class="font-medium text-slate-600">Thursday, Oct 26th</span></p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex shrink-0 items-center gap-3 self-end sm:self-center">
-                                <div class="flex items-center gap-2 rounded-full bg-blue-100 px-3 py-1 text-blue-700">
-                                    <span class="material-symbols-outlined text-base"> task_alt </span>
-                                    <span class="text-sm font-medium">Evaluated</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div
-                            class="card-hover flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 ease-in-out sm:flex-row sm:items-center sm:justify-between">
-                            <div class="flex items-start gap-4">
-                                <div
-                                    class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-slate-100 text-base font-bold text-slate-600">
-                                    2</div>
-                                <div class="flex flex-col gap-2">
-                                    <h3 class="text-lg font-semibold leading-tight text-slate-800">History Essay</h3>
-                                    <div class="flex items-center gap-2 text-sm">
-                                        <span class="material-symbols-outlined text-base text-slate-500"> event </span>
-                                        <p class="font-normal text-slate-500">Due: <span
-                                                class="font-medium text-slate-600">Monday, Oct 30th</span></p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex shrink-0 items-center gap-3 self-end sm:self-center">
-                                <div class="flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-amber-700">
-                                    <span class="material-symbols-outlined text-base"> pending </span>
-                                    <span class="text-sm font-medium">To Do</span>
-                                </div>
-                                <button
-                                    class="flex h-10 min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-md bg-[var(--primary-color)] px-4 text-sm font-semibold leading-normal text-white transition-colors duration-300 hover:bg-blue-700">
-                                    <span class="material-symbols-outlined text-base"> upload </span>
-                                    <span>Submit</span>
-                                </button>
-                            </div>
-                        </div>
-                        <div
-                            class="card-hover flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 ease-in-out sm:flex-row sm:items-center sm:justify-between">
-                            <div class="flex items-start gap-4">
-                                <div
-                                    class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-slate-100 text-base font-bold text-slate-600">
-                                    3</div>
-                                <div class="flex flex-col gap-2">
-                                    <h3 class="text-lg font-semibold leading-tight text-slate-800">Science Project</h3>
-                                    <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-                                        <div class="flex items-center gap-2 text-sm">
-                                            <span class="material-symbols-outlined text-base text-slate-500"> event
-                                            </span>
-                                            <p class="font-normal text-slate-500">Due: <span
-                                                    class="font-medium text-slate-600">Wednesday, Nov 1st</span></p>
-                                        </div>
-                                        <div class="flex items-center gap-2 text-sm">
-                                            <span class="material-symbols-outlined text-base text-slate-500"> check
-                                            </span>
-                                            <p class="font-normal text-slate-500">Submitted: <span
-                                                    class="font-medium text-slate-600">Wednesday, Nov 1st</span></p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex shrink-0 items-center gap-3 self-end sm:self-center">
-                                <div
-                                    class="flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-emerald-700">
-                                    <span class="material-symbols-outlined text-base"> check_circle </span>
-                                    <span class="text-sm font-medium">Submitted</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div
-                            class="card-hover flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 ease-in-out sm:flex-row sm:items-center sm:justify-between">
-                            <div class="flex items-start gap-4">
-                                <div
-                                    class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-slate-100 text-base font-bold text-slate-600">
-                                    4</div>
-                                <div class="flex flex-col gap-2">
-                                    <h3 class="text-lg font-semibold leading-tight text-slate-800">Literature Review
-                                    </h3>
-                                    <div class="flex items-center gap-2 text-sm">
-                                        <span class="material-symbols-outlined text-base text-slate-500"> event </span>
-                                        <p class="font-normal text-slate-500">Due: <span
-                                                class="font-medium text-slate-600">Friday, Nov 3rd</span></p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex shrink-0 items-center gap-3 self-end sm:self-center">
-                                <div class="flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-amber-700">
-                                    <span class="material-symbols-outlined text-base"> pending </span>
-                                    <span class="text-sm font-medium">To Do</span>
-                                </div>
-                                <button
-                                    class="flex h-10 min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-md bg-[var(--primary-color)] px-4 text-sm font-semibold leading-normal text-white transition-colors duration-300 hover:bg-blue-700">
-                                    <span class="material-symbols-outlined text-base"> upload </span>
-                                    <span>Submit</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div
-                        class="sticky top-10 flex h-fit flex-col gap-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-                        <div class="flex flex-col gap-2">
-                            <h3 class="text-xl font-bold leading-tight tracking-[-0.015em] text-slate-900">Study Items
-                                &amp; Guidelines</h3>
-                            <p class="text-sm font-normal leading-normal text-slate-500">Resources to help you with this
-                                week's tasks.</p>
-                        </div>
-                        <div class="flex flex-col gap-y-6">
-                            <div>
-                                <h4 class="mb-3 text-base font-semibold leading-normal text-slate-800">Study Items</h4>
-                                <ul class="flex flex-col gap-4">
-                                    <li class="flex items-start gap-3">
-                                        <span class="material-symbols-outlined mt-1 text-slate-400"> book </span>
-                                        <div class="flex flex-col">
-                                            <a class="text-sm font-medium leading-normal text-[var(--primary-color)] hover:underline"
-                                                href="#">Chapter 5: The French Revolution</a>
-                                            <p class="text-sm font-normal text-slate-500">Read through the chapter and
-                                                take notes on key events.</p>
-                                        </div>
-                                    </li>
-                                    <li class="flex items-start gap-3">
-                                        <span class="material-symbols-outlined mt-1 text-slate-400"> video_library
-                                        </span>
-                                        <div class="flex flex-col">
-                                            <a class="text-sm font-medium leading-normal text-[var(--primary-color)] hover:underline"
-                                                href="#">Algebra II: Quadratic Equations</a>
-                                            <p class="text-sm font-normal text-slate-500">Watch the tutorial and
-                                                complete the practice problems.</p>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="border-t border-slate-200"></div>
-                            <div>
-                                <h4 class="mb-3 text-base font-semibold leading-normal text-slate-800">Guidelines</h4>
-                                <ul class="flex flex-col gap-4">
-                                    <li class="flex items-start gap-3">
-                                        <span class="material-symbols-outlined mt-1 text-base text-slate-400"> lightbulb
-                                        </span>
-                                        <p class="flex-1 text-sm font-normal text-slate-600">For the history essay,
-                                            focus on creating a clear thesis statement and providing strong supporting
-                                            evidence.</p>
-                                    </li>
-                                    <li class="flex items-start gap-3">
-                                        <span class="material-symbols-outlined mt-1 text-base text-slate-400"> lightbulb
-                                        </span>
-                                        <p class="flex-1 text-sm font-normal text-slate-600">Ensure all citations are in
-                                            APA format for the literature review.</p>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                
             </div>
         </main>
     </div>

@@ -9,6 +9,7 @@ window.inView = inView;
 import '../../css/tailwind.css';
 
 import 'material-symbols';
+import 'htmx.org';
 
 import Alpine from "alpinejs";
 window.Alpine = Alpine;

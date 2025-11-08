@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% load static %}
+{% load i18n %}
 
 {% block content %}
 <div @scroll.window="atTop = (window.pageYOffset &gt; 50) ? false : true"
@@ -15,24 +17,23 @@
                         </div>
                         <div class="p-8 md:p-10 lg:p-12 flex-1 flex flex-col justify-center">
                             <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-900">
-                                Full-Stack Web Development</h1>
-                            <p class="mt-4 text-lg max-w-3xl text-slate-600">Embark on a journey to become a full-stack
-                                developer. Master front-end and back-end technologies to build complete web
-                                applications.</p>
+                                {{enrollment.learning_path}}</h1>
+                            <p class="mt-4 text-lg max-w-3xl text-slate-600">{{enrollment.learning_path.description |safe}}</p>
                             <div class="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-6">
                                 <div class="w-full sm:w-72">
                                     <div class="flex items-center justify-between text-sm text-slate-500 mb-2">
-                                        <span>Progress</span>
-                                        <span class="font-semibold text-slate-700">75%</span>
+                                        <span>{% trans "Progress"%}</span>
+                                        <span class="font-semibold text-slate-700">{{enrollment.get_progress_percent}}%</span>
                                     </div>
                                     <div class="w-full bg-slate-200 rounded-full h-3">
-                                        <div class="bg-[var(--primary-color)] h-3 rounded-full" style="width: 75%">
+                                        <div class="bg-(--primary-color) h-3 rounded-full" style="width: {{enrollment.get_progress_percent}}%">
                                         </div>
                                     </div>
                                 </div>
-                                <button
+                                <a
+                                    href='{% url "step-list" %}'
                                     class="inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/90 h-12 px-10 py-3 text-base font-bold shadow-md hover:shadow-lg transition-shadow">
-                                    Continue Learning </button>
+                                    {% trans 'Continue Learning' %} </a>
                             </div>
                         </div>
                     </div>
@@ -44,18 +45,18 @@
                         <div class="lg:col-span-1">
                             <div class="space-y-10">
                                 <div class="bg-white rounded-xl shadow-lg p-8">
-                                    <h3 class="text-xl font-bold text-slate-900 mb-6">Path Details</h3>
+                                    <h3 class="text-xl font-bold text-slate-900 mb-6">{% trans "Path Details"%}</h3>
                                     <div class="space-y-6">
                                         <div class="flex items-start gap-4">
                                             <span class="material-symbols-outlined text-3xl text-primary-color mt-1">
                                                 person_pin </span>
                                             <div>
-                                                <p class="text-sm font-medium text-slate-500">Mentor</p>
+                                                <p class="text-sm font-medium text-slate-500">{% trans "Mentor"%}</p>
                                                 <div class="flex items-center gap-3 mt-1">
-                                                    <img alt="Mentor profile picture"
+                                                    <img alt="Mentor profile picture" ``
                                                         class="w-12 h-12 rounded-full object-cover"
-                                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZFkrx5h2JXzQW-XzdXBk5xnn4Wvedd2ytGCLa2mA0PIGC6pdLhiw3etfAjGWVullT-3BPNqXqf_Xwb0HiAQbMDyPc7RBlSauwwFQ-jwluIO_rl5FamV8MYCdAYFnKvHt-orRGUqjHgWCJlNQ5ixyIs8dxgrrdH2CTjEVJLXQkUFgsmGmrIZbKusMXsP7Xp6dWN46xogV2PANyjdVMfnjl99oiT_xSVIAQM5eEiDf2M_kH69wOwuh6kz4BEfHpb_AqfOHUcg2wr-M" />
-                                                    <p class="font-semibold text-slate-800 text-lg">Dr. Angela Yu</p>
+                                                        src="{% if mentor_assignment.mentor.user.image %}{{ mentor_assignment.mentor.user.image.url }}{% else %}{% static "images/default_user_image.jpg" %}{% endif %}" />
+                                                    <p class="font-semibold text-slate-800 text-lg">{{mentor}}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -63,19 +64,18 @@
                                             <span class="material-symbols-outlined text-3xl text-primary-color mt-1">
                                                 workspace_premium </span>
                                             <div>
-                                                <p class="text-sm font-medium text-slate-500">Plan Type</p>
-                                                <p class="text-lg font-semibold text-slate-800 mt-1">Pro Plan</p>
+                                                <p class="text-sm font-medium text-slate-500">{% trans "Plan Type"%}</p>
+                                                <p class="text-lg font-semibold text-slate-800 mt-1">{{plan}}</p>
                                             </div>
                                         </div>
                                         <div class="flex items-start gap-4">
                                             <span class="material-symbols-outlined text-3xl text-primary-color mt-1">
                                                 date_range </span>
                                             <div>
-                                                <p class="text-sm font-medium text-slate-500">Duration</p>
+                                                <p class="text-sm font-medium text-slate-500">{% trans "Duration"%}</p>
                                                 <div class="mt-1">
-                                                    <p class="text-lg font-semibold text-slate-800">Jan 15, 2024 - Jun
-                                                        15, 2024</p>
-                                                    <p class="text-sm text-slate-500">5 months</p>
+                                                    <p class="text-lg font-semibold text-slate-800">{{plan_expires}}</p>
+                                                    <p class="text-sm text-slate-500">{{days_remaining}} {% trans "Days"%}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -88,87 +88,63 @@
                                 <div>
                                     <h2 class="text-3xl font-bold text-slate-900 mb-6 flex items-center gap-3"> <span
                                             class="material-symbols-outlined text-4xl text-primary-color"> live_tv
-                                        </span> Online Sessions </h2>
+                                        </span> {% trans "Online Sessions"%} </h2>
                                     <div class="space-y-6">
-                                        <div class="bg-white rounded-xl shadow-lg p-6 border-l-8 border-amber-400">
-                                            <div
-                                                class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                                                <div>
-                                                    <span
-                                                        class="text-xs font-semibold bg-amber-100 text-amber-600 px-3 py-1 rounded-full mb-2 inline-block">UPCOMING</span>
-                                                    <p class="font-bold text-slate-800 text-xl">React Hooks Deep Dive
-                                                    </p>
-                                                    <p class="text-sm text-slate-500">One-on-One with Dr. Angela Yu</p>
+                                        {% for session in upcoming_sessions %}
+                                            <div class="bg-white rounded-xl shadow-lg p-6 border-l-8 border-amber-400">
+                                                <div
+                                                    class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                                    <div>
+                                                        <span class="text-xs font-semibold bg-amber-100 text-amber-600 px-3 py-1 rounded-full mb-2 inline-block">UPCOMING</span>
+                                                        <p class="font-bold text-slate-800 text-xl">{{session.mentor_group_session.session_type}}</p>
+                                                        <p class="text-sm text-slate-500">{{session.mentor_group_session.session_type.description |safe}}</p>
+                                                    </div>
+                                                    <a
+                                                        href='{{session.mentor_group_session.google_meet_link}}'
+                                                        class="w-full sm:w-auto inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/90 h-11 px-6 py-2.5 shadow-md hover:shadow-lg transition-shadow">
+                                                        {% trans "Join Session"%} </a>
                                                 </div>
-                                                <button
-                                                    class="w-full sm:w-auto inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/90 h-11 px-6 py-2.5 shadow-md hover:shadow-lg transition-shadow">
-                                                    Join Session </button>
-                                            </div>
-                                            <div class="mt-6 border-t border-slate-200 pt-5 space-y-4 text-slate-600">
-                                                <div class="flex items-center gap-3">
-                                                    <span class="material-symbols-outlined text-xl"> calendar_today
-                                                    </span>
-                                                    <p>Wednesday, May 29, 2024</p>
-                                                </div>
-                                                <div class="flex items-center gap-3">
-                                                    <span class="material-symbols-outlined text-xl"> schedule </span>
-                                                    <p>4:00 PM - 5:00 PM (60 min)</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="bg-white rounded-xl shadow-lg p-6 border-l-8 border-slate-300">
-                                            <div
-                                                class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                                                <div>
-                                                    <span
-                                                        class="text-xs font-semibold bg-slate-100 text-slate-600 px-3 py-1 rounded-full mb-2 inline-block">COMPLETED</span>
-                                                    <p class="font-bold text-slate-800 text-xl">Backend API Strategies
-                                                    </p>
-                                                    <p class="text-sm text-slate-500">One-on-One with Dr. Angela Yu</p>
-                                                </div>
-                                                <button
-                                                    class="w-full sm:w-auto inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background border border-slate-300 bg-transparent hover:bg-slate-100 text-slate-800 h-11 px-6 py-2.5 transition-colors">
-                                                    View Recording </button>
-                                            </div>
-                                            <div class="mt-6 border-t border-slate-200 pt-5 space-y-4 text-slate-600">
-                                                <div class="flex items-center gap-3">
-                                                    <span class="material-symbols-outlined text-xl"> calendar_today
-                                                    </span>
-                                                    <p>Friday, May 31, 2024</p>
-                                                </div>
-                                                <div class="flex items-center gap-3">
-                                                    <span class="material-symbols-outlined text-xl"> schedule </span>
-                                                    <p>2:00 PM - 3:00 PM (60 min)</p>
+                                                <div class="mt-6 border-t border-slate-200 pt-5 space-y-4 text-slate-600">
+                                                    <div class="flex items-center gap-3">
+                                                        <span class="material-symbols-outlined text-xl"> calendar_today
+                                                        </span>
+                                                        <p>{{session.occurence_datetime|date:"D, d M Y"}}</p>
+                                                    </div>
+                                                    <div class="flex items-center gap-3">
+                                                        <span class="material-symbols-outlined text-xl"> schedule </span>
+                                                        <p>{{session.occurence_datetime|date:"H:i"}}</p>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="bg-white rounded-xl shadow-lg p-6 border-l-8 border-sky-400">
-                                            <div
-                                                class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                                                <div>
-                                                    <span
-                                                        class="text-xs font-semibold bg-sky-100 text-sky-600 px-3 py-1 rounded-full mb-2 inline-block">SCHEDULED</span>
-                                                    <p class="font-bold text-slate-800 text-xl">Advanced CSS Workshop
-                                                    </p>
-                                                    <p class="text-sm text-slate-500">Group Session with Dr. Angela Yu
-                                                    </p>
+                                        {% endfor %}
+                                        {% for session in past_sessions %}
+                                            <div class="bg-white rounded-xl shadow-lg p-6 border-l-8 border-slate-300">
+                                                <div
+                                                    class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                                    <div>
+                                                        <span
+                                                            class="text-xs font-semibold bg-slate-100 text-slate-600 px-3 py-1 rounded-full mb-2 inline-block">COMPLETED</span>
+                                                        <p class="font-bold text-slate-800 text-xl">{{session.mentor_group_session.session_type}}</p>
+                                                        <p class="text-sm text-slate-500">{{session.mentor_group_session.session_type.description |safe}}</p>
+                                                    </div>
+                                                    <a
+                                                        href='{{session.session_video_record}}'
+                                                        class="w-full sm:w-auto inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background border border-slate-300 bg-transparent hover:bg-slate-100 text-slate-800 h-11 px-6 py-2.5 transition-colors">
+                                                        {% trans "View Recording"%} </a>
                                                 </div>
-                                                <button
-                                                    class="w-full sm:w-auto inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/90 h-11 px-6 py-2.5 shadow-md hover:shadow-lg transition-shadow">
-                                                    Join Session </button>
+                                                <div class="mt-6 border-t border-slate-200 pt-5 space-y-4 text-slate-600">
+                                                    <div class="flex items-center gap-3">
+                                                        <span class="material-symbols-outlined text-xl"> calendar_today
+                                                        </span>
+                                                        <p>{{session.occurence_datetime|date:"D, d M Y"}}</p>
+                                                    </div>
+                                                    <div class="flex items-center gap-3">
+                                                        <span class="material-symbols-outlined text-xl"> schedule </span>
+                                                        <p>{{session.occurence_datetime|date:"H:i"}}</p>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="mt-6 border-t border-slate-200 pt-5 space-y-4 text-slate-600">
-                                                <div class="flex items-center gap-3">
-                                                    <span class="material-symbols-outlined text-xl"> calendar_today
-                                                    </span>
-                                                    <p>Monday, June 3, 2024</p>
-                                                </div>
-                                                <div class="flex items-center gap-3">
-                                                    <span class="material-symbols-outlined text-xl"> schedule </span>
-                                                    <p>6:00 PM - 7:30 PM (90 min)</p>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        {% endfor %}
                                     </div>
                                 </div>
                             </div>
@@ -179,5 +155,4 @@
         </main>
     </div>
 </div>
-<script defer="" src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 {% endblock %}

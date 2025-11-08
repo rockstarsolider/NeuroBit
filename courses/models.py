@@ -10,7 +10,6 @@
 # ➑  Subscription plans                   │
 # ➒  Mentor‑group sessions  ← new block   │  **added to match ERD**
 
-from datetime import timedelta
 import jdatetime as jd
 from decimal import Decimal
 
@@ -18,12 +17,9 @@ from django.core.validators import (
     RegexValidator, MinValueValidator, MaxValueValidator
 )
 from django.db import models, transaction
-from django.db.models import Q, CheckConstraint, Index
-from django.db.models.functions import TruncMonth
+from django.db.models import Q, CheckConstraint, Count
 from django.utils import timezone
 from django.conf import settings
-from django.core.exceptions import ValidationError
-from django.contrib.postgres.fields import ArrayField
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -34,6 +30,7 @@ from core.utility import phone_re
 from core.notify import send_subscription_expired_sms
 from pages.templatetags.custom_translation_tags import translate_number
 from pages.templatetags.persian_calendar_convertor import convert_to_persian_calendar, format_persian_datetime
+from django.utils.functional import cached_property
 
 
 JALALI_MONTHS_EN = [
@@ -182,7 +179,34 @@ class LearningPath(models.Model):
 
     def __str__(self):
         return self.name
+    
 
+class EducationalStepQuerySet(models.QuerySet):
+    def with_progress(self, enrollment):
+        """Attach progress info for a specific learner enrollment."""
+        return self.filter(learning_path=enrollment.learning_path).annotate(
+            total_tasks=Count("tasks", distinct=True),
+            done_tasks=Count(
+                "tasks__submissions",
+                filter=Q(
+                    tasks__submissions__step_progress__mentor_assignment__enrollment=enrollment,
+                    tasks__submissions__evaluations__mentor__assignments__enrollment=enrollment,
+                    tasks__submissions__evaluations__evaluated_at__isnull=False,
+                ),
+                distinct=True,
+            ),
+            completed=Count(
+                "step_progresses",
+                filter=Q(
+                    step_progresses__mentor_assignment__enrollment=enrollment,
+                    step_progresses__task_completion_date__isnull=False,
+                ),
+                distinct=True,
+            ),
+        )
+
+    def ordered(self):
+        return self.order_by("sequence_no")
 
 class EducationalStep(models.Model):
     learning_path = models.ForeignKey(LearningPath, on_delete=models.CASCADE, related_name="steps")
@@ -199,6 +223,25 @@ class EducationalStep(models.Model):
 
     def __str__(self):
         return f"{self.learning_path} | {self.sequence_no}. {self.title}"
+    
+    objects = EducationalStepQuerySet.as_manager()
+    
+    def get_percentile(self):
+        if not getattr(self, "total_tasks", 0):
+            return 0
+        return round((self.done_tasks / self.total_tasks) * 100)
+
+    def can_start(self, enrollment):
+        if not self.is_mandatory:
+            return True
+        return not EducationalStep.objects.filter(
+            learning_path=self.learning_path,
+            sequence_no__lt=self.sequence_no,
+            is_mandatory=True,
+        ).exclude(
+            step_progresses__mentor_assignment__enrollment=enrollment,
+            step_progresses__task_completion_date__isnull=False,
+        ).exists()
 
 
 class Resources(models.Model):
@@ -351,7 +394,7 @@ def submissions_upload_to(instance, filename) -> str:  # noqa: D401
 class TaskSubmission(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="submissions")
     step_progress = models.ForeignKey(StepProgress, on_delete=models.CASCADE, related_name="submissions")
-    submitted_at = models.DateTimeField(blank=True, null=True)
+    submitted_at = models.DateTimeField(auto_now_add=True)
     artifact_url = models.URLField(max_length=500, blank=True)
     file = models.FileField(upload_to=submissions_upload_to, blank=True)
     report_video_file = models.FileField(upload_to=submissions_upload_to, blank=True)

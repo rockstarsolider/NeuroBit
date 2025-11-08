@@ -1,0 +1,168 @@
+{% load i18n %}
+
+<form method="get" 
+    id="task-filter-form"
+    class="mb-8 flex flex-wrap items-center justify-between gap-4"
+    hx-get="{% url 'task-list' step.id %}"
+    hx-target="#task-container"
+    hx-swap="innerHTML"
+    hx-trigger="input delay:400ms from:#task-search, change from:button"
+    >
+    <div class="flex items-center gap-2 rounded-lg bg-slate-100 p-1">
+        <button type="button" name="status" value="all"
+            hx-get="{% url 'task-list' step.id %}?search={{ request.GET.search|default:'' }}"
+            hx-target="#task-container"
+            hx-swap="innerHTML"
+            class="flex cursor-pointer h-9 min-w-[84px] items-center justify-center rounded-md px-4 text-sm font-semibold
+                    {% if request.GET.status == 'all' or not request.GET.status %}
+                    bg-[var(--primary-color)] text-white
+                    {% else %}
+                    bg-transparent text-slate-600 hover:bg-slate-200
+                    {% endif %}">
+            All
+        </button>
+    
+        <button type="button" name="status" value="evaluated"
+            hx-get="{% url 'task-list' step.id %}?status=evaluated&search={{ request.GET.search|default:'' }}"
+            hx-target="#task-container"
+            hx-swap="innerHTML"
+            class="flex cursor-pointer h-9 min-w-[84px] items-center justify-center rounded-md px-4 text-sm font-semibold
+                    {% if request.GET.status == 'evaluated' %}
+                    bg-[var(--primary-color)] text-white
+                    {% else %}
+                    bg-transparent text-slate-600 hover:bg-slate-200
+                    {% endif %}">
+            Completed
+        </button>
+    
+        <button type="button" name="status" value="todo"
+            hx-get="{% url 'task-list' step.id %}?status=todo&search={{ request.GET.search|default:'' }}"
+            hx-target="#task-container"
+            hx-swap="innerHTML"
+            class="flex cursor-pointer h-9 min-w-[84px] items-center justify-center rounded-md px-4 text-sm font-semibold
+                    {% if request.GET.status == 'todo' %}
+                    bg-[var(--primary-color)] text-white
+                    {% else %}
+                    bg-transparent text-slate-600 hover:bg-slate-200
+                    {% endif %}">
+            To Do
+        </button>
+        </div>
+    
+        <!-- Search box -->
+        <div class="relative w-full sm:w-auto">
+        <input
+            id="task-search"
+            name="search"
+            value="{{ request.GET.search }}"
+            class="h-11 w-full rounded-lg border border-slate-200 py-2 pl-10 pr-4
+                    focus:border-transparent focus:outline-none focus:ring-2
+                    focus:ring-[var(--primary-color)] sm:w-64"
+            placeholder="Search tasks..."
+            type="text"
+            hx-get="{% url 'task-list' step.id %}"
+            hx-target="#task-container"
+            hx-swap="innerHTML"
+            hx-trigger="input delay:400ms"
+        >
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+            search
+        </span>
+        </div>
+</form>
+
+<div class="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-12">
+    <div  class="flex flex-col gap-6 lg:col-span-2">
+        {% for task in tasks %}
+            <div
+                class="card-hover flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 ease-in-out sm:flex-row sm:items-center sm:justify-between">
+                <div class="flex items-start gap-4">
+                    <div
+                        class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-slate-100 text-base font-bold text-slate-600">
+                        {{task.order_in_step}}</div>
+                    <div class="flex flex-col gap-2">
+                        <h3 class="text-lg font-semibold leading-tight text-slate-800">{{task.title}}</h3>
+                        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+                            <div class="flex items-center gap-2 text-sm">
+                                <span class="material-symbols-outlined text-base text-slate-500"> check
+                                </span>
+                                <p class="font-normal text-slate-500">Submitted: <span
+                                        class="font-medium text-slate-600">{{task.latest_submission}}</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% if task.is_completed %}
+                    <div class="flex shrink-0 items-center gap-3 self-end sm:self-center">
+                        <div class="flex items-center gap-2 rounded-full bg-blue-100 px-3 py-1 text-blue-700">
+                            <span class="material-symbols-outlined text-base"> task_alt </span>
+                            <span class="text-sm font-medium">Evaluated</span>
+                        </div>
+                    </div>
+                {% elif task.latest_submission%}
+                    <div
+                        class="flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-emerald-700">
+                        <span class="material-symbols-outlined text-base"> check_circle </span>
+                        <span class="text-sm font-medium">Submitted</span>
+                    </div>
+                {% else %}
+                    <a
+                        href='{% url "task-submission" %}'
+                        class="flex h-10 min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-md bg-[var(--primary-color)] px-4 text-sm font-semibold leading-normal text-white transition-colors duration-300 hover:bg-blue-700">
+                        <span class="material-symbols-outlined text-base"> upload </span>
+                        <span>Submit</span>
+                    </a>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+    {% comment %} Resources {% endcomment %}
+    <div
+        class="sticky top-10 flex h-fit flex-col gap-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div class="flex flex-col gap-2">
+            <h3 class="text-xl font-bold leading-tight tracking-[-0.015em] text-slate-900">{% trans "Study Items &amp; Guidelines"%}</h3>
+            <p class="text-sm font-normal leading-normal text-slate-500">{% trans "Resources to help you with this week's tasks."%}</p>
+        </div>
+        <div class="flex flex-col gap-y-6">
+            <div>
+                <h4 class="mb-3 text-base font-semibold leading-normal text-slate-800">{% trans "Study Items"%}</h4>
+                <ul class="flex flex-col gap-4">
+                    {% for resource in resources %}
+                        <li class="flex items-start gap-3">
+                            <span class="material-symbols-outlined mt-1 text-slate-400"> 
+                                {% if resource.type == "video" or resource.type == "playlist" %} video_library 
+                                {% elif resource.type == "book" or resource.type == "doc"%} book 
+                                {% elif resource.type == "course" %} school
+                                {% elif resource.type == "code" %} code_blocks
+                                {% else %} dynamic_feed
+                                {%endif%}
+                            </span>
+                            <div class="flex flex-col">
+                                <a class="text-sm font-medium leading-normal text-[var(--primary-color)] hover:underline"
+                                    href="#">{{resource.title}}</a>
+                                <div class="text-sm font-normal text-slate-500">{{resource.description|safe}}</div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="border-t border-slate-200"></div>
+            <div>
+                <h4 class="mb-3 text-base font-semibold leading-normal text-slate-800">{% trans "Guidelines"%}</h4>
+                <ul class="flex flex-col gap-4">
+                    <li class="flex items-start gap-3">
+                        <span class="material-symbols-outlined mt-1 text-base text-slate-400"> lightbulb
+                        </span>
+                        <p class="flex-1 text-sm font-normal text-slate-600">{% trans "Make sure to submit your tasks before your deadline."%}</p>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="material-symbols-outlined mt-1 text-base text-slate-400"> lightbulb
+                        </span>
+                        <p class="flex-1 text-sm font-normal text-slate-600">{% trans "Use the resources above before starting your tasks."%}</p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
