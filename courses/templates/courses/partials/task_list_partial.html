@@ -107,7 +107,7 @@
                     </div>
                 {% else %}
                     <a
-                        href='{% url "task-submission" %}'
+                        href='{% url "task-submission" step_progress_id=step_progress_id task_id=task.id %}'
                         class="flex h-10 min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-md bg-[var(--primary-color)] px-4 text-sm font-semibold leading-normal text-white transition-colors duration-300 hover:bg-blue-700">
                         <span class="material-symbols-outlined text-base"> upload </span>
                         <span>Submit</span>

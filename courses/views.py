@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import View, ListView, UpdateView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Learner, LearnerEnrollment, MentorAssignment, LearnerSubscribePlan, MentorGroupSessionOccurrence, StepProgress, EducationalStep, Task, TaskEvaluation, TaskSubmission
+from .models import (Learner, LearnerEnrollment, MentorAssignment, LearnerSubscribePlan, MentorGroupSessionOccurrence, 
+                    StepProgress, EducationalStep, Task, TaskEvaluation, TaskSubmission, SocialPost, SocialMedia)
 from core.models import CustomUser
 from django.db.models import Max, Count, Q, Prefetch, Sum, Exists, OuterRef
 from django.urls import reverse_lazy
@@ -16,7 +17,7 @@ class LearnerDashboardView(LoginRequiredMixin, View):
     def get(self, request):
         return render(request, 'courses/learner_dash.html')
     
-class StepListView(ListView):
+class StepListView(LoginRequiredMixin, ListView):
     template_name = "courses/step_list.html"
     context_object_name = "steps"
 
@@ -38,7 +39,7 @@ class StepListView(ListView):
         ctx["enrollment"] = self.enrollment
         return ctx
     
-class TaskListView(ListView):
+class TaskListView(LoginRequiredMixin, ListView):
     model = Task
     context_object_name = "tasks"
     template_name = "courses/task_list.html"
@@ -121,8 +122,10 @@ class TaskListView(ListView):
         completed = sum(1 for t in tasks if getattr(t, "is_completed", 0))
 
         due_date = None
+        step_progress_id = None
         if getattr(self, "step_progress", None):
             sp = self.step_progress
+            step_progress_id = sp.id
             due_date = sp.initial_promise_date + timedelta(
                 days=sp.initial_promise_days + (sp.total_extension_days or 0)
             )
@@ -136,6 +139,7 @@ class TaskListView(ListView):
             "completed_count": completed,
             "remaining_count": total - completed,
             "total": total,
+            "step_progress_id": step_progress_id,
         })
         return ctx
 
@@ -143,9 +147,92 @@ class TaskListView(ListView):
         return ["courses/partials/task_list_partial.html"] if self.request.headers.get("HX-Request") \
                else ["courses/task_list.html"]
     
-class TaskSubmissionView(LoginRequiredMixin, View):
-    def get(self, request):
-        return render(request, 'courses/task_submission.html')
+class TaskSubmissionView(View):
+    template_name = "courses/task_submission.html"
+
+    def get(self, request, step_progress_id, task_id):
+        step_progress = get_object_or_404(StepProgress, pk=step_progress_id)
+        task = get_object_or_404(Task, pk=task_id, step=step_progress.educational_step)
+
+        learner = getattr(request.user, "learner_profile", None)
+        if not learner or step_progress.mentor_assignment.enrollment.learner != learner:
+            messages.error(request, "You are not allowed to access this task.")
+            return redirect("task_list")
+
+        social_medias = SocialMedia.objects.all()
+        social_posts = SocialPost.objects.filter(step_progress=step_progress)
+
+        return render(request, self.template_name, {
+            "step_progress": step_progress,
+            "task": task,
+            "social_medias": social_medias,
+            "social_posts": social_posts,
+        })
+
+    def post(self, request, step_progress_id, task_id):
+        step_progress = get_object_or_404(StepProgress, pk=step_progress_id)
+        task = get_object_or_404(Task, pk=task_id, step=step_progress.educational_step)
+        learner = getattr(request.user, "learner_profile", None)
+
+        if not learner or step_progress.mentor_assignment.enrollment.learner != learner:
+            messages.error(request, "Unauthorized submission attempt.")
+            return redirect("task_list")
+
+        errors = []
+
+        # Handle TaskSubmission
+        artifact_url = request.POST.get("link1", "").strip()
+        report_video_link = request.POST.get("link2", "").strip()
+        repository = request.POST.get("link3", "").strip()
+        comment = request.POST.get("comments", "").strip()
+        file = request.FILES.get("file-upload1")
+        report_video_file = request.FILES.get("file-upload2")
+
+        if not any([artifact_url, report_video_link, repository, file, report_video_file]):
+            errors.append("Please provide at least one link or file for submission.")
+
+        if not errors:
+            TaskSubmission.objects.create(
+                task=task,
+                step_progress=step_progress,
+                artifact_url=artifact_url,
+                report_video_link=report_video_link,
+                repository=repository,
+                file=file,
+                report_video_file=report_video_file,
+                comment=comment
+            )
+            messages.success(request, "Task submitted successfully.")
+
+        # Handle SocialPost
+        platform_id = request.POST.get("platform1")
+        post_link = request.POST.get("post_link1")
+        description = request.POST.get("description1")
+        post_date = request.POST.get("post_date1")
+
+        if platform_id and post_link:
+            platform = get_object_or_404(SocialMedia, pk=platform_id)
+            existing_post = SocialPost.objects.filter(
+                learner=learner, step_progress=step_progress, platform=platform
+            ).first()
+            if existing_post:
+                errors.append(f"You already added a post for {platform}.")
+            else:
+                SocialPost.objects.create(
+                    learner=learner,
+                    step_progress=step_progress,
+                    platform=platform,
+                    url=post_link,
+                    description=description,
+                    posted_at=post_date or timezone.now()
+                )
+                messages.success(request, f"Social post for {platform} added.")
+
+        if errors:
+            for err in errors:
+                messages.error(request, err)
+
+        return redirect(request.path)
     
 class ProfileOverviewView(LoginRequiredMixin, View):
     def get(self, request):
