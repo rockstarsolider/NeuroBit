@@ -288,7 +288,7 @@ class LearnerEnrollment(models.Model):
             task_completion_date__isnull=False
         ).count()
 
-        return round((completed_steps / total_steps) * 100, 1)
+        return round((completed_steps / total_steps) * 100)
 
 
 class MentorAssignment(models.Model):

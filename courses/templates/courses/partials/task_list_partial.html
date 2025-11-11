@@ -93,12 +93,12 @@
                     </div>
                 </div>
                 {% if task.is_completed %}
-                    <div class="flex shrink-0 items-center gap-3 self-end sm:self-center">
+                    <a href='{% url "task-feedback" step_progress_id=step_progress_id task_id=task.id %}' class="flex shrink-0 items-center gap-3 self-end sm:self-center">
                         <div class="flex items-center gap-2 rounded-full bg-blue-100 px-3 py-1 text-blue-700">
                             <span class="material-symbols-outlined text-base"> task_alt </span>
                             <span class="text-sm font-medium">Evaluated</span>
                         </div>
-                    </div>
+                    </a>
                 {% elif task.latest_submission%}
                     <div
                         class="flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-emerald-700">

@@ -17,6 +17,7 @@ class LearnerDashboardView(LoginRequiredMixin, View):
     def get(self, request):
         return render(request, 'courses/learner_dash.html')
     
+
 class StepListView(LoginRequiredMixin, ListView):
     template_name = "courses/step_list.html"
     context_object_name = "steps"
@@ -39,6 +40,7 @@ class StepListView(LoginRequiredMixin, ListView):
         ctx["enrollment"] = self.enrollment
         return ctx
     
+
 class TaskListView(LoginRequiredMixin, ListView):
     model = Task
     context_object_name = "tasks"
@@ -147,6 +149,7 @@ class TaskListView(LoginRequiredMixin, ListView):
         return ["courses/partials/task_list_partial.html"] if self.request.headers.get("HX-Request") \
                else ["courses/task_list.html"]
     
+
 class TaskSubmissionView(View):
     template_name = "courses/task_submission.html"
 
@@ -234,6 +237,7 @@ class TaskSubmissionView(View):
 
         return redirect(request.path)
     
+
 class ProfileOverviewView(LoginRequiredMixin, View):
     def get(self, request):
         learner = get_object_or_404(Learner, user=request.user)
@@ -264,6 +268,7 @@ class ProfileOverviewView(LoginRequiredMixin, View):
             "completed_paths": completed,
         })
     
+
 class EditProfileView(LoginRequiredMixin, UpdateView):
     model = CustomUser
     template_name = "courses/edit_profile.html"
@@ -281,6 +286,7 @@ class EditProfileView(LoginRequiredMixin, UpdateView):
         messages.error(self.request, _("There was an error updating your profile. Please check the form."))
         return super().form_invalid(form)
     
+
 class LearningPathView(LoginRequiredMixin, DetailView):
     model = LearnerEnrollment
     template_name = "courses/learning_path.html"
@@ -331,55 +337,115 @@ class LearningPathView(LoginRequiredMixin, DetailView):
         })
         return ctx
     
+
 class SubscriptionPlansView(LoginRequiredMixin, View):
     def get(self, request):
         return render(request, 'courses/subscription/plans.html')
+
 
 class StepPromiseView(LoginRequiredMixin, View):
     def get(self, request):
         return render(request, 'courses/step_promise.html')
     
+
 class TaskFeedbackView(LoginRequiredMixin, View):
-    def get(self, request):
-        return render(request, 'courses/task_feedback.html')
+    template_name = "courses/task_feedback.html"
+
+    def get(self, request, step_progress_id, task_id):
+        learner = getattr(request.user, "learner_profile", None)
+        if not learner:
+            messages.error(request, "You must be logged in as a learner.")
+            return redirect("dashboard")
+
+        step_progress = get_object_or_404(StepProgress, pk=step_progress_id)
+        task = get_object_or_404(Task, pk=task_id, step=step_progress.educational_step)
+
+        # ✅ Permission check
+        if step_progress.mentor_assignment.enrollment.learner != learner:
+            messages.error(request, "You are not allowed to view feedback for this task.")
+            return redirect("task-list")
+
+        # ✅ Get latest submission for this learner and task
+        submission = (
+            TaskSubmission.objects.filter(task=task, step_progress=step_progress)
+            .order_by("-submitted_at")
+            .first()
+        )
+
+        if not submission:
+            messages.error(request, "You haven’t submitted this task yet.")
+            return redirect("task-list", step_progress.educational_step.id)
+
+        # ✅ Get evaluation if exists
+        evaluation = (
+            TaskEvaluation.objects
+            .select_related("mentor")
+            .filter(submission=submission)
+            .order_by("-evaluated_at")
+            .first()
+        )
+
+        if not evaluation:
+            messages.error(request, "This task has not been evaluated yet.")
+            return redirect("task-list", step_progress.educational_step.id)
+
+        context = {
+            "task": task,
+            "step_progress": step_progress,
+            "submission": submission,
+            "evaluation": evaluation,
+            "mentor": evaluation.mentor,
+        }
+
+        return render(request, self.template_name, context)
     
+
 # Mentor side Views
 class MnetorFeedbackListView(LoginRequiredMixin, ListView):
     def get(self, request):
         return render(request, 'courses/mentor/mentor_feedback_list.html')
     
+
 class MnetorFeedbackView(LoginRequiredMixin, View):
     def get(self, request):
         return render(request, 'courses/mentor/mentor_feedback.html')
     
+
 class AttendaceHubView(LoginRequiredMixin, View):
     def get(self, request):
         return render(request, 'courses/mentor/attendance_hub.html')
     
+
 class LearnersListView(LoginRequiredMixin, ListView):
     def get(self, request):
         return render(request, 'courses/mentor/learners_list.html')
     
+
 class SessionListView(LoginRequiredMixin, ListView):
     def get(self, request):
         return render(request, 'courses/mentor/session_list.html')
     
+
 class GroupSessionAttendanceView(LoginRequiredMixin, ListView):
     def get(self, request):
         return render(request, 'courses/mentor/group_session_attendance.html')
-    
+
+
 class PrivateSessionAttendanceView(LoginRequiredMixin, ListView):
     def get(self, request):
         return render(request, 'courses/mentor/private_session_attendance.html')
-    
+
+
 class PrivateSessionManageView(LoginRequiredMixin, View):
     def get(self, request):
         return render(request, 'courses/mentor/private_session_manage.html')
+
 
 class LearnerAttendanceHistoryView(LoginRequiredMixin, ListView):
     def get(self, request):
         return render(request, 'courses/mentor/learner_attendance_history.html')
     
+
 class GroupAttendanceHistoryView(LoginRequiredMixin, ListView):
     def get(self, request):
         return render(request, 'courses/mentor/group_attend_history.html')
