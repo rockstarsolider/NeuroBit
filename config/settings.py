@@ -326,4 +326,4 @@ if DEBUG:
 
 LOGIN_URL = '/login/'
 
-Kavenegar_API = os.environ.get('KAVENEGAR_API')
+KAVENEGAR_API = os.environ.get('KAVENEGAR_API')
