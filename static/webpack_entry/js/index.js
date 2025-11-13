@@ -6,7 +6,7 @@ window.animate = animate;
 window.scroll = scroll;
 window.inView = inView;
 
-import '../../css/tailwind.css';
+import '../../../input.css';
 
 import 'material-symbols';
 import 'htmx.org';

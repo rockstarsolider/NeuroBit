@@ -23,6 +23,8 @@ class CustomUser(AbstractUser):
     city         = models.CharField(max_length=64)
     birthdate    = models.DateField(null=True, blank=True)
     gender = models.CharField(max_length=1, choices=GenderChoices, default=GenderChoices.MALE, blank=True)
+    otp_code = models.PositiveSmallIntegerField(blank=True, null=True)
+    otp_code_created = models.DateTimeField(auto_now=True)
 
     # no need for a custom manager unless you want extra helpers
 

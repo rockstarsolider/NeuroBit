@@ -252,7 +252,7 @@ class TaskSubmissionView(View):
         learner = getattr(request.user, "learner_profile", None)
         if not learner or step_progress.mentor_assignment.enrollment.learner != learner:
             messages.error(request, "You are not allowed to access this task.")
-            return redirect("task_list")
+            return redirect("learner-dashboard")
 
         social_medias = SocialMedia.objects.all()
         social_posts = SocialPost.objects.filter(step_progress=step_progress)
@@ -271,7 +271,7 @@ class TaskSubmissionView(View):
 
         if not learner or step_progress.mentor_assignment.enrollment.learner != learner:
             messages.error(request, "Unauthorized submission attempt.")
-            return redirect("task_list")
+            return redirect("learner-dashboard")
 
         errors = []
 
@@ -447,7 +447,7 @@ class TaskFeedbackView(LoginRequiredMixin, View):
         learner = getattr(request.user, "learner_profile", None)
         if not learner:
             messages.error(request, "You must be logged in as a learner.")
-            return redirect("dashboard")
+            return redirect("learner-dashboard")
 
         step_progress = get_object_or_404(StepProgress, pk=step_progress_id)
         task = get_object_or_404(Task, pk=task_id, step=step_progress.educational_step)
@@ -455,7 +455,7 @@ class TaskFeedbackView(LoginRequiredMixin, View):
         # ✅ Permission check
         if step_progress.mentor_assignment.enrollment.learner != learner:
             messages.error(request, "You are not allowed to view feedback for this task.")
-            return redirect("task-list")
+            return redirect("learner-dashboard-list")
 
         # ✅ Get latest submission for this learner and task
         submission = (

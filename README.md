@@ -51,6 +51,7 @@ Neurobit is a training program and web platform focused on helping teenagers and
    SECRET_KEY=your-secret-key
    DEBUG=True
    # DATABASE_URL=postgres://USER:PASSWORD@HOST:PORT/DBNAME   # optional
+   # KAVENEGAR_API=   # optional. used for sms
    ```
 5. **Apply migrations and create a superuser**
    ```bash

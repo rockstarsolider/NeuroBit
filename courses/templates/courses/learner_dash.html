@@ -23,7 +23,9 @@
                 </div>
               </div>
               <p class="mt-3 font-semibold">{% trans "Overall Progress"%}</p>
-              <p class="text-sm text-slate-500">{{latest_enrollment.learning_path}}</p>
+              {% if latest_enrollment %}
+                <p class="text-sm text-slate-500">{{latest_enrollment.learning_path}}</p>
+              {% endif %}
             </div>
             <div class="flex flex-col items-center justify-center text-center p-6 bg-slate-50 rounded-lg">
               <span class="material-symbols-outlined text-5xl text-green-500">task_alt</span>
@@ -92,19 +94,21 @@
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div class="lg:col-span-2 space-y-8">
-            <div class="bg-white p-6 rounded-lg shadow-sm">
-              <h3 class="text-xl font-bold mb-4">{% trans "Continue Learning Path"%}</h3>
-              <div class="space-y-4">
-                <p class="text-lg font-semibold">{{latest_enrollment.learning_path}}</p>
-                <div class="flex items-center gap-4">
-                  <div class="flex-1 bg-slate-200 rounded-full h-3">
-                    <div class="h-3 rounded-full bg-(--primary-color)" style="width: {{progress_percent}}%;"></div>
+            {% if latest_enrollment %}
+              <div class="bg-white p-6 rounded-lg shadow-sm">
+                <h3 class="text-xl font-bold mb-4">{% trans "Continue Learning Path"%}</h3>
+                <div class="space-y-4">
+                  <p class="text-lg font-semibold">{{latest_enrollment.learning_path}}</p>
+                  <div class="flex items-center gap-4">
+                    <div class="flex-1 bg-slate-200 rounded-full h-3">
+                      <div class="h-3 rounded-full bg-(--primary-color)" style="width: {{progress_percent}}%;"></div>
+                    </div>
+                    <p class="text-base font-bold text-(--primary-color)">{{progress_percent}}%</p>
                   </div>
-                  <p class="text-base font-bold text-(--primary-color)">{{progress_percent}}%</p>
+                  <a href='{% url "learning-path" latest_enrollment.id %}' class="inline-flex items-center gap-2 mt-4 text-sm font-semibold text-(--primary-color) hover:cursor-pointer hover:underline">{% trans "Continue Learning"%} <span class="material-symbols-outlined">arrow_forward</span></a>
                 </div>
-                <a href='{% url "learning-path" latest_enrollment.id %}' class="inline-flex items-center gap-2 mt-4 text-sm font-semibold text-(--primary-color) hover:cursor-pointer hover:underline">{% trans "Continue Learning"%} <span class="material-symbols-outlined">arrow_forward</span></a>
               </div>
-            </div>
+            {% endif %}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div class="bg-white p-6 rounded-lg shadow-sm">
                 <h3 class="text-xl font-bold mb-4">{% trans "Upcoming Deadlines"%}</h3>
@@ -167,10 +171,12 @@
                 <span class="material-symbols-outlined text-3xl text-slate-700">payments</span>
                 <span class="text-sm font-medium">{% trans "Subscription Plans"%}</span>
               </a>
-              <a class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors" href='{% url "learning-path" latest_enrollment.id %}'>
-                <span class="material-symbols-outlined text-3xl text-slate-700">school</span>
-                <span class="text-sm font-medium">{% trans "Learning Path"%}</span>
-              </a>
+              {% if latest_enrollment %}
+                <a class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors" href='{% url "learning-path" latest_enrollment.id %}'>
+                  <span class="material-symbols-outlined text-3xl text-slate-700">school</span>
+                  <span class="text-sm font-medium">{% trans "Learning Path"%}</span>
+                </a>
+              {%endif%}
               <a class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors" href="{% url "profile-overview" %}">
                 <span class="material-symbols-outlined text-3xl text-slate-700">person</span>
                 <span class="text-sm font-medium">{% trans "Profile"%}</span>

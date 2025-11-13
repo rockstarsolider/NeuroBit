@@ -2,6 +2,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("auth/", views.phone_view, name="phone_view"),
-    path("auth/verify/", views.verify_otp, name="verify_otp"),
+    path('login/', views.LoginView.as_view(), name='login'),
+    path('verify/', views.verify_otp_view, name='verify')
 ]

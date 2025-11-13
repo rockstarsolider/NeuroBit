@@ -324,4 +324,6 @@ if DEBUG:
     # Show toolbar on every DEBUG request
     DEBUG_TOOLBAR_CONFIG = {"SHOW_TOOLBAR_CALLBACK": lambda request: True}
 
-LOGIN_URL = '/auth/'
+LOGIN_URL = '/login/'
+
+Kavenegar_API = os.environ.get('KAVENEGAR_API')
