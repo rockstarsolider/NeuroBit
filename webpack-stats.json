@@ -39,20 +39,10 @@
       "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-2af87197991c09f14bf3.css",
       "publicPath": "/static/webpack_output/main-2af87197991c09f14bf3.css"
     },
-    "main-5fd324a9cd2529dc20de.css": {
-      "name": "main-5fd324a9cd2529dc20de.css",
-      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-5fd324a9cd2529dc20de.css",
-      "publicPath": "/static/webpack_output/main-5fd324a9cd2529dc20de.css"
-    },
     "main-b56bddee3cf6e4fdb8a9.js": {
       "name": "main-b56bddee3cf6e4fdb8a9.js",
       "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-b56bddee3cf6e4fdb8a9.js",
       "publicPath": "/static/webpack_output/main-b56bddee3cf6e4fdb8a9.js"
-    },
-    "main-e245b2c6d1402452902e.js": {
-      "name": "main-e245b2c6d1402452902e.js",
-      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-e245b2c6d1402452902e.js",
-      "publicPath": "/static/webpack_output/main-e245b2c6d1402452902e.js"
     },
     "plotly-048a583c630733d133e2.js": {
       "name": "plotly-048a583c630733d133e2.js",
@@ -93,7 +83,5 @@
       "main-b56bddee3cf6e4fdb8a9.js"
     ]
   },
-  "publicPath": "/static/webpack_output/",
-  "error": "ModuleNotFoundError",
-  "message": "Module not found: Error: Can't resolve '../../../css/tailwind.css' in 'A:\\Pouria\\neurobit_working\\static\\webpack_entry\\js'"
+  "publicPath": "/static/webpack_output/"
 }

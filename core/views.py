@@ -7,6 +7,7 @@ from . models import CustomUser
 from .forms import LoginForm
 from . import helper
 from django.utils.translation import gettext as _
+from courses.models import Learner
 
 
 class LoginView(View):
@@ -57,11 +58,12 @@ def verify_otp_view(request):
                 messages.error(request, _('OTP code is expired!, please try again.'))
                 return redirect('verify')
 
-            if user.otp_code != int(request.POST.get('otp')):
+            if user.otp_code != str(request.POST.get('otp')):
                 messages.error(request, _('OTP code is incorrect!, please try again.'))
                 return redirect('verify')
             user.is_active = True
             user.save()
+            Learner.objects.get_or_create(user=user)
             login(request, user)
             messages.success(request, _("Signed in!"))
             return redirect('learner-dashboard')

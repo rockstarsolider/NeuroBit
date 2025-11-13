@@ -1,29 +1,35 @@
 from django.utils import timezone
-from kavenegar import *
-from config.settings import Kavenegar_API
 from random import randint
-
 from .models import CustomUser
+import logging
+import secrets
+from django.conf import settings
+from django.utils.translation import gettext_lazy as _
+try:
+    from kavenegar import KavenegarAPI
+    _kavenegar = KavenegarAPI(settings.KAVENEGAR_API)
+except Exception:  # nosec - best effort
+    _kavenegar = None
 
+    
+# Optional SMS client (Kavenegar). Falls back silently in dev.
+def get_random_otp() -> str:
+    """Generate a cryptographically secure 6-digit OTP."""
+    return f"{secrets.randbelow(900000) + 100000}"
 
-def send_otp_code(phone_number, code):
+def send_otp_code(phone_number: str, code: str) -> None:
+    if not _kavenegar:
+        logging.warning("Kavenegar client not available; SMS not sent (dev mode).")
+        return
+    params = {
+        "sender": '1000100175',
+        "receptor": phone_number,
+        "message": f"کد ورود شما: {code}",
+    }
     try:
-        api = KavenegarAPI(Kavenegar_API)
-        params = {
-            'sender': '1000100175',
-            'receptor': phone_number,
-            'message': f'Your Verify Code: {code}'
-        }
-        response = api.sms_send(params)
-        print(response)
-    except APIException as e:
-        print(e)
-    except HTTPException as e:
-        print(e)
-
-
-def get_random_otp():
-    return randint(10000, 99999)
+        _kavenegar.sms_send(params)
+    except Exception as exc:  # nosec
+        logging.warning("Failed to send OTP via Kavenegar: %s", exc)
 
 
 def check_otp_expiration(phone_number):

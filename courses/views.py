@@ -13,7 +13,7 @@ from django.utils.translation import gettext_lazy as _
 from datetime import timedelta
 
 # Learner side Views
-class LearnerDashboardView(TemplateView):
+class LearnerDashboardView(LoginRequiredMixin, TemplateView):
     template_name = "courses/learner_dash.html"
 
     def get_context_data(self, **kwargs):
