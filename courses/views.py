@@ -1,10 +1,10 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import View, ListView, UpdateView, DetailView
+from django.views.generic import View, ListView, UpdateView, DetailView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import (Learner, LearnerEnrollment, MentorAssignment, LearnerSubscribePlan, MentorGroupSessionOccurrence, 
                     StepProgress, EducationalStep, Task, TaskEvaluation, TaskSubmission, SocialPost, SocialMedia)
 from core.models import CustomUser
-from django.db.models import Max, Count, Q, Prefetch, Sum, Exists, OuterRef
+from django.db.models import Max, Count, Q, Prefetch, Sum, Exists, OuterRef, F
 from django.urls import reverse_lazy
 from .forms import ProfileForm
 from django.contrib import messages
@@ -13,9 +13,101 @@ from django.utils.translation import gettext_lazy as _
 from datetime import timedelta
 
 # Learner side Views
-class LearnerDashboardView(LoginRequiredMixin, View):
-    def get(self, request):
-        return render(request, 'courses/learner_dash.html')
+class LearnerDashboardView(TemplateView):
+    template_name = "courses/learner_dash.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+
+        learner = getattr(user, "learner_profile", None)
+        if not learner:
+            context["latest_enrollment"] = None
+            return context
+
+        # ✅ 1 query for latest active enrollment + related learning_path
+        latest_enrollment = (
+            LearnerEnrollment.objects
+            .select_related("learning_path")
+            .filter(learner=learner, status="active")
+            .order_by("-enroll_date")
+            .first()
+        )
+
+        context["latest_enrollment"] = latest_enrollment
+
+        if latest_enrollment:
+            # ✅ 1 query for StepProgress (prefetch tasks + submissions)
+            step_progresses = (
+                StepProgress.objects
+                .filter(mentor_assignment__enrollment=latest_enrollment)
+                .select_related("educational_step")
+                .prefetch_related(
+                    Prefetch("submissions", queryset=TaskSubmission.objects.only("id", "submitted_at"))
+                )
+            )
+
+            completed_steps = step_progresses.filter(task_completion_date__isnull=False).count()
+            total_steps = latest_enrollment.learning_path.steps.count()
+            progress_percent = round((completed_steps / total_steps) * 100) if total_steps else 0
+
+            # ✅ Compute upcoming deadlines (Python-side)
+            now = timezone.now()
+            upcoming_deadlines = []
+            for sp in step_progresses:
+                if sp.task_completion_date:
+                    continue
+
+                # Sum all extension days
+                extra_days = sum(ext.extended_by_days for ext in sp.extensions.all())
+                due_date = sp.initial_promise_date + timedelta(days=sp.initial_promise_days + extra_days)
+
+                if due_date > now:
+                    upcoming_deadlines.append({
+                        "step_title": sp.educational_step.title,
+                        "due_date": due_date,
+                        "days_left": (due_date - now).days,
+                    })
+
+            upcoming_deadlines.sort(key=lambda x: x["due_date"])
+            context["upcoming_deadlines"] = upcoming_deadlines[:5]
+
+            # ✅ Recent submissions
+            recent_submissions = (
+                TaskSubmission.objects
+                .filter(step_progress__mentor_assignment__enrollment=latest_enrollment)
+                .select_related("task", "step_progress__educational_step")
+                .order_by("-submitted_at")[:3]
+            )
+
+            # ✅ Recent evaluations
+            recent_evaluations = (
+                TaskEvaluation.objects
+                .filter(submission__step_progress__mentor_assignment__enrollment=latest_enrollment)
+                .select_related("submission__task", "mentor")
+                .order_by("-evaluated_at")[:3]
+            )
+
+            context.update({
+                "progress_percent": progress_percent,
+                "completed_steps": completed_steps,
+                "total_steps": total_steps,
+                "step_progresses": step_progresses,
+                "progress_offset": 282.6 - (progress_percent / 100) * 282.6,  # For svg in template
+                "upcoming_deadlines": upcoming_deadlines,
+                "recent_submissions": recent_submissions,
+                "recent_evaluations": recent_evaluations,
+            })
+        else:
+            context.update({
+                "progress_percent": 0,
+                "completed_steps": 0,
+                "total_steps": 0,
+                "step_progresses": [],
+                "progress_offset": 0
+            })
+
+        return context
     
 
 class StepListView(LoginRequiredMixin, ListView):
@@ -257,9 +349,9 @@ class ProfileOverviewView(LoginRequiredMixin, View):
 
         ongoing, completed = [], []
         for e in enrollments:
-            print(e, e.done)
-            p = round((e.done / e.total * 100), 1) if e.total else 0
-            data = {"path": e.learning_path, "status": e.status, "progress": p, "completed_date": e.last_done or e.unenroll_date}
+            p = round((e.done / e.total * 100)) if e.total else 0
+            p_offset = 100 - p  # For svg in template
+            data = {"path": e.learning_path, "status": e.status, "progress": p, "progress_offset":p_offset, "completed_date": e.last_done or e.unenroll_date, "enrollment": e.id}
             (completed if e.status == "graduated" else ongoing).append(data)
 
         return render(request, "courses/profile_overview.html", {

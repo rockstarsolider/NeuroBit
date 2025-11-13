@@ -27,7 +27,7 @@
                         class="flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold 
                               {% if step.can_start %}bg-slate-200 text-slate-700 hover:bg-slate-300{% else %}bg-slate-100 text-slate-400 cursor-not-allowed pointer-events-none{% endif %}"
                         {% if step.can_start %}href="{% url 'task-list' step.id %}"{% endif %}>
-                        {% trans 'Continue' %}
+                        {% trans 'View' %}
                       </a>
                     <div class="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 text-green-600">
                       <span class="material-symbols-outlined text-xl">done_all</span>

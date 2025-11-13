@@ -20,7 +20,7 @@
         <span class="material-symbols-outlined text-2xl text-slate-600 hover:text-(--primary-color) transition-colors"> notifications </span>
         <span class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">2</span>
         </button>
-        <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-slate-200" style='background-image: url("");'></div>
+        <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-slate-200" style='background-image: url("{{user.image.url}}");'></div>
         <form action="{% url 'set_language' %}" method="post">
             {% csrf_token %}
             {% get_current_language as LANGUAGE_CODE %}
