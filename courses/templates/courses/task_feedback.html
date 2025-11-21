@@ -29,11 +29,11 @@
                         </div>
                         <div class="flex-1 md:pl-8">
                             <div class="rating">
-                                <input id="star1" type="radio" name="score" value="1" class="mask mask-star-2 bg-(--primary-color)" aria-label="1 star" {% if evaluation.score == 1 %} checked="checked" {% endif %}/>
-                                <input id="star2" type="radio" name="score" value="2" class="mask mask-star-2 bg-(--primary-color)" aria-label="2 star" {% if evaluation.score == 2 %} checked="checked" {% endif %} />
-                                <input id="star3" type="radio" name="score" value="3" class="mask mask-star-2 bg-(--primary-color)" aria-label="3 star" {% if evaluation.score == 3 %} checked="checked" {% endif %}/>
-                                <input id="star4" type="radio" name="score" value="4" class="mask mask-star-2 bg-(--primary-color)" aria-label="4 star" {% if evaluation.score == 4 %} checked="checked" {% endif %}/>
-                                <input id="star5" type="radio" name="score" value="5" class="mask mask-star-2 bg-(--primary-color)" aria-label="5 star" {% if evaluation.score == 5 %} checked="checked" {% endif %}/>
+                                <input id="star1" type="radio" name="score" value="1" disabled class="mask mask-star-2 bg-(--primary-color)" aria-label="1 star" {% if evaluation.score == 1 %} checked="checked" {% endif %}/>
+                                <input id="star2" type="radio" name="score" value="2" disabled class="mask mask-star-2 bg-(--primary-color)" aria-label="2 star" {% if evaluation.score == 2 %} checked="checked" {% endif %} />
+                                <input id="star3" type="radio" name="score" value="3" disabled class="mask mask-star-2 bg-(--primary-color)" aria-label="3 star" {% if evaluation.score == 3 %} checked="checked" {% endif %}/>
+                                <input id="star4" type="radio" name="score" value="4" disabled class="mask mask-star-2 bg-(--primary-color)" aria-label="4 star" {% if evaluation.score == 4 %} checked="checked" {% endif %}/>
+                                <input id="star5" type="radio" name="score" value="5" disabled class="mask mask-star-2 bg-(--primary-color)" aria-label="5 star" {% if evaluation.score == 5 %} checked="checked" {% endif %}/>
                             </div>
                             <div class="prose max-w-none text-slate-700 mt-8">
                                 <div> {{evaluation.feedback|safe}} </div>

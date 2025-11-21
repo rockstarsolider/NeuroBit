@@ -1,17 +1,17 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import View, ListView, UpdateView, DetailView, TemplateView, FormView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import View, ListView, UpdateView, DetailView, TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import (Learner, LearnerEnrollment, MentorAssignment, LearnerSubscribePlan, MentorGroupSessionOccurrence, 
-                    StepProgress, EducationalStep, Task, TaskEvaluation, TaskSubmission, SocialPost, SocialMedia
-                    )
+                    StepProgress, EducationalStep, Task, TaskEvaluation, TaskSubmission, SocialPost, SocialMedia,
+                    MentorGroupSession, StepProgressSession)
 from core.models import CustomUser
-from django.db.models import Max, Count, Q, Prefetch, Sum, Exists, OuterRef, F
+from django.db.models import Max, Count, Q, Prefetch, Sum, Exists, OuterRef, Subquery
 from django.urls import reverse_lazy
 from .forms import ProfileForm
 from django.contrib import messages
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from datetime import timedelta
+from datetime import timedelta, datetime
 from django.utils.functional import cached_property
 
 # Learner side Views
@@ -730,14 +730,247 @@ class AttendaceHubView(LoginRequiredMixin, View):
         return render(request, 'courses/mentor/attendance_hub.html')
     
 
-class LearnersListView(LoginRequiredMixin, ListView):
-    def get(self, request):
-        return render(request, 'courses/mentor/learners_list.html')
+class MentorLearnersView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    template_name = "courses/mentor/learners_list.html"
+    context_object_name = "rows"
+
+    def test_func(self):
+        return hasattr(self.request.user, "mentor_profile")
+
+    def get_queryset(self):
+        mentor = self.request.user.mentor_profile
+
+        search = self.request.GET.get("search", "").strip()
+        status = self.request.GET.get("status", "all")
+
+        qs = (
+            MentorAssignment.objects.filter(mentor=mentor)
+            .select_related(
+                "enrollment__learner__user",
+                "enrollment__learning_path",
+            )
+        )
+
+        if status == "active":
+            qs = qs.filter(enrollment__learner__status="active")
+        elif status == "inactive":
+            qs = qs.filter(enrollment__learner__status="inactive")
+
+        if search:
+            qs = qs.filter(
+                Q(enrollment__learner__user__first_name__icontains=search)
+                | Q(enrollment__learner__user__last_name__icontains=search)
+            )
+
+        active_plan = LearnerSubscribePlan.objects.filter(
+            learner_enrollment=OuterRef("enrollment"),
+            status="active",
+        ).order_by("-start_datetime")
+
+        qs = qs.annotate(
+            plan_name=Subquery(active_plan.values("subscription_plan__name")[:1])
+        )
+
+        rows = {}
+        for a in qs:
+            learner = a.enrollment.learner
+            rows[learner.pk] = {
+                "learner": learner,
+                "learning_path": a.enrollment.learning_path,
+                "start_date": a.start_date,
+                "plan": a.plan_name or "—",
+            }
+
+        return list(rows.values())
     
 
-class SessionListView(LoginRequiredMixin, ListView):
-    def get(self, request):
-        return render(request, 'courses/mentor/session_list.html')
+
+class SessionListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    template_name = "courses/mentor/session_list.html"
+    context_object_name = "sessions"
+
+    def test_func(self):
+        return hasattr(self.request.user, "mentor_profile")
+
+    def get_queryset(self):
+        mentor = self.request.user.mentor_profile
+        now = timezone.now()
+
+        mode = self.request.GET.get("range", "upcoming")  # past/upcoming
+        search = self.request.GET.get("search", "").strip().lower()
+        sort = self.request.GET.get("sort", "")
+
+        # ---------------------------------------------------------
+        # UPCOMING SESSIONS (Recurring)
+        # ---------------------------------------------------------
+        if mode == "upcoming":
+            sessions = []
+
+            # ---------------------------------------------------------
+            # RECURRING GROUP SESSIONS (MentorGroupSession)
+            # ---------------------------------------------------------
+            for g in MentorGroupSession.objects.filter(mentor=mentor).select_related(
+                "learning_path", "session_type"
+            ):
+                today_weekday = now.isoweekday()
+                session_weekday = int(g.suppused_day)
+
+                delta_days = (session_weekday - today_weekday) % 7
+                next_date = (now + timedelta(days=delta_days)).date()
+
+                next_dt = datetime.combine(next_date, g.suppoused_time)
+                next_dt = timezone.make_aware(next_dt)
+
+                if next_dt >= now:
+                    sessions.append({
+                        "type": "group",
+                        "datetime": next_dt,
+                        "session": g,
+                        "learning_path": g.learning_path,
+                        "session_type": g.session_type,
+                        "learner": None,
+                    })
+
+            # ---------------------------------------------------------
+            # RECURRING CODE REVIEW SESSIONS (MentorAssignment)
+            # ---------------------------------------------------------
+            for a in MentorAssignment.objects.filter(mentor=mentor).select_related(
+                "enrollment__learner__user",
+                "enrollment__learning_path",
+            ):
+                today_weekday = now.isoweekday()
+                session_weekday = int(a.code_review_session_day)
+
+                delta_days = (session_weekday - today_weekday) % 7
+                next_date = (now + timedelta(days=delta_days)).date()
+
+                next_dt = datetime.combine(next_date, a.code_review_session_time)
+                next_dt = timezone.make_aware(next_dt)
+
+                if next_dt >= now:
+                    sessions.append({
+                        "type": "code_review",
+                        "datetime": next_dt,
+                        "assignment": a,
+                        "learning_path": a.enrollment.learning_path,
+                        "learner": a.enrollment.learner,
+                        "session_type": None,
+                    })
+
+            # Sort ascending
+            sessions.sort(key=lambda x: x["datetime"])
+
+        # ---------------------------------------------------------
+        # PAST SESSIONS (Actual Occurrences)
+        # ---------------------------------------------------------
+        else:
+            sessions = []
+
+            # Past group occurrences
+            group_occ = MentorGroupSessionOccurrence.objects.filter(
+                mentor_group_session__mentor=mentor,
+                occurence_datetime__lt=now,
+            ).select_related(
+                "mentor_group_session",
+                "mentor_group_session__learning_path",
+                "mentor_group_session__session_type",
+            )
+
+            for occ in group_occ:
+                sessions.append({
+                    "type": "group_occurrence",
+                    "datetime": occ.occurence_datetime,
+                    "occurrence": occ,
+                    "learning_path": occ.mentor_group_session.learning_path,
+                    "session_type": occ.mentor_group_session.session_type,
+                    "learner": None,
+                })
+
+            # Past 1:1 step sessions
+            step_occ = StepProgressSession.objects.filter(
+                step_progress__mentor_assignment__mentor=mentor,
+                datetime__lt=now,
+            ).select_related(
+                "session_type",
+                "step_progress",
+                "step_progress__mentor_assignment__enrollment__learner__user",
+                "step_progress__mentor_assignment__enrollment__learning_path",
+            )
+
+            for sess in step_occ:
+                sessions.append({
+                    "type": "step_session",
+                    "datetime": sess.datetime,
+                    "session": sess,
+                    "learning_path": sess.step_progress.mentor_assignment.enrollment.learning_path,
+                    "learner": sess.step_progress.mentor_assignment.enrollment.learner,
+                    "session_type": sess.session_type,
+                })
+
+            # Sort descending
+            sessions.sort(key=lambda x: x["datetime"], reverse=True)
+
+        # ---------------------------------------------------------
+        # SEARCH FILTER
+        # ---------------------------------------------------------
+        if search:
+            sessions = [
+                s for s in sessions
+                if (
+                    s.get("learner")
+                    and (
+                        search in s["learner"].user.first_name.lower()
+                        or search in s["learner"].user.last_name.lower()
+                    )
+                )
+                or (
+                    s.get("learning_path")
+                    and search in s["learning_path"].name.lower()
+                )
+                or (
+                    s.get("session_type")
+                    and search in s["session_type"].name_fa.lower()
+                )
+                or (
+                    s["type"] == "code_review" and "code" in search
+                )
+                or (
+                    s["type"] == "group" and "group" in search
+                )
+            ]
+
+        # ---------------------------------------------------------
+        # SORTING
+        # --------------------------------------------------------- 
+        def session_title(s):
+            if s["type"] == "group":
+                return f"{s['session'].session_type.name_fa} {s['learning_path'].name}".lower()
+            if s["type"] == "code_review":
+                return f"code review {s['learner'].user.get_full_name()}".lower()
+            if s["type"] == "group_occurrence":
+                return f"{s['session_type'].name_fa} {s['learning_path'].name}".lower()
+            if s["type"] == "step_session":
+                return f"step session {s['learner'].user.get_full_name()}".lower()
+            return ""
+
+        if sort == "oldest":
+            sessions.sort(key=lambda s: s["datetime"])
+        elif sort == "title_asc":
+            sessions.sort(key=lambda s: session_title(s))
+        elif sort == "title_desc":
+            sessions.sort(key=lambda s: session_title(s), reverse=True)
+        else:
+            # sort newest (default)
+            sessions.sort(key=lambda s: s["datetime"], reverse=True)
+
+        return sessions
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["range"] = self.request.GET.get("range", "upcoming")
+        ctx["search"] = self.request.GET.get("search", "")
+        ctx["sort"] = self.request.GET.get("sort", "")
+        return ctx
     
 
 class GroupSessionAttendanceView(LoginRequiredMixin, ListView):
