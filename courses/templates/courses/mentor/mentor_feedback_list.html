@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
 
 {% block content %}
 <div class="relative flex h-auto min-h-screen w-full flex-col bg-slate-50 group/design-root overflow-x-hidden"
@@ -9,14 +11,16 @@
             <div class="layout-content-container flex w-full max-w-6xl flex-col gap-8">
                 <div class="flex flex-col gap-2">
                     <div class="flex items-center justify-between">
-                        <h1 class="text-3xl font-bold text-[var(--text-primary)]">Feedback Queue</h1>
+                        <h1 class="text-3xl font-bold text-[var(--text-primary)]">{% trans "Feedback Queue"%}</h1>
                         <div class="flex items-center gap-2 rounded-lg bg-[var(--secondary-color)] px-4 py-2 text-sm">
-                            <span class="font-semibold text-[var(--primary-color)]">Tasks in Queue:</span>
-                            <span class="font-bold text-lg text-[var(--primary-color)]">5</span>
+                            <span class="font-semibold text-[var(--primary-color)]">{% trans "Tasks in Queue:"%}</span>
+                            <span class="font-bold text-lg text-[var(--primary-color)]">{{pending_count}}</span>
                         </div>
                     </div>
-                    <p class="text-[var(--text-secondary)]">Manage and provide feedback on pending tasks.</p>
+                    <p class="text-[var(--text-secondary)]">{% trans "Manage and provide feedback on pending tasks."%}</p>
                 </div>
+
+
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-wrap items-center justify-between gap-4">
                         <div class="relative flex-1 min-w-[300px]">
@@ -24,34 +28,55 @@
                                 class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]">
                                 search </span>
                             <input
+                                name="q" hx-get="." hx-target="#submission-list" hx-trigger="keyup changed delay:300ms"
                                 class="form-input w-full rounded-md border-slate-300 bg-white py-2.5 pl-10 pr-4 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:border-[var(--primary-color)] focus:ring-[var(--primary-color)]"
                                 placeholder="Search tasks by title, learner..." type="search" />
                         </div>
+
                         <div class="flex flex-wrap gap-3">
-                            <button
-                                class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-md bg-white border border-slate-300 px-4 text-sm font-medium text-[var(--text-secondary)] hover:bg-slate-50 transition-colors">
-                                <span>Sort by Date</span>
-                                <span class="material-symbols-outlined text-lg"> arrow_downward </span>
-                            </button>
-                            <button
-                                class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-md bg-white border border-slate-300 px-4 text-sm font-medium text-[var(--text-secondary)] hover:bg-slate-50 transition-colors">
-                                <span>Filter by Learner</span>
-                                <span class="material-symbols-outlined text-lg"> expand_more </span>
-                            </button>
-                            <button
-                                class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-md bg-white border border-slate-300 px-4 text-sm font-medium text-[var(--text-secondary)] hover:bg-slate-50 transition-colors">
-                                <span>Filter by Urgency</span>
-                                <span class="material-symbols-outlined text-lg"> expand_more </span>
-                            </button>
+                            <select
+                                name="sort"
+                                hx-get="."
+                                hx-target="#submission-list"
+                                hx-trigger="change"
+                                class="h-10 rounded-md border border-slate-300 bg-white px-3 text-sm text-[var(--text-secondary)]"
+                            >
+                                <option value="">Sort by (Default)</option>
+                                <option value="date">Date (Newest First)</option>
+                                <option value="date_old">Date (Oldest First)</option>
+                                <option value="task">Task Title</option>
+                                <option value="learner">Learner Name</option>
+                            </select>
+
+                            <select
+                                name="learner"
+                                hx-get="."
+                                hx-target="#submission-list"
+                                hx-trigger="change"
+                                class="h-10 rounded-md border border-slate-300 bg-white px-3 text-sm text-[var(--text-secondary)]"
+                            >
+                                <option value="">Filter by Learner</option>
+
+                                {% for learner in learners %}
+                                    <option 
+                                        value="{{ learner.id }}"
+                                        {% if request.GET.learner == learner.id|stringformat:"s" %}selected{% endif %}
+                                    >
+                                        {{ learner.user.get_full_name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
                         </div>
                     </div>
-                    <div class="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+
+
+                    <div  class="overflow-x-auto rounded-lg border border-slate-200 bg-white">
                         <table class="w-full text-left">
                             <thead class="bg-slate-50 border-b border-slate-200">
                                 <tr>
                                     <th
                                         class="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
-                                        Step Title</th>
+                                        Task Title</th>
                                     <th
                                         class="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
                                         Learner</th>
@@ -63,112 +88,8 @@
                                         Action</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-200">
-                                <tr class="hover:bg-slate-50">
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm font-medium text-[var(--text-primary)]">
-                                        Project Proposal</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-[var(--text-secondary)]">
-                                        <div class="flex items-center gap-3">
-                                            <img alt="Sophia Clark's avatar" class="h-8 w-8 rounded-full object-cover"
-                                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHi0p5zC0yhMAZEH_aCqtJifj7DxAKa2tzY39Ox_nxYFaL95kMCooV-_gnOXdB6iAnMrgFK40E1MXC2LoFLq-7g1OhQ0_24IgoUEA6SPONSpXMIYG6fGgi4nPSQL3cdO2N9u7vRbjBDevQJSgO71-obaEuCR0xGnoyUtCH_t453nP3rmtGL6dvK1LX1rkyo1l3XvCf4IVqL5dkkvTVoJD-lsT0uR_A6b-73qQJHvOLoF5DRfjNKFT44V5HEtxylFo8MsycYweRvQY" />
-                                            <span>Sophia Clark</span>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-[var(--text-secondary)]">
-                                        2024-03-15</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-right">
-                                        <button
-                                            class="inline-flex items-center gap-2 rounded-md bg-[var(--secondary-color)] px-4 py-2 text-sm font-semibold text-[var(--primary-color)] hover:bg-blue-100 transition-colors">
-                                            <span class="material-symbols-outlined text-base">rate_review</span>
-                                            Review Task
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr class="hover:bg-slate-50">
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm font-medium text-[var(--text-primary)]">
-                                        Research Paper Outline</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-[var(--text-secondary)]">
-                                        <div class="flex items-center gap-3">
-                                            <img alt="Ethan Miller's avatar" class="h-8 w-8 rounded-full object-cover"
-                                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7Ku-UewPrr1cBP1lGJDgdWEoDY25OatAlvgfxdH_Wc_oyM7Q5H5JUdgtmJb2YklLog61stgYUgeUJ54xz5OuXD0h9Iz-lwtNmSp7cdoKWyl45Ba1NoQCKLOuNEKlSOzMMACVovSSufaNyrWgmZM9osSOgQ0DWRoOxD18xgm8GwMjQrjlpUjj9777pz3GiEqktcFH1-80XdeyJ-wMb9d2wUDu54SQCq2Bu9CszkVAl8CwScyhMB9Qz-93tYo0SmiEp6CWz-PrIceo" />
-                                            <span>Ethan Miller</span>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-[var(--text-secondary)]">
-                                        2024-03-14</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-right">
-                                        <button
-                                            class="inline-flex items-center gap-2 rounded-md bg-[var(--secondary-color)] px-4 py-2 text-sm font-semibold text-[var(--primary-color)] hover:bg-blue-100 transition-colors">
-                                            <span class="material-symbols-outlined text-base">rate_review</span>
-                                            Review Task
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr class="hover:bg-slate-50">
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm font-medium text-[var(--text-primary)]">
-                                        Case Study Analysis</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-[var(--text-secondary)]">
-                                        <div class="flex items-center gap-3">
-                                            <img alt="Olivia Davis's avatar" class="h-8 w-8 rounded-full object-cover"
-                                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqIx_wrGoFZ2Mi1ZIe_lWzQgiLUNa9bvFv5p5249LvyYVXWNSGwuVXmgnJ5cY-anAv23FTi3ys6E4pb4rKLqJxe5UEvIvgP-mu60RY5SNZnK2RrPnJu3rVPjY8ZGrRhnTh09FknL52eZQ7uaweLu-81erec5V_5o8mC5p0wxS5pg4Ux8tl4I7BPIQrvy3agoWVJPCY6arSytD_XHFEVtZ54zqUL-Nf6isFCeHS0EHTRGLi7gOaaAvBlJh6XkRL9JiotzONVikVPD4" />
-                                            <span>Olivia Davis</span>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-[var(--text-secondary)]">
-                                        2024-03-12</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-right">
-                                        <button
-                                            class="inline-flex items-center gap-2 rounded-md bg-[var(--secondary-color)] px-4 py-2 text-sm font-semibold text-[var(--primary-color)] hover:bg-blue-100 transition-colors">
-                                            <span class="material-symbols-outlined text-base">rate_review</span>
-                                            Review Task
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr class="hover:bg-slate-50">
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm font-medium text-[var(--text-primary)]">
-                                        Presentation Slides</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-[var(--text-secondary)]">
-                                        <div class="flex items-center gap-3">
-                                            <img alt="Liam Wilson's avatar" class="h-8 w-8 rounded-full object-cover"
-                                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCejq8uGNknVk_JY6p6MaZX_TvlB6mPAjvJhG6OfVMki93WvnmtYvk0YK-G7QsoBwuFJ_dQy-riJPObp-rRDr6NRaj59Drnm29Dl4G1Wxmd5WxNSHxh_Qk1oG2mAEZLz504VTTr68gVFjmPLAzre21wSOVsT6M5KDDHQU8cSPXrS7Uz7vjdRRmrd9L79g9wGTYllDlBKIkm-8QQcIGoH41Z2WDBYJrJ57VV5Rd4clA7ZS4omQdRp-TYluRGM-fKFceBePUGIRdDKt0" />
-                                            <span>Liam Wilson</span>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-[var(--text-secondary)]">
-                                        2024-03-10</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-right">
-                                        <button
-                                            class="inline-flex items-center gap-2 rounded-md bg-[var(--secondary-color)] px-4 py-2 text-sm font-semibold text-[var(--primary-color)] hover:bg-blue-100 transition-colors">
-                                            <span class="material-symbols-outlined text-base">rate_review</span>
-                                            Review Task
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr class="hover:bg-slate-50">
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm font-medium text-[var(--text-primary)]">
-                                        Final Report</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-[var(--text-secondary)]">
-                                        <div class="flex items-center gap-3">
-                                            <img alt="Ava Taylor's avatar" class="h-8 w-8 rounded-full object-cover"
-                                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgTw5gu7Y9h12rcdrkgwJhcaUnDfprkQ5mBEylD0RCDHUym7LNpinZNX95bHT-7RsWbS-IoEAqym4u5tTaHwjN7hnTPwodRBb6hv1fQUhPWVFnHzrR4IXof6YTpLBXEIeJPNb-5EZysLwARE-tqxA79GrhrxlJ0jqJwy_QrqM0U6aQOiZmN1xvsRSSYZi-qzgdV1dKqFnDwmcWb5i0nmjs2YA7OT2-FVWPmSjm6CfCZUMDH1kwZCha08VncRfoGffDhLImFcJWhpU" />
-                                            <span>Ava Taylor</span>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-[var(--text-secondary)]">
-                                        2024-03-08</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-right">
-                                        <button
-                                            class="inline-flex items-center gap-2 rounded-md bg-[var(--secondary-color)] px-4 py-2 text-sm font-semibold text-[var(--primary-color)] hover:bg-blue-100 transition-colors">
-                                            <span class="material-symbols-outlined text-base">rate_review</span>
-                                            Review Task
-                                        </button>
-                                    </td>
-                                </tr>
+                            <tbody id="submission-list" hx-get="{% url 'mentor-feedback-list' %}" hx-trigger="change from:#filters" class="divide-y divide-slate-200">
+                                {% include 'courses/partials/mentor_feedback_table.html' %}
                             </tbody>
                         </table>
                     </div>

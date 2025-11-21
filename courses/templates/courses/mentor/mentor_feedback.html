@@ -12,115 +12,85 @@
                 </div>
                 <div class="rounded-lg border border-[#e2e8f0] bg-white shadow-sm">
                     <div class="border-b border-[#e2e8f0] bg-[#f8fafc] p-6">
-                        <h3 class="text-lg font-semibold text-[#0f172a]">Task Details</h3>
+                        <h3 class="text-lg font-semibold text-[#0f172a]">Task Sumbission Details</h3>
                         <dl class="mt-4 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-3">
                             <div>
                                 <dt class="text-sm font-medium text-[#64748b]">Task Title</dt>
-                                <dd class="mt-1 text-base font-semibold text-[#0f172a]">Design a Landing Page</dd>
+                                <dd class="mt-1 text-base font-semibold text-[#0f172a]">{{submission.task.title}}</dd>
                             </div>
                             <div>
                                 <dt class="text-sm font-medium text-[#64748b]">Learner</dt>
-                                <dd class="mt-1 text-base font-semibold text-[#0f172a]">Alex Doe</dd>
+                                <dd class="mt-1 text-base font-semibold text-[#0f172a]">{{submission.step_progress.mentor_assignment.enrollment.learner.user.get_full_name}}</dd>
                             </div>
                             <div>
-                                <dt class="text-sm font-medium text-[#64748b]">Submitted Work</dt>
-                                <dd class="mt-1">
-                                    <a class="flex items-center gap-2 text-[#0284c7] hover:underline" href="#">
-                                        <span class="material-symbols-outlined text-lg"> attach_file </span>
-                                        <span class="text-base font-medium">landing-page-design.fig</span>
-                                    </a>
+                                <dt class="text-sm font-medium text-[#64748b]">Submitted at</dt>
+                                <dd class="mt-1 text-base font-semibold text-[#0f172a]">{{submission.submitted_at}}</dd>
+                            </div>
+                        </dl>
+                        <dl class="mt-4 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-3">
+                            <div>
+                                <dt class="text-sm font-medium text-[#64748b]">Promised Date</dt>
+                                <dd class="mt-1 text-base font-semibold text-[#0f172a]">{{submission.step_progress.initial_promise_date}}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-[#64748b]">Links</dt>
+                                <dd class="mt-1 text-base font-semibold">
+                                    <a class='text-(--primary-color)' href="{{submission.artifact_url}}">Artifact</a> - 
+                                    <a class='text-(--primary-color)' href="{{submission.report_video_link}}">Report Video</a> - 
+                                    <a class='text-(--primary-color)' href="{{submission.repository}}">Repository</a>
+                                </dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-[#64748b]">Files</dt>
+                                <dd class="mt-1 text-base font-semibold">
+                                    {% if submission.file %}<a class='text-(--primary-color)' href="{{submission.file.url}}" download>File</a> - {% endif %}
+                                    {% if submission.report_video_link %}<a class='text-(--primary-color)' href="{{submission.report_video_link.url}}" download>Report Video</a>{% endif %}
                                 </dd>
                             </div>
                         </dl>
+                        <dl class="mt-4 flex flex-col gap-x-6 gap-y-4">
+                            <div>
+                                <dt class="text-sm font-medium text-[#64748b]">Comment</dt>
+                                <dd class="mt-1 text-base font-semibold text-[#0f172a]">{{submission.comment|safe}}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-[#64748b]">Task Description</dt>
+                                <dd class="mt-1 text-base font-semibold text-[#0f172a]">{{submission.task.description|safe}}</dd>
+                            </div>
+                        </dl>
                     </div>
+
                     <div class="p-6">
-                        <form class="space-y-6">
+                        <form class="space-y-6" method='post'>
+                            {% csrf_token %}
                             <div>
                                 <label class="block text-sm font-medium text-[#334155]"
                                     for="detailed-feedback">Detailed Feedback</label>
                                 <textarea
                                     class="mt-1 block w-full rounded-md border-[#cbd5e1] shadow-sm focus:border-[#0ea5e9] focus:ring-[#0ea5e9] sm:text-sm"
-                                    id="detailed-feedback" name="detailed-feedback"
+                                    id="detailed-feedback" name="feedback"
                                     placeholder="Provide clear, constructive, and actionable feedback..."
-                                    rows="6"></textarea>
+                                    rows="6">{{evaluation.feedback}}</textarea>
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-[#334155]">Attach Files</label>
-                                <div
-                                    class="mt-1 flex justify-center rounded-md border-2 border-dashed border-[#cbd5e1] px-6 pt-5 pb-6">
-                                    <div class="space-y-1 text-center">
-                                        <span class="material-symbols-outlined text-4xl text-[#94a3b8]">
-                                            cloud_upload </span>
-                                        <div class="flex text-sm text-[#475569]">
-                                            <label
-                                                class="relative cursor-pointer rounded-md bg-white font-medium text-[#0284c7] focus-within:outline-none focus-within:ring-2 focus-within:ring-[#0ea5e9] focus-within:ring-offset-2 hover:text-[#0ea5e9]"
-                                                for="file-upload">
-                                                <span>Upload a file</span>
-                                                <input class="sr-only" id="file-upload" name="file-upload"
-                                                    type="file" />
-                                            </label>
-                                            <p class="pl-1">or drag and drop</p>
-                                        </div>
-                                        <p class="text-xs text-[#64748b]">PNG, JPG, PDF up to 10MB</p>
-                                    </div>
-                                </div>
+
+                            <div class="rating">
+                                <input id="star1" type="radio" name="score" value="1" class="mask mask-star-2 bg-(--primary-color)" aria-label="1 star" {% if evaluation.score == 1 %} checked="checked" {% endif %}/>
+                                <input id="star2" type="radio" name="score" value="2" class="mask mask-star-2 bg-(--primary-color)" aria-label="2 star" {% if evaluation.score == 2 %} checked="checked" {% endif %} />
+                                <input id="star3" type="radio" name="score" value="3" class="mask mask-star-2 bg-(--primary-color)" aria-label="3 star" {% if evaluation.score == 3 %} checked="checked" {% endif %}/>
+                                <input id="star4" type="radio" name="score" value="4" class="mask mask-star-2 bg-(--primary-color)" aria-label="4 star" {% if evaluation.score == 4 %} checked="checked" {% endif %}/>
+                                <input id="star5" type="radio" name="score" value="5" class="mask mask-star-2 bg-(--primary-color)" aria-label="5 star" {% if evaluation.score == 5 %} checked="checked" {% endif %}/>
                             </div>
-                            <div class="space-y-3">
-                                <h4 class="text-sm font-medium text-[#334155]">Uploaded Files</h4>
-                                <ul class="space-y-3">
-                                    <li
-                                        class="flex items-center justify-between rounded-md border border-[#e2e8f0] bg-[#f8fafc] px-3 py-2">
-                                        <div class="flex items-center gap-3">
-                                            <span class="material-symbols-outlined text-[#64748b]"> description
-                                            </span>
-                                            <span
-                                                class="text-sm font-medium text-[#1e293b]">feedback-notes.pdf</span>
-                                        </div>
-                                        <button class="text-[#64748b] hover:text-red-600">
-                                            <span class="material-symbols-outlined text-xl"> delete </span>
-                                        </button>
-                                    </li>
-                                    <li
-                                        class="flex items-center justify-between rounded-md border border-[#e2e8f0] bg-[#f8fafc] px-3 py-2">
-                                        <div class="flex items-center gap-3">
-                                            <span class="material-symbols-outlined text-[#64748b]"> image </span>
-                                            <span
-                                                class="text-sm font-medium text-[#1e293b]">inspiration-screenshot.png</span>
-                                        </div>
-                                        <button class="text-[#64748b] hover:text-red-600">
-                                            <span class="material-symbols-outlined text-xl"> delete </span>
-                                        </button>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-[#334155]">Task Score</label>
-                                <div class="star-rating mt-2 flex flex-row-reverse items-center justify-end gap-1">
-                                    <input id="star5" name="rating" type="radio" value="5" /><label for="star5"
-                                        title="5 stars"><span
-                                            class="material-symbols-outlined !text-4xl">star</span></label>
-                                    <input id="star4" name="rating" type="radio" value="4" /><label for="star4"
-                                        title="4 stars"><span
-                                            class="material-symbols-outlined !text-4xl">star</span></label>
-                                    <input id="star3" name="rating" type="radio" value="3" /><label for="star3"
-                                        title="3 stars"><span
-                                            class="material-symbols-outlined !text-4xl">star</span></label>
-                                    <input id="star2" name="rating" type="radio" value="2" /><label for="star2"
-                                        title="2 stars"><span
-                                            class="material-symbols-outlined !text-4xl">star</span></label>
-                                    <input id="star1" name="rating" type="radio" value="1" /><label for="star1"
-                                        title="1 star"><span
-                                            class="material-symbols-outlined !text-4xl">star</span></label>
-                                </div>
-                            </div>
+
                             <div class="flex justify-end gap-4 pt-6">
+                                <a 
+                                    href='{% url "mentor-feedback-list" %}'
+                                    class="rounded-md border border-[#cbd5e1] bg-white px-6 py-2.5 text-sm font-semibold text-[#334155] shadow-sm hover:bg-[#f8fafc] focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-[#0284c7]"
+                                    type="button">Cancel</a>
                                 <button
-                                    class="rounded-md border border-[#cbd5e1] bg-white px-6 py-2.5 text-sm font-semibold text-[#334155] shadow-sm hover:bg-[#f8fafc] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0284c7]"
-                                    type="button">Cancel</button>
-                                <button
-                                    class="rounded-md bg-[#0284c7] px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#0369a1] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0284c7]"
+                                    class="rounded-md cursor-pointer bg-[#0284c7] px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#0369a1] focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-[#0284c7]"
                                     type="submit">Submit Feedback</button>
                             </div>
+
                         </form>
                     </div>
                 </div>

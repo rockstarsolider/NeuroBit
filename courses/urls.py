@@ -14,7 +14,7 @@ urlpatterns = [
     path('task_feedback/<int:step_progress_id>/task/<int:task_id>/', views.TaskFeedbackView.as_view(), name='task-feedback'),
 
     path('mentor_feedback_list/', views.MnetorFeedbackListView.as_view(), name='mentor-feedback-list'),
-    path('mentor_feedback/', views.MnetorFeedbackView.as_view(), name='mentor-feedback'),
+    path('mentor_feedback/<int:pk>/', views.MentorFeedbackView.as_view(), name='mentor-feedback'),
     path('attendance_hub/', views.AttendaceHubView.as_view(), name='attendance-hub'),
     path('learners_list/', views.LearnersListView.as_view(), name='learners-list'),
     path('session_list/', views.SessionListView.as_view(), name='session-list'),

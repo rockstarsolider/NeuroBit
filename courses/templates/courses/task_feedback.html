@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden bg-slate-50">
@@ -17,29 +18,24 @@
                     </div>
                     <div class="flex flex-col gap-8 p-6 md:flex-row">
                         <div class="flex flex-col items-center text-center md:w-1/4 md:items-start md:text-left">
-                            <div class="mb-4 h-32 w-32 rounded-full bg-cover bg-center bg-no-repeat"
-                                style='background-image: url("{{mentor.user.image.url}}");'>
-                            </div>
+                            {% if mentor.user.image %}
+                                <img src="{{ mentor.user.image.url }}" class="mb-4 h-32 w-32 rounded-full bg-cover bg-center bg-no-repeat" alt="Profile">
+                            {% else %}
+                                <img src="{% static 'images/default_user_image.jpg' %}" class="mb-4 h-32 w-32 rounded-full bg-cover bg-center bg-no-repeat" alt="Default Profile">
+                            {% endif %}
                             <h3 class="text-xl font-bold">{{mentor.user.first_name}} {{mentor.user.last_name}}</h3>
                             <p class="text-slate-500">Mentor</p>
                             <p class="mt-2 text-sm text-slate-400">{{evaluation.evaluated_at}}</p>
                         </div>
                         <div class="flex-1 md:pl-8">
-                            <div class="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                                <h2 class="text-2xl font-bold">Feedback</h2>
-                                <div class="flex flex-col items-start gap-2 sm:items-end">
-                                    <p class="text-sm font-medium text-slate-600">Task Score</p>
-                                    <div class="flex items-center gap-1">
-                                        <span class="material-symbols-outlined text-2xl text-yellow-400">star</span>
-                                        <span class="material-symbols-outlined text-2xl text-yellow-400">star</span>
-                                        <span class="material-symbols-outlined text-2xl text-yellow-400">star</span>
-                                        <span class="material-symbols-outlined text-2xl text-yellow-400">star</span>
-                                        <span
-                                            class="material-symbols-outlined text-2xl text-slate-300">star_outline</span>
-                                    </div>
-                                </div>
+                            <div class="rating">
+                                <input id="star1" type="radio" name="score" value="1" class="mask mask-star-2 bg-(--primary-color)" aria-label="1 star" {% if evaluation.score == 1 %} checked="checked" {% endif %}/>
+                                <input id="star2" type="radio" name="score" value="2" class="mask mask-star-2 bg-(--primary-color)" aria-label="2 star" {% if evaluation.score == 2 %} checked="checked" {% endif %} />
+                                <input id="star3" type="radio" name="score" value="3" class="mask mask-star-2 bg-(--primary-color)" aria-label="3 star" {% if evaluation.score == 3 %} checked="checked" {% endif %}/>
+                                <input id="star4" type="radio" name="score" value="4" class="mask mask-star-2 bg-(--primary-color)" aria-label="4 star" {% if evaluation.score == 4 %} checked="checked" {% endif %}/>
+                                <input id="star5" type="radio" name="score" value="5" class="mask mask-star-2 bg-(--primary-color)" aria-label="5 star" {% if evaluation.score == 5 %} checked="checked" {% endif %}/>
                             </div>
-                            <div class="prose max-w-none text-slate-700">
+                            <div class="prose max-w-none text-slate-700 mt-8">
                                 <div> {{evaluation.feedback|safe}} </div>
                             </div>
                         </div>

@@ -52,6 +52,7 @@ def verify_otp_view(request):
     try:
         phone_number = request.session.get('phone_number')
         user = CustomUser.objects.get(phone_number=phone_number)
+
         if request.method == "POST":
             # check otp expiration
             if not helper.check_otp_expiration(phone_number):
@@ -61,13 +62,21 @@ def verify_otp_view(request):
             if user.otp_code != str(request.POST.get('otp')):
                 messages.error(request, _('OTP code is incorrect!, please try again.'))
                 return redirect('verify')
+            
             user.is_active = True
             user.save()
-            Learner.objects.get_or_create(user=user)
+
             login(request, user)
+
+            if hasattr(user, "mentor_profile"):
+                messages.success(request, _("Signed in!"))
+                return redirect('attendance-hub')
+            
+            Learner.objects.get_or_create(user=user)
             messages.success(request, _("Signed in!"))
             return redirect('learner-dashboard')
+        
         return render(request, 'core/verify.html', {'phone_number': phone_number})
     except CustomUser.DoesNotExist:
-        messages.error(request, 'Error accorded!, please try again.')
+        messages.error(request, _('Error accorded!, please try again.'))
         return redirect('login')

@@ -34,15 +34,25 @@
       "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\learning_paths-c2eabbc246f4022b0cf6.js",
       "publicPath": "/static/webpack_output/learning_paths-c2eabbc246f4022b0cf6.js"
     },
-    "main-2af87197991c09f14bf3.css": {
-      "name": "main-2af87197991c09f14bf3.css",
-      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-2af87197991c09f14bf3.css",
-      "publicPath": "/static/webpack_output/main-2af87197991c09f14bf3.css"
+    "main-0063caa25031988b6ffc.css": {
+      "name": "main-0063caa25031988b6ffc.css",
+      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-0063caa25031988b6ffc.css",
+      "publicPath": "/static/webpack_output/main-0063caa25031988b6ffc.css"
     },
     "main-b56bddee3cf6e4fdb8a9.js": {
       "name": "main-b56bddee3cf6e4fdb8a9.js",
       "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-b56bddee3cf6e4fdb8a9.js",
       "publicPath": "/static/webpack_output/main-b56bddee3cf6e4fdb8a9.js"
+    },
+    "main-cc1a6549017b604ce19f.css": {
+      "name": "main-cc1a6549017b604ce19f.css",
+      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-cc1a6549017b604ce19f.css",
+      "publicPath": "/static/webpack_output/main-cc1a6549017b604ce19f.css"
+    },
+    "main-e6a94b0556cbf9d29313.css": {
+      "name": "main-e6a94b0556cbf9d29313.css",
+      "path": "A:\\Pouria\\neurobit_working\\static\\webpack_output\\main-e6a94b0556cbf9d29313.css",
+      "publicPath": "/static/webpack_output/main-e6a94b0556cbf9d29313.css"
     },
     "plotly-048a583c630733d133e2.js": {
       "name": "plotly-048a583c630733d133e2.js",
@@ -79,7 +89,7 @@
     "main": [
       "runtime-0a1d7751042834c98a40.js",
       "vendors-cffbc07edb4866ba9c49.js",
-      "main-2af87197991c09f14bf3.css",
+      "main-cc1a6549017b604ce19f.css",
       "main-b56bddee3cf6e4fdb8a9.js"
     ]
   },

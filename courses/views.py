@@ -1,8 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import View, ListView, UpdateView, DetailView, TemplateView
+from django.views.generic import View, ListView, UpdateView, DetailView, TemplateView, FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import (Learner, LearnerEnrollment, MentorAssignment, LearnerSubscribePlan, MentorGroupSessionOccurrence, 
-                    StepProgress, EducationalStep, Task, TaskEvaluation, TaskSubmission, SocialPost, SocialMedia)
+                    StepProgress, EducationalStep, Task, TaskEvaluation, TaskSubmission, SocialPost, SocialMedia
+                    )
 from core.models import CustomUser
 from django.db.models import Max, Count, Q, Prefetch, Sum, Exists, OuterRef, F
 from django.urls import reverse_lazy
@@ -11,6 +12,7 @@ from django.contrib import messages
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from datetime import timedelta
+from django.utils.functional import cached_property
 
 # Learner side Views
 class LearnerDashboardView(LoginRequiredMixin, TemplateView):
@@ -455,7 +457,7 @@ class TaskFeedbackView(LoginRequiredMixin, View):
         # ✅ Permission check
         if step_progress.mentor_assignment.enrollment.learner != learner:
             messages.error(request, "You are not allowed to view feedback for this task.")
-            return redirect("learner-dashboard-list")
+            return redirect("learner-dashboard")
 
         # ✅ Get latest submission for this learner and task
         submission = (
@@ -494,13 +496,233 @@ class TaskFeedbackView(LoginRequiredMixin, View):
 
 # Mentor side Views
 class MnetorFeedbackListView(LoginRequiredMixin, ListView):
-    def get(self, request):
-        return render(request, 'courses/mentor/mentor_feedback_list.html')
+    """ Mentor panel: submissions to evaluate + already evaluated ones """
+    model = TaskSubmission
+    template_name = "courses/mentor/mentor_feedback_list.html"
+    context_object_name = "submissions"
+    paginate_by = 25
+
+    def get_template_names(self):
+        if self.request.headers.get("HX-Request"):
+            # Return ONLY the table portion for HTMX
+            return ["courses/partials/mentor_feedback_table.html"]
+        return [self.template_name]
+
+    # ---------------------
+    # Access control
+    # ---------------------
+    @cached_property
+    def mentor(self):
+        return getattr(self.request.user, "mentor_profile", None)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.mentor:
+            messages.error(request, _('you do not have access to this page'))
+            return redirect("attendance-hub")
+        return super().dispatch(request, *args, **kwargs)
+
+    # ---------------------
+    # Core Queryset
+    # ---------------------
+    def get_queryset(self):
+        mentor = self.mentor
+
+        # Subquery: check if submission already evaluated by this mentor
+        evaluation_exists = TaskEvaluation.objects.filter(
+            submission=OuterRef("pk"), mentor=mentor
+        )
+
+        qs = (
+            TaskSubmission.objects
+            .filter(step_progress__mentor_assignment__mentor=mentor)
+            .select_related(
+                "task",
+                "step_progress",
+                "step_progress__mentor_assignment",
+                "step_progress__mentor_assignment__enrollment",
+                "step_progress__mentor_assignment__enrollment__learner",
+                "step_progress__mentor_assignment__enrollment__learner__user",
+            )
+            .annotate(
+                has_evaluation=Exists(evaluation_exists)
+            )
+        )
+
+        # ---------------------
+        # SEARCH
+        # ---------------------
+        q = self.request.GET.get("q")
+        if q:
+            qs = qs.filter(
+                Q(task__title__icontains=q) |
+                Q(step_progress__mentor_assignment__enrollment__learner__user__first_name__icontains=q) |
+                Q(step_progress__mentor_assignment__enrollment__learner__user__last_name__icontains=q)
+            )
+
+        # ---------------------
+        # FILTERS
+        # ---------------------
+        learner_id = self.request.GET.get("learner")
+        if learner_id:
+            qs = qs.filter(
+                step_progress__mentor_assignment__enrollment__learner_id=learner_id
+            )
+
+        task_id = self.request.GET.get("task")
+        if task_id:
+            qs = qs.filter(task_id=task_id)
+
+        status = self.request.GET.get("status")
+        if status == "pending":
+            qs = qs.filter(has_evaluation=False)
+        elif status == "evaluated":
+            qs = qs.filter(has_evaluation=True)
+
+        # ---------------------
+        # SORTING
+        # ---------------------
+        sort = self.request.GET.get("sort")
+        if sort == "task":
+            qs = qs.order_by("task__title")
+        elif sort == "learner":
+            qs = qs.order_by(
+                "has_evaluation",
+                "step_progress__mentor_assignment__enrollment__learner__user__first_name",
+                "step_progress__mentor_assignment__enrollment__learner__user__last_name",
+                "-submitted_at",
+            )
+        elif sort == "date_old":
+            qs = qs.order_by("has_evaluation", "submitted_at")
+        else:
+            # default behavior → show pending, then evaluated
+            qs = qs.order_by("has_evaluation", "-submitted_at")
+
+        return qs
+
+    # ---------------------
+    # Extra context
+    # ---------------------
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+
+        mentor = self.mentor
+        pending_count = (
+            TaskSubmission.objects
+            .filter(step_progress__mentor_assignment__mentor=mentor)
+            .annotate(
+                has_eval=Exists(
+                    TaskEvaluation.objects.filter(
+                        submission=OuterRef("pk"), mentor=mentor
+                    )
+                )
+            )
+            .filter(has_eval=False)
+            .count()
+        )
+        ctx["pending_count"] = pending_count
+
+        ctx["learners"] = (
+            Learner.objects
+            .filter(enrollments__mentor_assignments__mentor=self.mentor)
+            .select_related("user")
+            .distinct()
+        )
+
+        return ctx
     
 
-class MnetorFeedbackView(LoginRequiredMixin, View):
-    def get(self, request):
-        return render(request, 'courses/mentor/mentor_feedback.html')
+class MentorFeedbackView(LoginRequiredMixin, DetailView):
+    """
+    Mentor evaluates a specific submission.
+    """
+    model = TaskSubmission
+    template_name = "courses/mentor/mentor_feedback.html"
+    context_object_name = "submission"
+
+    # -----------------------------
+    # Check mentor access
+    # -----------------------------
+    @property
+    def mentor(self):
+        return getattr(self.request.user, "mentor_profile", None)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.mentor:
+            messages.error(request, _("You do not have access to this page."))
+            return redirect("attendance-hub")
+        return super().dispatch(request, *args, **kwargs)
+
+    # -----------------------------
+    # Queryset
+    # -----------------------------
+    def get_queryset(self):
+        mentor = self.mentor
+
+        return (
+            TaskSubmission.objects
+            .select_related(
+                "task",
+                "step_progress",
+                "step_progress__mentor_assignment",
+                "step_progress__mentor_assignment__enrollment",
+                "step_progress__mentor_assignment__enrollment__learner",
+                "step_progress__mentor_assignment__enrollment__learner__user",
+            )
+            .annotate(
+                already_evaluated=Exists(
+                    TaskEvaluation.objects.filter(
+                        submission=OuterRef("pk"), mentor=mentor
+                    )
+                )
+            )
+            .filter(step_progress__mentor_assignment__mentor=mentor)
+        )
+
+    # -----------------------------
+    # GET: load page
+    # -----------------------------
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        submission = ctx["submission"]
+
+        # Load evaluation if exists (in case of editing)
+        evaluation = TaskEvaluation.objects.filter(
+            submission=submission, mentor=self.mentor
+        ).first()
+
+        ctx["evaluation"] = evaluation
+        return ctx
+
+    # -----------------------------
+    # POST: submit evaluation
+    # -----------------------------
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        submission = self.object
+
+        # Extract form values
+        score = request.POST.get("score")
+        feedback = request.POST.get("feedback", "")
+
+        if not score:
+            messages.error(request, _("Please choose a score."))
+            return redirect("mentor-feedback", pk=submission.pk)
+
+        evaluation, created = TaskEvaluation.objects.update_or_create(
+            submission=submission,
+            mentor=self.mentor,
+            defaults={
+                "score": int(score),
+                "feedback": feedback,
+            }
+        )
+
+        if created:
+            messages.success(request, _("Evaluation submitted successfully!"))
+        else:
+            messages.success(request, _("Evaluation updated successfully!"))
+
+        return redirect("mentor-feedback-list")
     
 
 class AttendaceHubView(LoginRequiredMixin, View):
