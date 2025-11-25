@@ -21,10 +21,6 @@
         <span class="material-symbols-outlined text-2xl text-slate-600 hover:text-(--primary-color) transition-colors"> notifications </span>
         <span class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">2</span>
         </button>
-        {% comment %} <div 
-            class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-slate-200" 
-            style='background-image: url("{{ user.image.url|default_if_none:static('images/default_user_image.jpg') }}");'>
-        </div> {% endcomment %}
         {% if user.image %}
             <img src="{{ user.image.url }}" class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-slate-200" alt="Profile">
         {% else %}

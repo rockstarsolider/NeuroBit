@@ -92,6 +92,9 @@
                                 Session Title
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                                Type
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                                 Day
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
@@ -113,11 +116,24 @@
                                 {% if s.type == "group" %}
                                     {{ s.session.session_type.name_fa }} — {{ s.learning_path.name }}
                                 {% elif s.type == "code_review" %}
-                                    Code Review — {{ s.learner.user.get_full_name }} ({{ s.learning_path.name }})
+                                    {{ s.learner.user.get_full_name }} — بررسی کد ({{ s.learning_path.name }})
                                 {% elif s.type == "group_occurrence" %}
-                                    {{ s.session_type.name_fa }} — {{ s.learning_path.name }} (Past)
+                                    {{ s.session_type.name_fa }} — {{ s.learning_path.name }}
                                 {% elif s.type == "step_session" %}
-                                    Step Session — {{ s.learner.user.get_full_name }} ({{ s.learning_path.name }})
+                                    {{ s.learner.user.get_full_name }} — بررسی کد ({{ s.learning_path.name }})
+                                {% endif %}
+                            </td>
+
+                            <!-- Type -->
+                            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                                {% if s.type == "group" %}
+                                    <span class="material-symbols-outlined">groups</span>
+                                {% elif s.type == "code_review" %}
+                                    <span class="material-symbols-outlined">person</span>
+                                {% elif s.type == "group_occurrence" %}
+                                    <span class="material-symbols-outlined">groups</span>
+                                {% elif s.type == "step_session" %}
+                                    <span class="material-symbols-outlined">person</span>
                                 {% endif %}
                             </td>
 

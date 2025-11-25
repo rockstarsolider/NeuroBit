@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 <div class="flex flex-col min-h-screen bg-slate-50">
@@ -12,23 +13,35 @@
                         Back to Session History
                     </a>
                 </div>
+
                 <div class="bg-white p-6 sm:p-8 rounded-xl shadow-sm border border-gray-200">
                     <div class="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
                         <div>
-                            <h2 class="text-3xl font-bold text-[var(--brand-text-primary)]">Group Mentoring Session: The
-                                Art of Feedback</h2>
+                            <h2 class="text-3xl font-bold text-[var(--brand-text-primary)]">
+                                {{occurrence.mentor_group_session.session_type}} - {{occurrence.mentor_group_session.learning_path}}
+                            </h2>
                             <div class="mt-2 flex items-center gap-4 text-gray-500">
+
+                                <!-- Date And Time -->
                                 <div class="flex items-center gap-2">
                                     <span class="material-symbols-outlined text-lg">calendar_today</span>
-                                    <span>March 15, 2024</span>
+                                    <span>{%if occurrence.occurence_datetime_changed %} {{occurrence.new_datetime|date}} {% else %} {{occurrence.occurence_datetime|date}} {% endif %}</span>
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <span class="material-symbols-outlined text-lg">schedule</span>
-                                    <span>10:00 AM - 11:00 AM</span>
+                                    <span>{%if occurrence.occurence_datetime_changed %} {{occurrence.new_datetime|time}} {% else %} {{occurrence.occurence_datetime|time}} {% endif %}</span>
+                                </div>
+
+                                <!-- Recorded Video Link -->
+                                <div class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined">link</span>
+                                    <a class='text-(--primary-color)' href='{{occurrence.session_video_record}}'>{{occurrence.session_video_record}}</a>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
@@ -44,111 +57,42 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <div class="flex-shrink-0 h-10 w-10">
-                                                <img alt="Sophia Clark avatar" class="h-10 w-10 rounded-full"
-                                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4kU1uG75qGy2yb9goD_f-m_lpeogDdIleOcyJ9OBci_mPMuSzJSmaq-ueQNb81mJLN8CuJcEgCp8C-o_ZNHQBVdCvLZQB9QCXc8gX63ygTJ3oJu6PF46wbz_VMx45CZXvB0MOVPeV8BVBe3bKu5CjzlLhC5LWZA-aNimDayKEWgE-6pX_sMVxs96lc5G59irapsltF68_u_3LA-aXXpT4zjSifTsNrwrJ3pF0M6Q90f7bRrNvcTu6fDWVlLXlODhDg_L_2ybhibY" />
+                                {% for p in participants %}
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <!-- User Image -->
+                                                <div class="flex-shrink-0 h-10 w-10">
+                                                    {% if p.mentor_assignment.enrollment.learner.user.image %}
+                                                        <img src="{{ p.mentor_assignment.enrollment.learner.user.image.url }}" class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-slate-200" alt="Profile">
+                                                    {% else %}
+                                                        <img src="{% static 'images/default_user_image.jpg' %}" class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-slate-200" alt="Default Profile">
+                                                    {% endif %}
+                                                </div>
+
+                                                <div class="ml-4">
+                                                    <div class="text-sm font-medium text-gray-900">{{p.mentor_assignment.enrollment.learner.user.get_full_name}}</div>
+                                                    <div class="text-sm text-gray-500">{{p.mentor_assignment.enrollment.learner.user.email}}</div>
+                                                </div>
                                             </div>
-                                            <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900">Sophia Clark</div>
-                                                <div class="text-sm text-gray-500">sophia.clark@example.com</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span
-                                            class="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-[#D1FAE5] text-[var(--status-present-text)]">
-                                            <span class="material-symbols-outlined text-base mr-1.5">check_circle</span>
-                                            Present
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <div class="flex-shrink-0 h-10 w-10">
-                                                <img alt="Ethan Bennett avatar" class="h-10 w-10 rounded-full"
-                                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtCd6_Q970nc-3XFndmcnoXA33j_i6PtDHmELTeH3t9-l4qWuBMIqlSar6eoNZ4imZ0houKQuhg0xc4GIisXpyvAMKEahAixKH7fXwjsRrctBQv-APB3__9mCeBVgMdBeVao4JJn1Pitm0LC1ADa1f4-LQ2q2GykAEFiMCe0daKH4kw_EtpBmBmWoGWawBiy7yt9KHbIrzT3_8-4zQtKSS1Uxc6yhonlhz8yPgFe-Eu60lbytIqGjmkGGG1nlJO7ScB6N4xsRtxBM" />
-                                            </div>
-                                            <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900">Ethan Bennett</div>
-                                                <div class="text-sm text-gray-500">ethan.bennett@example.com</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span
-                                            class="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-[#FEE2E2] text-[var(--status-absent-text)]">
-                                            <span class="material-symbols-outlined text-base mr-1.5">cancel</span>
-                                            Absent
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <div class="flex-shrink-0 h-10 w-10">
-                                                <img alt="Olivia Carter avatar" class="h-10 w-10 rounded-full"
-                                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuArtdw6qHyZmRzIDahKHItATixHdPdPwqgfrFCrQdJm8-39kHOJfSaqbQ-DNj-K7Yct7mp9jF25ujPG_8lGhPHp6O09Afl1k81q2UgbIfhPJYdwX7QgMg_7pUIi3LOZj4pdJ4DJvj9zVMGopRQU_HcrWYbxFD99nMReLIh1kWB4Dz-W0-bkn3vG7CeukkT8CSWnsc0yE1RWvhhLexG6a0fUOdP5Sn6cftu1zbJElroZgoBH0ekF4GqMqaWnrOR3-6luzk2ChJlGNr8" />
-                                            </div>
-                                            <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900">Olivia Carter</div>
-                                                <div class="text-sm text-gray-500">olivia.carter@example.com</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span
-                                            class="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-[#D1FAE5] text-[var(--status-present-text)]">
-                                            <span class="material-symbols-outlined text-base mr-1.5">check_circle</span>
-                                            Present
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <div class="flex-shrink-0 h-10 w-10">
-                                                <img alt="Liam Davis avatar" class="h-10 w-10 rounded-full"
-                                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIguooEWK04GPFITfgwpsOFoZ_as9CfgK085I5LVVtdX7g0dtKVfzjK2LtzV8WzTGARSWwdV_nSQeyhggw_cy6ATZxkOg49azYGKBkA3EPlDVIV254jC6Q7MjKfR---nddsdCtVKE5oQzdCoqiTCPUm4_NwhJvcjeDg_Ta7KGmbhcYMcWmwZ9Pa3Iy3WQ1DyiQOWI29LBcEKFyqjXRdcPgh9S_WdyUwMJZpgvBSfPe1_iBur90GQJwrn8duQR32-W78KxHL5E_Vs4" />
-                                            </div>
-                                            <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900">Liam Davis</div>
-                                                <div class="text-sm text-gray-500">liam.davis@example.com</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span
-                                            class="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-[#FEF3C7] text-[var(--status-excused-text)]">
-                                            <span class="material-symbols-outlined text-base mr-1.5">person_off</span>
-                                            Excused
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <div class="flex-shrink-0 h-10 w-10">
-                                                <img alt="Ava Evans avatar" class="h-10 w-10 rounded-full"
-                                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQNo2CiwR0Cxoq8rlhLU6FMPIi02wTiKgBYIxd3Qmk7GW58h52dewsyUFqgcWykumc0ysC93X9up4lUgueUuuy33H_4qGUyRX0WpPbddJgDG9sVU-fDOJZ7RvWvmNoFWTPaeQdymztyoROK3B9bCj6iz_0Fy12QIKdAbsW1ZukxHAi_Ulu4EEeUI1DH5ZZJ7mAaRGdTeTimFUsEseC9iukRimE0gKq81xEJH1TkI0fn42FL75Ce1_AZSnWTb5R1RhraeJucI4jLEQ" />
-                                            </div>
-                                            <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900">Ava Evans</div>
-                                                <div class="text-sm text-gray-500">ava.evans@example.com</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span
-                                            class="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-[#D1FAE5] text-[var(--status-present-text)]">
-                                            <span class="material-symbols-outlined text-base mr-1.5">check_circle</span>
-                                            Present
-                                        </span>
-                                    </td>
-                                </tr>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            {% if p.learner_was_present %}
+                                                <span
+                                                    class="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-[#D1FAE5] text-[var(--status-present-text)]">
+                                                    <span class="material-symbols-outlined text-base mr-1.5">check_circle</span>
+                                                    Present
+                                                </span>
+                                            {% else %}
+                                                <span
+                                                    class="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-[#FEE2E2] text-[var(--status-absent-text)]"> 
+                                                    <span class="material-symbols-outlined text-base mr-1.5">cancel</span>
+                                                    Absent
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>

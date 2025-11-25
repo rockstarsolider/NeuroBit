@@ -3,7 +3,7 @@ from django.views.generic import View, ListView, UpdateView, DetailView, Templat
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import (Learner, LearnerEnrollment, MentorAssignment, LearnerSubscribePlan, MentorGroupSessionOccurrence, 
                     StepProgress, EducationalStep, Task, TaskEvaluation, TaskSubmission, SocialPost, SocialMedia,
-                    MentorGroupSession, StepProgressSession)
+                    MentorGroupSession, StepProgressSession, MentorGroupSessionParticipant)
 from core.models import CustomUser
 from django.db.models import Max, Count, Q, Prefetch, Sum, Exists, OuterRef, Subquery
 from django.urls import reverse_lazy
@@ -13,6 +13,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from datetime import timedelta, datetime
 from django.utils.functional import cached_property
+from django.http import Http404
 
 # Learner side Views
 class LearnerDashboardView(LoginRequiredMixin, TemplateView):
@@ -495,7 +496,7 @@ class TaskFeedbackView(LoginRequiredMixin, View):
     
 
 # Mentor side Views
-class MnetorFeedbackListView(LoginRequiredMixin, ListView):
+class MentorFeedbackListView(LoginRequiredMixin, ListView):
     """ Mentor panel: submissions to evaluate + already evaluated ones """
     model = TaskSubmission
     template_name = "courses/mentor/mentor_feedback_list.html"
@@ -731,6 +732,7 @@ class AttendaceHubView(LoginRequiredMixin, View):
     
 
 class MentorLearnersView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    """ Shows a list of Learners of a mentor """
     template_name = "courses/mentor/learners_list.html"
     context_object_name = "rows"
 
@@ -786,6 +788,7 @@ class MentorLearnersView(LoginRequiredMixin, UserPassesTestMixin, ListView):
 
 
 class SessionListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    """ Shows a list of upcoming and past sessions for a mentor """
     template_name = "courses/mentor/session_list.html"
     context_object_name = "sessions"
 
@@ -993,6 +996,52 @@ class LearnerAttendanceHistoryView(LoginRequiredMixin, ListView):
         return render(request, 'courses/mentor/learner_attendance_history.html')
     
 
-class GroupAttendanceHistoryView(LoginRequiredMixin, ListView):
-    def get(self, request):
-        return render(request, 'courses/mentor/group_attend_history.html')
+class GroupSessionAttendanceHistoryView(LoginRequiredMixin, DetailView):
+    """Show attendance list for a single group session occurrence."""
+    model = MentorGroupSessionOccurrence
+    context_object_name = "occurrence"
+    template_name = "courses/mentor/group_attend_history.html"
+
+    def get_queryset(self):
+        # Preload everything needed by the template
+        return (
+            MentorGroupSessionOccurrence.objects
+            .select_related(
+                "mentor_group_session",
+                "mentor_group_session__mentor__user",
+                "mentor_group_session__learning_path",
+                "mentor_group_session__session_type",
+            )
+        )
+
+    def dispatch(self, request, *args, **kwargs):
+        # Must be mentor
+        if not hasattr(request.user, "mentor_profile"):
+            raise Http404("You do not have access to this page.")
+
+        occurrence = self.get_object()
+
+        # Only the mentor who owns the session can view it
+        if occurrence.mentor_group_session.mentor != request.user.mentor_profile:
+            raise Http404("You do not have access to this session.")
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+
+        occurrence = self.object
+
+        participants = (
+            MentorGroupSessionParticipant.objects
+            .filter(mentor_group_session_occurence=occurrence)
+            .select_related(
+                "mentor_assignment",
+                "mentor_assignment__enrollment",
+                "mentor_assignment__enrollment__learner",
+                "mentor_assignment__enrollment__learner__user",
+            )
+        )
+
+        ctx["participants"] = participants
+        return ctx
