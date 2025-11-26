@@ -49,22 +49,25 @@
                             </select>
 
                             <select
-                                name="learner"
+                                name="status"
                                 hx-get="."
                                 hx-target="#submission-list"
                                 hx-trigger="change"
                                 class="h-10 rounded-md border border-slate-300 bg-white px-3 text-sm text-[var(--text-secondary)]"
                             >
-                                <option value="">Filter by Learner</option>
-
-                                {% for learner in learners %}
-                                    <option 
-                                        value="{{ learner.id }}"
-                                        {% if request.GET.learner == learner.id|stringformat:"s" %}selected{% endif %}
-                                    >
-                                        {{ learner.user.get_full_name }}
-                                    </option>
-                                {% endfor %}
+                                <option value="">Filter by Evaluation</option>
+                                <option 
+                                    value="evaluated"
+                                    {% if request.GET.status == evaluated %}selected{% endif %}
+                                >
+                                    Evaluated
+                                </option>
+                                <option 
+                                    value="pending"
+                                    {% if request.GET.status == pending %}selected{% endif %}
+                                >
+                                    Pending
+                                </option>
                             </select>
                         </div>
                     </div>

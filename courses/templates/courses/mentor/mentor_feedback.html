@@ -23,8 +23,12 @@
                                 <dd class="mt-1 text-base font-semibold text-[#0f172a]">{{submission.step_progress.mentor_assignment.enrollment.learner.user.get_full_name}}</dd>
                             </div>
                             <div>
-                                <dt class="text-sm font-medium text-[#64748b]">Submitted at</dt>
-                                <dd class="mt-1 text-base font-semibold text-[#0f172a]">{{submission.submitted_at}}</dd>
+                                <dt class="text-sm font-medium text-[#64748b]">Links</dt>
+                                <dd class="mt-1 text-base font-semibold">
+                                    <a class='text-(--primary-color)' href="{{submission.artifact_url}}">Artifact</a> - 
+                                    <a class='text-(--primary-color)' href="{{submission.report_video_link}}">Report Video</a> - 
+                                    <a class='text-(--primary-color)' href="{{submission.repository}}">Repository</a>
+                                </dd>
                             </div>
                         </dl>
                         <dl class="mt-4 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-3">
@@ -33,13 +37,15 @@
                                 <dd class="mt-1 text-base font-semibold text-[#0f172a]">{{submission.step_progress.initial_promise_date}}</dd>
                             </div>
                             <div>
-                                <dt class="text-sm font-medium text-[#64748b]">Links</dt>
-                                <dd class="mt-1 text-base font-semibold">
-                                    <a class='text-(--primary-color)' href="{{submission.artifact_url}}">Artifact</a> - 
-                                    <a class='text-(--primary-color)' href="{{submission.report_video_link}}">Report Video</a> - 
-                                    <a class='text-(--primary-color)' href="{{submission.repository}}">Repository</a>
-                                </dd>
+                                <dt class="text-sm font-medium text-[#64748b]">Submitted at</dt>
+                                <dd class="mt-1 text-base font-semibold text-[#0f172a]">{{submission.submitted_at}}</dd>
                             </div>
+                            <div>
+                                <dt class="text-sm font-medium text-[#64748b]">Evaluated at</dt>
+                                <dd class="mt-1 text-base font-semibold text-[#0f172a]">{{evaluation.evaluated_at}}</dd>
+                            </div>
+                        </dl>
+                        <dl class="mt-4 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-3">
                             <div>
                                 <dt class="text-sm font-medium text-[#64748b]">Files</dt>
                                 <dd class="mt-1 text-base font-semibold">

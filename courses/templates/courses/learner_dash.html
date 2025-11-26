@@ -177,7 +177,7 @@
                   <span class="text-sm font-medium">{% trans "Learning Path"%}</span>
                 </a>
               {%endif%}
-              <a class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors" href="{% url "profile-overview" %}">
+              <a class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors" href="{% url "profile" user.id %}">
                 <span class="material-symbols-outlined text-3xl text-slate-700">person</span>
                 <span class="text-sm font-medium">{% trans "Profile"%}</span>
               </a>

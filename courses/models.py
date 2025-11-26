@@ -298,9 +298,9 @@ class MentorAssignment(models.Model):
     end_date = models.DateField(null=True, blank=True)
     reason_for_change = models.TextField(blank=True)
     # if the learner was pro
-    code_review_pro_session_datetime = models.DateTimeField(blank=True, null=True) # Private
-    code_review_session_day = models.PositiveSmallIntegerField(choices=Weekday, default=Weekday.SAT)
-    code_review_session_time = models.TimeField(default=timezone.now)
+    google_meet_link = models.URLField(blank=True, help_text="The link for joining the meeting session.") # Private Session link
+    code_review_session_day = models.PositiveSmallIntegerField(choices=Weekday, default=Weekday.SAT) # Private Session Day
+    code_review_session_time = models.TimeField(default=timezone.now) # Private Session Time
 
     class Meta:
         ordering = ("-start_date",)

@@ -3,7 +3,7 @@ from django.views.generic import View, ListView, UpdateView, DetailView, Templat
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import (Learner, LearnerEnrollment, MentorAssignment, LearnerSubscribePlan, MentorGroupSessionOccurrence, 
                     StepProgress, EducationalStep, Task, TaskEvaluation, TaskSubmission, SocialPost, SocialMedia,
-                    MentorGroupSession, StepProgressSession, MentorGroupSessionParticipant)
+                    MentorGroupSession, StepProgressSession, MentorGroupSessionParticipant, SessionType)
 from core.models import CustomUser
 from django.db.models import Max, Count, Q, Prefetch, Sum, Exists, OuterRef, Subquery
 from django.urls import reverse_lazy, reverse
@@ -13,12 +13,17 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from datetime import timedelta, datetime
 from django.utils.functional import cached_property
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.template.loader import render_to_string
 
 # Learner side Views
 class LearnerDashboardView(LoginRequiredMixin, TemplateView):
     template_name = "courses/learner_dash.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        if not hasattr(request.user, "learner_profile"):
+            raise Http404("You do not have access to this page.")
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -130,6 +135,11 @@ class StepListView(LoginRequiredMixin, ListView):
             s.percentile = s.get_percentile()
             s.can_start = s.can_start(self.enrollment)
         return qs
+    
+    def dispatch(self, request, *args, **kwargs):
+        if not hasattr(request.user, "learner_profile"):
+            raise Http404("You do not have access to this page.")
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -141,6 +151,11 @@ class TaskListView(LoginRequiredMixin, ListView):
     model = Task
     context_object_name = "tasks"
     template_name = "courses/task_list.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        if not hasattr(request.user, "learner_profile"):
+            raise Http404("You do not have access to this page.")
+        return super().dispatch(request, *args, **kwargs)
 
     def get_step_progress(self, step_id, learner):
         return (
@@ -249,6 +264,11 @@ class TaskListView(LoginRequiredMixin, ListView):
 class TaskSubmissionView(View):
     template_name = "courses/task_submission.html"
 
+    def dispatch(self, request, *args, **kwargs):
+        if not hasattr(request.user, "learner_profile"):
+            raise Http404("You do not have access to this page.")
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request, step_progress_id, task_id):
         step_progress = get_object_or_404(StepProgress, pk=step_progress_id)
         task = get_object_or_404(Task, pk=task_id, step=step_progress.educational_step)
@@ -334,35 +354,79 @@ class TaskSubmissionView(View):
         return redirect(request.path)
     
 
-class ProfileOverviewView(LoginRequiredMixin, View):
-    def get(self, request):
-        learner = get_object_or_404(Learner, user=request.user)
-        enrollments = (
-            learner.enrollments
-            .select_related("learning_path")
-            .annotate(
-                total=Count("learning_path__steps", distinct=True),
-                done=Count(
-                    "learning_path__steps__step_progresses",
-                    filter=Q(learning_path__steps__step_progresses__task_completion_date__isnull=False),
-                    distinct=True
-                ),
-                last_done=Max("learning_path__steps__step_progresses__task_completion_date")
+class ProfileView(LoginRequiredMixin, View):
+    """
+    Unified profile page for ALL users.
+    - If user is a learner → adds learning path progress
+    - If user is mentor → shows only base profile area
+    """
+
+    def get(self, request, user_id):
+        user = get_object_or_404(CustomUser, pk=user_id)
+
+        # Prepare context for template (common fields)
+        context = {
+            "viewed_user": user,
+            "profile_user": None,
+            "ongoing_paths": [],
+            "completed_paths": [],
+        }
+
+        # ─────────────────────────────────────────────
+        # LEARNER PROFILE
+        # ─────────────────────────────────────────────
+        if hasattr(user, "learner_profile"):
+            profile_user = user.learner_profile
+            context["profile_user"] = profile_user
+
+            enrollments = (
+                profile_user.enrollments
+                .select_related("learning_path")
+                .annotate(
+                    total=Count("learning_path__steps", distinct=True),
+                    done=Count(
+                        "learning_path__steps__step_progresses",
+                        filter=Q(
+                            learning_path__steps__step_progresses__task_completion_date__isnull=False
+                        ),
+                        distinct=True,
+                    ),
+                    last_done=Max(
+                        "learning_path__steps__step_progresses__task_completion_date"
+                    )
+                )
             )
-        )
 
-        ongoing, completed = [], []
-        for e in enrollments:
-            p = round((e.done / e.total * 100)) if e.total else 0
-            p_offset = 100 - p  # For svg in template
-            data = {"path": e.learning_path, "status": e.status, "progress": p, "progress_offset":p_offset, "completed_date": e.last_done or e.unenroll_date, "enrollment": e.id}
-            (completed if e.status == "graduated" else ongoing).append(data)
+            ongoing, completed = [], []
 
-        return render(request, "courses/profile_overview.html", {
-            "learner": learner,
-            "ongoing_paths": ongoing,
-            "completed_paths": completed,
-        })
+            for e in enrollments:
+                p = round((e.done / e.total * 100)) if e.total else 0
+                p_offset = 100 - p
+
+                row = {
+                    "path": e.learning_path,
+                    "status": e.status,
+                    "progress": p,
+                    "progress_offset": p_offset,
+                    "completed_date": e.last_done or e.unenroll_date,
+                    "enrollment": e.id,
+                }
+
+                (completed if e.status == "graduated" else ongoing).append(row)
+
+            context["ongoing_paths"] = ongoing
+            context["completed_paths"] = completed
+
+        # ─────────────────────────────────────────────
+        # MENTOR PROFILE
+        # (same template, but no learning paths)
+        # ─────────────────────────────────────────────
+        elif hasattr(user, "mentor_profile"):
+            context["profile_user"] = user.mentor_profile
+            context["is_mentor"] = True
+
+        # REUSE SAME TEMPLATE FOR BOTH
+        return render(request, "courses/profile_overview.html", context)
     
 
 class EditProfileView(LoginRequiredMixin, UpdateView):
@@ -387,6 +451,11 @@ class LearningPathView(LoginRequiredMixin, DetailView):
     model = LearnerEnrollment
     template_name = "courses/learning_path.html"
     context_object_name = "enrollment"
+
+    def dispatch(self, request, *args, **kwargs):
+        if not hasattr(request.user, "learner_profile"):
+            raise Http404("You do not have access to this page.")
+        return super().dispatch(request, *args, **kwargs)
 
     def get_object(self, queryset=None):
         learner = get_object_or_404(Learner, user=self.request.user)
@@ -447,6 +516,11 @@ class StepPromiseView(LoginRequiredMixin, View):
 class TaskFeedbackView(LoginRequiredMixin, View):
     template_name = "courses/task_feedback.html"
 
+    def dispatch(self, request, *args, **kwargs):
+        if not hasattr(request.user, "learner_profile"):
+            raise Http404("You do not have access to this page.")
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request, step_progress_id, task_id):
         learner = getattr(request.user, "learner_profile", None)
         if not learner:
@@ -496,7 +570,10 @@ class TaskFeedbackView(LoginRequiredMixin, View):
         return render(request, self.template_name, context)
     
 
+# ---------------------
 # Mentor side Views
+# ---------------------
+
 class MentorFeedbackListView(LoginRequiredMixin, ListView):
     """ Mentor panel: submissions to evaluate + already evaluated ones """
     model = TaskSubmission
@@ -564,11 +641,6 @@ class MentorFeedbackListView(LoginRequiredMixin, ListView):
         # ---------------------
         # FILTERS
         # ---------------------
-        learner_id = self.request.GET.get("learner")
-        if learner_id:
-            qs = qs.filter(
-                step_progress__mentor_assignment__enrollment__learner_id=learner_id
-            )
 
         task_id = self.request.GET.get("task")
         if task_id:
@@ -731,6 +803,11 @@ class AttendaceHubView(LoginRequiredMixin, View):
     def get(self, request):
         return render(request, 'courses/mentor/attendance_hub.html')
     
+    def dispatch(self, request, *args, **kwargs):
+        if not hasattr(request.user, "mentor_profile"):
+            return HttpResponseForbidden("You are not a mentor.")
+        return super().dispatch(request, *args, **kwargs)
+    
 
 class MentorLearnersView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     """ Shows a list of Learners of a mentor """
@@ -842,6 +919,14 @@ class SessionListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
                 "enrollment__learner__user",
                 "enrollment__learning_path",
             ):
+                # pick most recent StepProgress for this learner's current step
+                step_progress = (
+                    a.step_progresses
+                        .select_related("educational_step")
+                        .order_by("-initial_promise_date")
+                        .first()
+                )
+
                 today_weekday = now.isoweekday()
                 session_weekday = int(a.code_review_session_day)
 
@@ -858,6 +943,7 @@ class SessionListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
                         "assignment": a,
                         "learning_path": a.enrollment.learning_path,
                         "learner": a.enrollment.learner,
+                        "step_progress": step_progress,
                         "session_type": None,
                     })
 
@@ -1072,15 +1158,145 @@ class GroupSessionAttendanceView(TemplateView, LoginRequiredMixin):
             reverse("session-list")
         )
 
+    
+class PrivateSessionHistoryView(LoginRequiredMixin, DetailView):
+    model = StepProgressSession
+    template_name = "courses/mentor/private_session_attendance.html"
+    context_object_name = "session_obj"
 
-class PrivateSessionAttendanceView(LoginRequiredMixin, ListView):
-    def get(self, request):
-        return render(request, 'courses/mentor/private_session_attendance.html')
+    def get_queryset(self):
+        # Optimize to 1 query
+        return (
+            StepProgressSession.objects
+            .select_related(
+                "step_progress",
+                "step_progress__educational_step",
+                "step_progress__mentor_assignment",
+                "step_progress__mentor_assignment__mentor",
+                "step_progress__mentor_assignment__enrollment",
+                "step_progress__mentor_assignment__enrollment__learner",
+                "step_progress__mentor_assignment__enrollment__learner__user",
+                "session_type",
+            )
+        )
+
+    def dispatch(self, request, *args, **kwargs):
+        session = self.get_object()
+        assigned_mentor = session.step_progress.mentor_assignment.mentor
+
+        if not hasattr(request.user, "mentor_profile"):
+            return HttpResponseForbidden("You are not a mentor.")
+
+        if request.user.mentor_profile != assigned_mentor:
+            return HttpResponseForbidden("You do not have permission to view this session.")
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        s = ctx["session_obj"]
+
+        ctx.update({
+            "learner": s.step_progress.mentor_assignment.enrollment.learner,
+            "step": s.step_progress.educational_step,
+            "assignment": s.step_progress.mentor_assignment,
+        })
+        return ctx
 
 
 class PrivateSessionManageView(LoginRequiredMixin, View):
-    def get(self, request):
-        return render(request, 'courses/mentor/private_session_manage.html')
+    template_name = "courses/mentor/private_session_manage.html"
+
+    def get_step_progress(self):
+        return (
+            StepProgress.objects
+            .select_related(
+                "mentor_assignment",
+                "mentor_assignment__mentor",
+                "mentor_assignment__enrollment",
+                "mentor_assignment__enrollment__learner",
+                "mentor_assignment__enrollment__learner__user",
+                "educational_step"
+            )
+            .get(pk=self.kwargs["step_progress_id"])
+        )
+
+    def dispatch(self, request, *args, **kwargs):
+        step_progress = self.get_step_progress()
+        assigned_mentor = step_progress.mentor_assignment.mentor
+
+        # Only correct mentor can access
+        if not hasattr(request.user, "mentor_profile"):
+            return HttpResponseForbidden("You are not a mentor.")
+
+        if request.user.mentor_profile != assigned_mentor:
+            return HttpResponseForbidden("You are not authorized for this learner.")
+
+        return super().dispatch(request, *args, **kwargs)
+
+    # -----------------------------
+    # Build session datetime
+    # -----------------------------
+    def compute_session_datetime(self, assignment):
+        # compute next date of weekday from schedule
+        target_weekday = assignment.code_review_session_day  # 1..7
+        time_value = assignment.code_review_session_time     # Time object
+
+        now = timezone.localtime()
+        current_weekday = now.isoweekday()
+
+        # Days until next session weekday
+        delta_days = (target_weekday - current_weekday) % 7
+        if delta_days == 0:
+            delta_days = 7  # next week's same day
+
+        session_date = now.date() + timedelta(days=delta_days)
+        session_dt = datetime.combine(session_date, time_value)
+        session_dt = timezone.make_aware(session_dt)
+
+        return session_dt
+
+    # -----------------------------
+    # GET: show form
+    # -----------------------------
+    def get(self, request, *args, **kwargs):
+        step_progress = self.get_step_progress()
+        assignment = step_progress.mentor_assignment
+        session_datetime = self.compute_session_datetime(assignment)
+
+        session_types = SessionType.objects.all().order_by("name_fa")
+
+        return render(request, self.template_name, {
+            "step_progress": step_progress,
+            "learner": assignment.enrollment.learner,
+            "step": step_progress.educational_step,
+            "session_datetime": session_datetime,
+            "session_types": session_types,   # <— dropdown data
+        })
+
+    # -----------------------------
+    # POST: create StepProgressSession
+    # -----------------------------
+    def post(self, request, *args, **kwargs):
+        step_progress = self.get_step_progress()
+        assignment = step_progress.mentor_assignment
+
+        present = request.POST.get("present") == "on"
+        recorded_link = request.POST.get("recorded_meet_link", "").strip()
+        session_type_id = request.POST.get("session_type_id")
+
+        # Validate session type
+        session_type = get_object_or_404(SessionType, pk=session_type_id)
+
+        StepProgressSession.objects.create(
+            step_progress=step_progress,
+            session_type=session_type,
+            present=present,
+            recorded_meet_link=recorded_link,
+        )
+
+        messages.success(request, "Private session recorded successfully.")
+        return redirect(reverse("session-list"))
 
 
 class LearnerAttendanceHistoryView(LoginRequiredMixin, ListView):
@@ -1221,11 +1437,11 @@ class LearnerAttendanceHistoryView(LoginRequiredMixin, ListView):
         return super().render_to_response(context, **response_kwargs)
     
 
-class GroupSessionAttendanceHistoryView(LoginRequiredMixin, DetailView):
+class GroupSessionHistoryView(LoginRequiredMixin, DetailView):
     """Show attendance list for a single group session occurrence."""
     model = MentorGroupSessionOccurrence
     context_object_name = "occurrence"
-    template_name = "courses/mentor/group_attend_history.html"
+    template_name = "courses/mentor/group_session_history.html"
 
     def get_queryset(self):
         # Preload everything needed by the template

@@ -54,14 +54,14 @@
                         </select>
 
                         <!-- UPCOMING / PAST TOGGLE -->
-                        <div class="flex rounded-md bg-gray-50 p-0.5">
+                        <div class="flex rounded-md bg-gray-50 p-0.5 w-96">
                             <button
                                 type="submit"
                                 name="range"
                                 value="upcoming"
                                 class="rounded-md px-3 py-1 text-sm font-medium ring-1 ring-inset ring-gray-300
                                 {% if range == 'upcoming' %} bg-white text-gray-700 {% else %} text-gray-500 hover:bg-gray-100 {% endif %}">
-                                Upcoming
+                                Weekly Sessions
                             </button>
 
                             <button
@@ -89,14 +89,20 @@
                             <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                                 Type
                             </th>
+                            {% if range == 'upcoming' %}
+                                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                                    Day
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                                    Time
+                                </th>
+                            {% else %}
+                                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                                    Held at
+                                </th>
+                            {% endif %}
                             <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                                Day
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                                Time
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                                Session Link
+                                {% if range == 'upcoming' %}Session Link{% elif range == 'past' %}Recorded Session Link{% endif %}
                             </th>
                             <th class="relative px-6 py-3"><span class="sr-only">Actions</span></th>
                         </tr>
@@ -132,6 +138,7 @@
                                 {% endif %}
                             </td>
 
+                            {% if range == 'upcoming' %}
                             <!-- DAY -->
                             <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                                 {{ s.datetime|date:"l" }}
@@ -141,33 +148,64 @@
                             <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                                 {{ s.datetime|date:"g:i A" }}
                             </td>
+                            {% else %}
+                            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                                {{ s.datetime }}
+                            </td>
+                            {% endif %}
 
                             <!-- LINK -->
                             <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                                 {% if s.type == "group" %}
                                     <a class="inline-flex items-center gap-1.5 text-blue-600 hover:underline"
-                                       href="{{ s.session.session_link }}">
+                                       href="{{ s.session.google_meet_link }}">
                                         <span class="material-symbols-outlined text-base">link</span> Join
                                     </a>
                                 {% elif s.type == "code_review" %}
                                     <a class="inline-flex items-center gap-1.5 text-blue-600 hover:underline"
-                                       href="{{ s.assignment.session_link }}">
+                                       href="{{ s.assignment.google_meet_link }}">
                                         <span class="material-symbols-outlined text-base">link</span> Join
                                     </a>
                                 {% elif s.type == "group_occurrence" %}
-                                    <span class="text-gray-400">Ended </span>
+                                    <a class="inline-flex items-center gap-1.5 text-blue-600 hover:underline"
+                                        href="{{ s.occurrence.session_video_record }}">
+                                        <span class="material-symbols-outlined text-base">link</span> View
+                                    </a>
                                 {% elif s.type == "step_session" %}
-                                    <span class="text-gray-400">Ended</span>
+                                    <a class="inline-flex items-center gap-1.5 text-blue-600 hover:underline"
+                                        href="{{ s.session.recorded_meet_link }}">
+                                        <span class="material-symbols-outlined text-base">link</span> View
+                                    </a>
                                 {% endif %}
                             </td>
 
                             <!-- ACTIONS -->
                             <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                                <a class="inline-flex items-center gap-2 rounded-md bg-slate-100 px-3 py-1.5 text-sm font-semibold text-primary-700 hover:bg-primary-200"
-                                   href="#">
-                                    <span class="material-symbols-outlined text-base">task_alt</span>
-                                    Manage Attendance
-                                </a>
+                                {% if s.type == "group" %}
+                                    <a class="inline-flex items-center gap-2 rounded-md bg-slate-100 px-3 py-1.5 text-sm font-semibold text-primary-700 hover:bg-primary-200"
+                                        href="{% url "group-session-attendance" s.session.id %}">
+                                        <span class="material-symbols-outlined text-base">add</span>
+                                        Add session occurrence
+                                    </a>
+                                {% elif s.type == "code_review" and s.step_progress %}
+                                    <a class="inline-flex items-center gap-2 rounded-md bg-slate-100 px-3 py-1.5 text-sm font-semibold text-primary-700 hover:bg-primary-200"
+                                        href="{% url "private-session-manage" s.step_progress.id %}">
+                                        <span class="material-symbols-outlined text-base">add</span>
+                                        Add session occurrence
+                                    </a>
+                                {% elif s.type == "group_occurrence" %}
+                                    <a class="inline-flex items-center gap-2 rounded-md bg-slate-100 px-3 py-1.5 text-sm font-semibold text-primary-700 hover:bg-primary-200"
+                                        href="{% url "group-session-history" s.occurrence.id %}">
+                                        <span class="material-symbols-outlined">folder</span>
+                                        View History
+                                    </a>
+                                {% elif s.type == "step_session" %}
+                                    <a class="inline-flex items-center gap-2 rounded-md bg-slate-100 px-3 py-1.5 text-sm font-semibold text-primary-700 hover:bg-primary-200"
+                                        href="{% url "private-session-history" s.session.id %}">
+                                        <span class="material-symbols-outlined">folder</span>
+                                        View History
+                                    </a>
+                                {% endif %}
                             </td>
                         </tr>
                         {% empty %}
