@@ -18,9 +18,9 @@ urlpatterns = [
     path('attendance_hub/', views.AttendaceHubView.as_view(), name='attendance-hub'),
     path('learners_list/', views.MentorLearnersView.as_view(), name='learners-list'),
     path('session_list/', views.SessionListView.as_view(), name='session-list'),
-    path('group_session_attendance/', views.GroupSessionAttendanceView.as_view(), name='group-session-attendance'),
+    path('group_session_attendance/<int:group_session_id>', views.GroupSessionAttendanceView.as_view(), name='group-session-attendance'),
     path('private_session_attendance/', views.PrivateSessionAttendanceView.as_view(), name='private-session-attendance'),
     path('private_session_manage/', views.PrivateSessionManageView.as_view(), name='private-session-manage'),
-    path('learner_attendance_history/', views.LearnerAttendanceHistoryView.as_view(), name='learner-attendance-history'),
+    path('learner_attendance_history/<int:learner_id>/', views.LearnerAttendanceHistoryView.as_view(), name='learner-attendance-history'),
     path('group_attendance_history/<int:pk>/', views.GroupSessionAttendanceHistoryView.as_view(), name='group-attendance-history'),
 ]

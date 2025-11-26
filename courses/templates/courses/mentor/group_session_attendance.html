@@ -1,38 +1,31 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 <div class="flex min-h-screen w-full flex-col">
     <main class="flex-1 bg-gray-50 py-8">
-        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+        <form method="post" class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+            {% csrf_token %}
             <div class="mb-8">
                 <h2 class="text-3xl font-bold tracking-tight text-gray-900 mb-4">
-                    Group Session Attendance
+                    {{ group_session.session_type.name_fa }} — {{ group_session.learning_path }}
                 </h2>
                 <div class="space-y-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700" for="session-topic">Session Topic</label>
-                        <input
-                            class="mt-1 block w-full rounded-md border-slate-50 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-lg"
-                            id="session-topic" name="session-topic" placeholder="e.g., Group Study on Calculus"
-                            type="text" value="Group Study on Calculus" />
-                    </div>
                     <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700" for="session-date">Session
-                                Date</label>
+                            <label class="block text-sm font-medium text-gray-700" for="session-date">Session Date</label>
                             <div class="relative mt-1">
                                 <input
-                                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
-                                    id="session-date" name="session-date" type="date" value="2024-07-20" />
+                                    class="block w-full disabled:bg-gray-100 rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                                    id="session-date" disabled name="session-date" type="date" value="{{ auto_datetime|date:"Y-m-d" }}" />
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700" for="session-time">Session
-                                Time</label>
+                            <label class="block text-sm font-medium text-gray-700" for="session-time">Session Time</label>
                             <div class="relative mt-1">
                                 <input
-                                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
-                                    id="session-time" name="session-time" type="time" value="14:00" />
+                                    class="block w-full disabled:bg-gray-100 rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                                    id="session-time" disabled name="session-time" type="time" value="{{ auto_datetime|time:'H:i' }}" />
                             </div>
                         </div>
                         <div>
@@ -40,9 +33,9 @@
                                 Duration</label>
                             <div class="relative mt-1">
                                 <input
-                                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                                    class="block w-full disabled:bg-gray-100 rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                                     id="session-duration" name="session-duration" placeholder="e.g., 60 minutes"
-                                    type="text" value="90 minutes" />
+                                    type="text" disabled value="{{group_session.session_type.duration_minutes}}" />
                             </div>
                         </div>
                     </div>
@@ -62,174 +55,76 @@
                                 for="session-time-changed">Session Time Changed</label>
                         </div>
                     </div>
-                    <div class="mt-6 flex justify-end">
-                        <button
-                            class="inline-flex items-center justify-center rounded-md bg-(--primary-color) px-4 py-2 text-sm font-semibold text-white shadow-sm">
-                            Save Session Details
-                        </button>
-                    </div>
                 </div>
             </div>
+
+
             <div class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
                 <div class="border-b border-gray-200 bg-gray-50 px-6 py-4">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-lg font-semibold text-gray-800">
-                            Authorized Participants
-                        </h3>
-                        <div class="flex items-center gap-6">
-                            <div class="flex items-center gap-2">
-                                <span class="material-symbols-outlined text-green-600"> check_circle </span>
-                                <span class="text-sm font-medium text-gray-600">Present: <span
-                                        class="font-bold text-gray-900">3</span></span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span class="material-symbols-outlined text-red-600"> cancel </span>
-                                <span class="text-sm font-medium text-gray-600">Absent: <span
-                                        class="font-bold text-gray-900">2</span></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="border-b border-gray-200 p-4 sm:p-6">
-                    <div class="relative">
-                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                            search </span>
-                        <input
-                            class="w-full rounded-md border-gray-300 py-2 pl-10 pr-4 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                            id="participant-search" name="participant-search" placeholder="Search participants..."
-                            type="search" />
-                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800">
+                        Presence of Learners
+                    </h3>
                 </div>
                 <ul class="divide-y divide-gray-200">
+                    {% for a in learners %}
                     <li class="flex items-center justify-between px-6 py-4">
                         <div class="flex items-center gap-4">
-                            <img alt="Sophia Clark" class="h-12 w-12 rounded-full object-cover"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxisqkUOZ7h21VUwWwTzu2tf_Yw0y5GC6KCuPR3s5N-U7-s9TZ2evOu0-2p7DaZC4WcB6k9EgYdiPd7MGzwtpiIoa7Kh4X8syeh-fRSDDrFeRnJuknJvsbaUY2DRXrDRGodNisvEGXU781Y8KDOIaF-cmQMdd4YIDOjkWyILyiIORn_Xd4vbg_KY7-MqSBIL9mx1Og4kiYMqhOpB2HIk1YiCDsjMHe4CRBWJm3f2RYypWt64bosDhHdpHuIOXCfxrTNFcPbbkAGv4" />
+                            {% if a.enrollment.learner.user.image %}
+                                <img src="{{ a.enrollment.learner.user.image.url }}" class="h-8 w-8 rounded-full" alt="Profile">
+                            {% else %}
+                                <img src="{% static 'images/default_user_image.jpg' %}" class="h-8 w-8 rounded-full" alt="Default Profile">
+                            {% endif %}
                             <div>
-                                <p class="font-medium text-gray-900">Sophia Clark</p>
-                                <span class="text-sm text-gray-500">Present</span>
+                                <p class="font-medium text-gray-900">{{ a.enrollment.learner.user.get_full_name }}</p>
                             </div>
                         </div>
+                
                         <div class="flex items-center gap-4">
-                            <a class="inline-flex items-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-700"
-                                href="#">
+                            <a href="{% url 'learner-attendance-history' a.enrollment.learner.id %}"
+                               class="inline-flex items-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-700">
                                 <span class="material-symbols-outlined text-base">history</span>
                                 View History
                             </a>
-                            <label class="switch-label relative inline-flex cursor-pointer items-center">
-                                <input checked="" class="peer sr-only" type="checkbox" />
-                                <div class="peer h-7 w-12 rounded-full bg-gray-200 peer-checked:bg-green-500"></div>
-                                <div
-                                    class="switch-dot absolute left-1 top-1 h-5 w-5 rounded-full bg-white shadow-md peer-checked:border-green-500">
-                                </div>
-                            </label>
+                
+                            <!-- Presence checkbox -->
+                            <input type="checkbox" name="presence-{{ a.id }}" class="toggle">
                         </div>
                     </li>
-                    <li class="flex items-center justify-between px-6 py-4">
-                        <div class="flex items-center gap-4">
-                            <img alt="Ethan Miller" class="h-12 w-12 rounded-full object-cover"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWnqupCCDcqVsRKlz8p6C2f42cOtpPMW5EEsy7EH6KWcAMD01K9hA8Hu0CYTZIW_5ebdrBy6cQmnizeiWXv5LA4ilcYJpb1yJWHNPliD8aDhM2zyXM8TpAL68WNIk5T0BuKcZw3QlKSMlheNGcBPs1K3pWI8kK_KB2udHFN4YoO1aS9aLF-0gsVIywx-JbQJu0KJsi7-tVQHEqI1Oh-sJzCZcB6l0nATzG7PGswra73E9ms439olbF1pI3uk_NfZSY7bHpgoW2lF0" />
-                            <div>
-                                <p class="font-medium text-gray-900">Ethan Miller</p>
-                                <span class="text-sm text-gray-500">Absent</span>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <a class="inline-flex items-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-700"
-                                href="#">
-                                <span class="material-symbols-outlined text-base">history</span>
-                                View History
-                            </a>
-                            <label class="switch-label relative inline-flex cursor-pointer items-center">
-                                <input class="peer sr-only" type="checkbox" />
-                                <div class="peer h-7 w-12 rounded-full bg-gray-200 peer-checked:bg-green-500"></div>
-                                <div
-                                    class="switch-dot absolute left-1 top-1 h-5 w-5 rounded-full bg-white shadow-md peer-checked:border-green-500">
-                                </div>
-                            </label>
-                        </div>
-                    </li>
-                    <li class="flex items-center justify-between px-6 py-4">
-                        <div class="flex items-center gap-4">
-                            <img alt="Olivia Davis" class="h-12 w-12 rounded-full object-cover"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6-OIJRxWuROB3jAv_LwM46QUN2WxcfpjMcki_1HT3JN1XXxGzZ8P0m-NW4DwMF9v5GmszKpKIdLa78C9eA2UCoGAWOQppp2olhc_2YhRPZI9FRQNTlgmQgpjoEnRV_TR6mV3s_Ini0l4FH8fFULRN-jW4rDkHOF5QbqlVZqxpPNTGNGEzVyLz35PMz5GmuXRBR8psluLvPhDK2D6cI8SfD3D6fubxYFoxGrsm573Mt5M918WpyCRBpUvvy5VojNF3_Jk40ctEMEc" />
-                            <div>
-                                <p class="font-medium text-gray-900">Olivia Davis</p>
-                                <span class="text-sm text-gray-500">Present</span>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <a class="inline-flex items-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-700"
-                                href="#">
-                                <span class="material-symbols-outlined text-base">history</span>
-                                View History
-                            </a>
-                            <label class="switch-label relative inline-flex cursor-pointer items-center">
-                                <input checked="" class="peer sr-only" type="checkbox" />
-                                <div class="peer h-7 w-12 rounded-full bg-gray-200 peer-checked:bg-green-500"></div>
-                                <div
-                                    class="switch-dot absolute left-1 top-1 h-5 w-5 rounded-full bg-white shadow-md peer-checked:border-green-500">
-                                </div>
-                            </label>
-                        </div>
-                    </li>
-                    <li class="flex items-center justify-between px-6 py-4">
-                        <div class="flex items-center gap-4">
-                            <img alt="Noah Wilson" class="h-12 w-12 rounded-full object-cover"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAshkoLK6vJIDBeFCKtzkLa4PRrO7lENKxn7kP1clpqSjfT_2k8dOvI3Z5QTx40HkQvhEWkvMqFvzYd5LngeAmoKEc7O-tEIAtry48Rfs2Dhd_Ko607gLdqBsvBOWweZYEFPo1XH50qAIO9OA8BU1ueCLWeDsck3S59bJ6eri_MCuzuM9WJkWiEn0TVKrq8mzwiunY6dAIfvfnHI6NoUm3inmZNhdSS7uktCwHJEnClbSd2hh1LcA7aiSU80db8jD-lxAlBwKB3esw" />
-                            <div>
-                                <p class="font-medium text-gray-900">Noah Wilson</p>
-                                <span class="text-sm text-gray-500">Present</span>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <a class="inline-flex items-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-700"
-                                href="#">
-                                <span class="material-symbols-outlined text-base">history</span>
-                                View History
-                            </a>
-                            <label class="switch-label relative inline-flex cursor-pointer items-center">
-                                <input checked="" class="peer sr-only" type="checkbox" />
-                                <div class="peer h-7 w-12 rounded-full bg-gray-200 peer-checked:bg-green-500"></div>
-                                <div
-                                    class="switch-dot absolute left-1 top-1 h-5 w-5 rounded-full bg-white shadow-md peer-checked:border-green-500">
-                                </div>
-                            </label>
-                        </div>
-                    </li>
-                    <li class="flex items-center justify-between px-6 py-4">
-                        <div class="flex items-center gap-4">
-                            <img alt="Ava Thompson" class="h-12 w-12 rounded-full object-cover"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbJO92x46YLF-Vii4ReAjTgYEstRivnwH10mMywyb5DnEeFzkiPybwIoA0KDRiACOiCViV_tpF9kd2v_Re-mJpSJhrWmPDW0LvVj08nfIJB4BuW1cATP01VzmH0gJOS60mBKAWSCY-rrWKzcYuMD-3-WVxsH1iaOPabzorD7J3RDhkaI5eKhQT0Z63K5EZ4rcTuMpnSSUSQCIanqysm3d39N_TZO8tNnu35yv6X12hsshMZnWZ28aXzfJGCRHGlXjC8I_RvibGQ9I" />
-                            <div>
-                                <p class="font-medium text-gray-900">Ava Thompson</p>
-                                <span class="text-sm text-gray-500">Absent</span>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <a class="inline-flex items-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-700"
-                                href="#">
-                                <span class="material-symbols-outlined text-base">history</span>
-                                View History
-                            </a>
-                            <label class="switch-label relative inline-flex cursor-pointer items-center">
-                                <input class="peer sr-only" type="checkbox" />
-                                <div class="peer h-7 w-12 rounded-full bg-gray-200 peer-checked:bg-green-500"></div>
-                                <div
-                                    class="switch-dot absolute left-1 top-1 h-5 w-5 rounded-full bg-white shadow-md peer-checked:border-green-500">
-                                </div>
-                            </label>
-                        </div>
-                    </li>
+                    {% endfor %}
                 </ul>
-                <div class="flex justify-end border-t border-gray-200 bg-gray-50 px-6 py-4">
-                    <button
-                        class="inline-flex items-center justify-center rounded-md bg-(--primary-color) px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
-                        Save Attendance
-                    </button>
-                </div>
             </div>
-        </div>
+
+            <div class="flex justify-end border-t border-gray-200 bg-gray-50 py-6">
+                <button 
+                    type='submit'
+                    class="inline-flex cursor-pointer items-center justify-center rounded-md bg-(--primary-color) px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
+                    Save
+                </button>
+            </div>
+        </form>
     </main>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const checkbox = document.getElementById('session-time-changed');
+        const dateInput = document.getElementById('session-date');
+        const timeInput = document.getElementById('session-time');
+
+        function toggleDateTimeFields() {
+            // If checked, disabled is false (enabled).
+            // If unchecked, disabled is true (disabled).
+            const isDisabled = !checkbox.checked;
+            
+            dateInput.disabled = isDisabled;
+            timeInput.disabled = isDisabled;
+        }
+
+        // Listen for changes
+        checkbox.addEventListener('change', toggleDateTimeFields);
+
+        // Run immediately on load to set initial state
+        toggleDateTimeFields();
+    });
+</script>
 {% endblock %}

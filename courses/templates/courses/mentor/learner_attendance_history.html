@@ -1,121 +1,93 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden bg-slate-50">
     <div class="layout-container flex h-full grow flex-col">
         <main class="flex-1 px-4 py-8 sm:px-6 md:px-10">
             <div class="mx-auto max-w-5xl">
+
+                <!-- Back Button -->
                 <div class="mb-8 flex items-center gap-4">
                     <a class="flex items-center gap-2 text-sm font-medium text-secondary-600 transition-colors hover:text-primary-500"
                         href="/learners_list">
-                        <span class="material-symbols-outlined"> arrow_back </span>
+                        <span class="material-symbols-outlined">arrow_back</span>
                         <span>Back to Learner List</span>
                     </a>
                 </div>
+
+                <!-- Page Header -->
                 <div class="mb-8">
-                    <h1 class="text-3xl font-bold tracking-tight text-secondary-900">Learner Attendance History</h1>
-                    <p class="mt-1 text-secondary-500">Review the attendance history for a specific learner's private
-                        code review sessions.</p>
+                    <h1 class="text-3xl font-bold tracking-tight text-secondary-900">
+                        Learner Attendance History
+                    </h1>
+                    <p class="mt-1 text-secondary-500">
+                        Review all group & private session attendance for this learner.
+                    </p>
                 </div>
-                <div
-                    class="mb-8 flex flex-col gap-6 rounded-lg border border-[#e2e8f0] bg-white p-6 sm:flex-row sm:items-center">
+
+                <!-- Learner Card -->
+                <div class="mb-8 flex flex-col gap-6 rounded-lg border border-[#e2e8f0] bg-white p-6 sm:flex-row sm:items-center">
                     <div class="shrink-0">
-                        <div class="h-24 w-24 rounded-full bg-cover bg-center bg-no-repeat sm:h-32 sm:w-32"
-                            style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBtKgexEZOpYgnGUuuFVTWdQaAJW4Hi1gFvOZU94yQjkeqgRca5nU8WZtRn3HEhe1UIV16joA2F7fhaZ4dAfiW9WBNT1ZmWr6RiyPJYsUSykMvlfTRsMX-ENrQ4h84wmFu-gzXwqXYO5oXdoUdU4aV8YKOToNaF51Sn8PITTaGfq035SDjbdzv1xoHVijcjpv25SEG4Pkg1K3GH2jE-H-o8J2Zw8nI_HHxLuHY1xur_3Eb2I8V5RZnu7OBROhW_KJ7cL_l4EcnwN9U");'>
-                        </div>
+                        {% if learner.user.image %}
+                            <img src="{{ learner.user.image.url }}" class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-slate-200" alt="Profile">
+                        {% else %}
+                            <img src="{% static 'images/default_user_image.jpg' %}" class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-slate-200" alt="Default Profile">
+                        {% endif %}
                     </div>
                     <div class="flex flex-col">
-                        <h2 class="text-2xl font-bold text-secondary-900">Sophia Clark</h2>
-                        <p class="text-base text-secondary-500">Learner ID: LC12345</p>
+                        <h2 class="text-2xl font-bold text-secondary-900">
+                            {{ learner.user.get_full_name }}
+                        </h2>
+                        <p class="text-base text-secondary-500">
+                            {{ learner.user.email }}
+                        </p>
                     </div>
                 </div>
+
+                <!-- Attendance Box -->
                 <div class="rounded-lg border border-[#e2e8f0] bg-white">
+
                     <div class="border-b border-[#e2e8f0] p-4 sm:p-6">
                         <h3 class="text-xl font-bold text-secondary-900">Attendance Records</h3>
-                        <div class="mt-4 flex flex-col gap-4 sm:flex-row sm:items-end">
+
+                        <!-- Filters -->
+                        <form 
+                            hx-get="."
+                            hx-target="#records-table"
+                            hx-trigger="change"
+                            class="mt-4 flex flex-col gap-4 sm:flex-row sm:items-end"
+                        >
+                            <!-- Session Type -->
                             <div class="relative flex-1">
-                                <label class="block pb-2 text-sm font-medium text-secondary-700" for="start-date">Start
-                                    Date</label>
-                                <input
-                                    class="form-input h-12 w-full rounded-md border-[#e2e8f0] bg-transparent text-secondary-900 placeholder:text-secondary-400 focus:border-primary-500 focus:ring-primary-500"
-                                    id="start-date" placeholder="Select start date" type="date" />
+                                <label class="block pb-2 text-sm font-medium text-secondary-700">Session Type</label>
+                                <select name="type"
+                                    class="form-input h-12 w-full rounded-md border-[#e2e8f0]">
+                                    <option value="">All</option>
+                                    <option value="group" {% if session_type_filter == 'group' %}selected{% endif %}>Group</option>
+                                    <option value="private" {% if session_type_filter == 'private' %}selected{% endif %}>Private</option>
+                                </select>
                             </div>
+
+                            <!-- Presence -->
                             <div class="relative flex-1">
-                                <label class="block pb-2 text-sm font-medium text-secondary-700" for="end-date">End
-                                    Date</label>
-                                <input
-                                    class="form-input h-12 w-full rounded-md border-[#e2e8f0] bg-transparent text-secondary-900 placeholder:text-secondary-400 focus:border-primary-500 focus:ring-primary-500"
-                                    id="end-date" placeholder="Select end date" type="date" />
+                                <label class="block pb-2 text-sm font-medium text-secondary-700">Presence</label>
+                                <select name="presence"
+                                    class="form-input h-12 w-full rounded-md border-[#e2e8f0]">
+                                    <option value="">All</option>
+                                    <option value="present" {% if presence_filter == 'present' %}selected{% endif %}>Present</option>
+                                    <option value="absent" {% if presence_filter == 'absent' %}selected{% endif %}>Absent</option>
+                                </select>
                             </div>
-                            <button
-                                class="flex h-12 items-center justify-center gap-2 rounded-md bg-primary-500 px-4 text-sm font-semibold text-white transition-colors hover:bg-primary-600">
-                                <span class="material-symbols-outlined"> search </span>
-                                <span>Filter</span>
-                            </button>
-                        </div>
+                        </form>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead class="bg-secondary-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-sm font-semibold text-secondary-600">Session Date</th>
-                                    <th class="px-6 py-3 text-sm font-semibold text-secondary-600">Time</th>
-                                    <th class="px-6 py-3 text-sm font-semibold text-secondary-600">Session Topic</th>
-                                    <th class="px-6 py-3 text-sm font-semibold text-secondary-600">Attendance Status
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-[#e2e8f0]">
-                                <tr>
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-secondary-700">2024-07-20</td>
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-secondary-700">10:00 AM</td>
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-secondary-700">Data Structures
-                                    </td>
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm">
-                                        <span
-                                            class="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-800">Present</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-secondary-700">2024-07-15</td>
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-secondary-700">2:00 PM</td>
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-secondary-700">Algorithms</td>
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm">
-                                        <span
-                                            class="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-800">Present</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-secondary-700">2024-07-10</td>
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-secondary-700">11:00 AM</td>
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-secondary-700">System Design
-                                    </td>
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm">
-                                        <span
-                                            class="inline-flex items-center rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-800">Absent</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-secondary-700">2024-07-05</td>
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-secondary-700">9:00 AM</td>
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-secondary-700">Code Review</td>
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm">
-                                        <span
-                                            class="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-800">Present</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-secondary-700">2024-07-01</td>
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-secondary-700">1:00 PM</td>
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-secondary-700">Debugging</td>
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm">
-                                        <span
-                                            class="inline-flex items-center rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-800">Excused</span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+
+                    <!-- Records Table -->
+                    <div id="records-table" class="overflow-x-auto">
+                        {% include "courses/partials/learner_attend_history_table.html" %}
+                        
                     </div>
+
                 </div>
             </div>
         </main>

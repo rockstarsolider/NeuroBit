@@ -6,14 +6,15 @@ from .models import (Learner, LearnerEnrollment, MentorAssignment, LearnerSubscr
                     MentorGroupSession, StepProgressSession, MentorGroupSessionParticipant)
 from core.models import CustomUser
 from django.db.models import Max, Count, Q, Prefetch, Sum, Exists, OuterRef, Subquery
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from .forms import ProfileForm
 from django.contrib import messages
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from datetime import timedelta, datetime
 from django.utils.functional import cached_property
-from django.http import Http404
+from django.http import Http404, HttpResponse
+from django.template.loader import render_to_string
 
 # Learner side Views
 class LearnerDashboardView(LoginRequiredMixin, TemplateView):
@@ -976,9 +977,100 @@ class SessionListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         return ctx
     
 
-class GroupSessionAttendanceView(LoginRequiredMixin, ListView):
-    def get(self, request):
-        return render(request, 'courses/mentor/group_session_attendance.html')
+class GroupSessionAttendanceView(TemplateView, LoginRequiredMixin):
+    template_name = "courses/mentor/group_session_attendance.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.group_session = get_object_or_404(
+            MentorGroupSession, id=kwargs["group_session_id"]
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    # ---------------------------------------------------------
+    # Generate the automatic occurrence datetime
+    # ---------------------------------------------------------
+    def get_initial_occurrence_datetime(self):
+        today = timezone.localdate()
+        current_weekday = today.weekday()
+        target_weekday = self.group_session.suppused_day  # Monday=0
+
+        delta = (target_weekday - current_weekday) % 7
+        session_date = today + timedelta(days=delta)
+
+        dt = datetime.combine(session_date, self.group_session.suppoused_time)
+        return timezone.make_aware(dt)
+
+    # ---------------------------------------------------------
+    # GET → Show form
+    # ---------------------------------------------------------
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+
+        auto_dt = self.get_initial_occurrence_datetime()
+
+        # All learners who belong to this group session
+        learners = MentorAssignment.objects.filter(
+            enrollment__learning_path=self.group_session.learning_path,
+            mentor=self.request.user.mentor_profile
+        ).select_related(
+            "enrollment",
+            "enrollment__learner",
+            "enrollment__learner__user",
+        )
+
+        ctx.update({
+            "group_session": self.group_session,
+            "auto_datetime": auto_dt,
+            "learners": learners,
+        })
+        return ctx
+
+    # ---------------------------------------------------------
+    # POST → Create occurrence + all attendance rows
+    # ---------------------------------------------------------
+    def post(self, request, *args, **kwargs):
+        # Time changed?
+        time_changed = request.POST.get("session-time-changed") == "on"
+
+        if time_changed:
+            date_str = request.POST.get("session-date")
+            time_str = request.POST.get("session-time")
+            dt = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
+            dt = timezone.make_aware(dt)
+        else:
+            dt = self.get_initial_occurrence_datetime()
+
+        # Create occurrence
+        occurrence = MentorGroupSessionOccurrence.objects.create(
+            mentor_group_session=self.group_session,
+            occurence_datetime=dt,
+            occurence_datetime_changed=time_changed,
+            new_datetime=dt if time_changed else None,
+            session_video_record=request.POST.get("session-recording-link"),
+        )
+
+        # ---------------------------------------------------------
+        # Create GroupSessionParticipants inside POST
+        # ---------------------------------------------------------
+        learner_assignments = MentorAssignment.objects.filter(
+            enrollment__learning_path=self.group_session.learning_path,
+            mentor=request.user.mentor_profile
+        )
+
+        for assignment in learner_assignments:
+            present = request.POST.get(f"presence-{assignment.id}") == "on"
+
+            MentorGroupSessionParticipant.objects.create(
+                mentor_group_session_occurence=occurrence,
+                mentor_assignment=assignment,
+                learner_was_present=present,
+            )
+
+        # Redirect back to same page
+        messages.success(request, "جلسه برگذار شده با موفقیت اضافه شد")
+        return redirect(
+            reverse("session-list")
+        )
 
 
 class PrivateSessionAttendanceView(LoginRequiredMixin, ListView):
@@ -992,8 +1084,141 @@ class PrivateSessionManageView(LoginRequiredMixin, View):
 
 
 class LearnerAttendanceHistoryView(LoginRequiredMixin, ListView):
-    def get(self, request):
-        return render(request, 'courses/mentor/learner_attendance_history.html')
+    template_name = "courses/mentor/learner_attendance_history.html"
+    partial_template_name = "courses/partials/learner_attend_history_table.html"
+    context_object_name = "records"
+    paginate_by = 30 
+
+    def dispatch(self, request, *args, **kwargs):
+        user = request.user
+        
+        # Must be mentor
+        if not hasattr(user, "mentor_profile"):
+            raise Http404()
+
+        self.mentor = user.mentor_profile
+
+        # pull learner_id from URL
+        self.learner_id = kwargs.get("learner_id")
+        if not self.learner_id:
+            raise Http404("Learner ID is missing")
+
+        # ensure mentor has access to that learner
+        has_access = MentorAssignment.objects.filter(
+            mentor=self.mentor,
+            enrollment__learner_id=self.learner_id
+        ).exists()
+
+        if not has_access:
+            raise Http404("You do not have access to this learner.")
+
+        # Load learner for template card
+        self.learner = Learner.objects.select_related("user").get(pk=self.learner_id)
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        presence_filter = self.request.GET.get("presence")   # present | absent
+        session_type_filter = self.request.GET.get("type")   # group | private
+
+        # ---------------------------------------------------------
+        # 1) GROUP SESSIONS
+        # ---------------------------------------------------------
+        group_qs = (
+            MentorGroupSessionParticipant.objects
+            .filter(
+                mentor_assignment__mentor=self.mentor,
+                mentor_assignment__enrollment__learner_id=self.learner_id,
+            )
+            .select_related(
+                "mentor_group_session_occurence",
+                "mentor_group_session_occurence__mentor_group_session",
+                "mentor_group_session_occurence__mentor_group_session__session_type",
+            )
+        )
+
+        if presence_filter in ("present", "absent"):
+            group_qs = group_qs.filter(
+                learner_was_present=(presence_filter == "present")
+            )
+
+        group_records = []
+        for p in group_qs:
+            occ = p.mentor_group_session_occurence
+            sess = occ.mentor_group_session
+
+            dt = occ.new_datetime if occ.occurence_datetime_changed else occ.occurence_datetime
+
+            group_records.append({
+                "datetime": dt,
+                "present": p.learner_was_present,
+                "type": "group",
+                "session_name": sess.session_type.name_fa,
+                "source": p,
+            })
+
+        # ---------------------------------------------------------
+        # 2) PRIVATE / CODE REVIEW SESSIONS
+        # ---------------------------------------------------------
+        private_qs = (
+            StepProgressSession.objects
+            .filter(
+                step_progress__mentor_assignment__mentor=self.mentor,
+                step_progress__mentor_assignment__enrollment__learner_id=self.learner_id,
+            )
+            .select_related(
+                "session_type",
+                "step_progress",
+                "step_progress__educational_step",
+            )
+        )
+
+        if presence_filter in ("present", "absent"):
+            private_qs = private_qs.filter(
+                present=(presence_filter == "present")
+            )
+
+        private_records = []
+        for s in private_qs:
+            private_records.append({
+                "datetime": s.datetime,
+                "present": s.present,
+                "type": "private",
+                "session_name": s.session_type.get_code_display(),
+                "source": s,
+            })
+
+        # ---------------------------------------------------------
+        # MERGE BOTH LISTS
+        # ---------------------------------------------------------
+        combined = group_records + private_records
+
+        # Filter by session type (optional)
+        if session_type_filter == "group":
+            combined = [r for r in combined if r["type"] == "group"]
+        elif session_type_filter == "private":
+            combined = [r for r in combined if r["type"] == "private"]
+
+        # Sort descending by datetime
+        combined.sort(key=lambda r: r["datetime"], reverse=True)
+
+        return combined
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["learner"] = self.learner
+        ctx["presence_filter"] = self.request.GET.get("presence", "")
+        ctx["session_type_filter"] = self.request.GET.get("type", "")
+        return ctx
+    
+    def render_to_response(self, context, **response_kwargs):
+        # HTMX request → return only the table
+        if self.request.headers.get("HX-Request") == "true":
+            html = render_to_string(self.partial_template_name, context, request=self.request)
+            return HttpResponse(html)
+
+        # Normal full-page render
+        return super().render_to_response(context, **response_kwargs)
     
 
 class GroupSessionAttendanceHistoryView(LoginRequiredMixin, DetailView):
