@@ -182,13 +182,13 @@
                             <!-- ACTIONS -->
                             <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                                 {% if s.type == "group" %}
-                                    <a class="inline-flex items-center gap-2 rounded-md bg-slate-100 px-3 py-1.5 text-sm font-semibold text-primary-700 hover:bg-primary-200"
+                                    <a class="inline-flex items-center gap-2 rounded-md bg-(--primary-color) text-white px-3 py-1.5 text-sm font-semibold text-primary-700 hover:bg-primary-200"
                                         href="{% url "group-session-attendance" s.session.id %}">
                                         <span class="material-symbols-outlined text-base">add</span>
                                         Add session occurrence
                                     </a>
                                 {% elif s.type == "code_review" and s.step_progress %}
-                                    <a class="inline-flex items-center gap-2 rounded-md bg-slate-100 px-3 py-1.5 text-sm font-semibold text-primary-700 hover:bg-primary-200"
+                                    <a class="inline-flex items-center gap-2 rounded-md bg-(--primary-color) text-white px-3 py-1.5 text-sm font-semibold text-primary-700 hover:bg-primary-200"
                                         href="{% url "private-session-manage" s.step_progress.id %}">
                                         <span class="material-symbols-outlined text-base">add</span>
                                         Add session occurrence

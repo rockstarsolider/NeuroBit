@@ -10,22 +10,35 @@
         </div>
         <h1 class="text-2xl font-bold tracking-tighter">EduPath</h1>
     </div>
+
     <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
-        <a class="hover:text-(--primary-color) transition-colors" href="#">{% trans "Home"%}</a>
-        <a class="hover:text-(--primary-color) transition-colors" href="#">{% trans "Learning Paths"%}</a>
-        <a class="hover:text-(--primary-color) transition-colors" href="#">{% trans "Weekly Tasks"%}</a>
-        <a class="hover:text-(--primary-color) transition-colors" href="#">{% trans "Support"%}</a>
+        {% if user.learner_profile %}
+            <a class="hover:text-(--primary-color) transition-colors" href="{% url "learner-dashboard" %}">{% trans "Dashboard"%}</a>
+            <a class="hover:text-(--primary-color) transition-colors" href="{% url "profile" user.id %}">{% trans "Profile"%}</a>
+            <a class="hover:text-(--primary-color) transition-colors" href="{% url "subscription-plans" %}">{% trans "Subscriptions"%}</a>
+            <a class="hover:text-(--primary-color) transition-colors" href="#">{% trans "Support"%}</a>
+        {% elif user.mentor_profile %}
+            <a class="hover:text-(--primary-color) transition-colors" href="{% url "attendance-hub" %}">{% trans "Dashboard"%}</a>
+            <a class="hover:text-(--primary-color) transition-colors" href="{% url "mentor-feedback-list" %}">{% trans "Feedback list"%}</a>
+            <a class="hover:text-(--primary-color) transition-colors" href="{% url "learners-list" %}">{% trans "Learners"%}</a>
+            <a class="hover:text-(--primary-color) transition-colors" href="{% url "session-list" %}">{% trans "Sessions"%}</a>
+        {% else %}
+
+        {% endif %}
     </nav>
+
     <div class="flex items-center gap-4">
         <button class="relative">
         <span class="material-symbols-outlined text-2xl text-slate-600 hover:text-(--primary-color) transition-colors"> notifications </span>
         <span class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">2</span>
         </button>
+
         {% if user.image %}
-            <img src="{{ user.image.url }}" class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-slate-200" alt="Profile">
+            <a href='{% url "profile" user.id %}'><img src="{{ user.image.url }}" class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-slate-200" alt="Profile"></a>
         {% else %}
             <img src="{% static 'images/default_user_image.jpg' %}" class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-slate-200" alt="Default Profile">
         {% endif %}
+
         <form action="{% url 'set_language' %}" method="post">
             {% csrf_token %}
             {% get_current_language as LANGUAGE_CODE %}

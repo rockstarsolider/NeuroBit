@@ -10,6 +10,7 @@
                     <h2 class="text-3xl font-bold text-gray-900">My Learners</h2>
                 </div>
                 
+                <!-- Search & Filters -->
                 <div class="flex flex-col gap-4">
                     <div class="relative w-full max-w-xs">
                         <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -66,6 +67,7 @@
                     </div>
                 </div>
 
+                <!-- Table -->
                 <div class="overflow-x-auto rounded-lg border border-gray-200 bg-white">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
@@ -110,7 +112,7 @@
                                             {% else %}
                                                 <img src="{% static 'images/default_user_image.jpg' %}" class="h-8 w-8 rounded-full" alt="Default Profile">
                                             {% endif %}
-                                            <a class="hover:text-(--primary-color) hover:underline" href="#">{{ row.learner.user.get_full_name }}</a>
+                                            <a class="hover:text-(--primary-color) hover:underline" href="{% url "profile" row.learner.user.id %}">{{ row.learner.user.get_full_name }}</a>
                                         </div>
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">{{ row.learning_path.name }}</td>
@@ -118,7 +120,7 @@
                                     <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">{{ row.plan }}</td>
                                     <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium flex justify-end gap-4">
                                         <a class="inline-flex items-center gap-2 rounded-md bg-(--primary-color) px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-600"
-                                            href="{% url "learner-attendance-history" row.learner.user.id %}">
+                                            href="{% url "learner-attendance-history" row.learner.id %}">
                                             <span>Attendance history</span>
                                         </a>
                                         <a class="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
