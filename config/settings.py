@@ -20,6 +20,7 @@ ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,0.0.0.0").split(
 
 # Application definition
 INSTALLED_APPS = [
+    "daphne",
     "unfold",  # before django.contrib.admin
     "unfold.contrib.filters",  # optional, if special filters are needed
     "unfold.contrib.forms",  # optional, if special form elements are needed
@@ -45,6 +46,9 @@ INSTALLED_APPS = [
     "core.apps.CoreConfig",
     'pages',
     'courses',
+    'notifications',
+
+    "channels",
 ]
 
 
@@ -100,6 +104,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'notifications.context_processors.unread_notifs',
             ],
         },
     },
@@ -327,3 +332,20 @@ if DEBUG:
 LOGIN_URL = '/login/'
 
 KAVENEGAR_API = os.environ.get('KAVENEGAR_API')
+
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [("127.0.0.1", 6379)],
+#         },
+#     },
+# }
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
+
+ASGI_APPLICATION = "config.asgi.application"

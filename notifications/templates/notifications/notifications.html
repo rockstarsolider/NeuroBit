@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="relative flex h-auto min-h-screen w-full flex-col items-center overflow-x-hidden bg-slate-50 pt-8">
+    <h2 class='font-bold text-4xl'>Notifications</h2>
+
+    <ul id='notifications' class='pt-8 w-full md:w-2xl flex flex-col gap-2'>
+        {% for notif in notifications %}
+            <div class="group relative flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md transition-all hover:shadow-xl hover:-translate-y-1">
+                <div class="flex flex-col p-6">
+                    <h3 class="text-xl font-bold text-gray-900">{{notif.title}}</h3>
+                    <p class="mt-2 text-base text-gray-600">{{notif.message}}</p>
+                </div>
+            </div>
+        {% empty %}
+            <h3 class="text-xl font-bold text-gray-900">You have no new notifications!</h3>
+        {% endfor %}
+
+        {% include "notifications/clear_button.html" with target="notifications" %}
+    </ul>
+</div>
+{% endblock %}

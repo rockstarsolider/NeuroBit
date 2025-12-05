@@ -1,0 +1,11 @@
+<hr class="h-0 my-2 border border-solid border-t-0 border-gray-700 opacity-25" />
+<li>
+    <button 
+        hx-post='{% url "mark_notifs_as_read" %}' 
+        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+        hx-target='#{{target}}'
+        hx-swap='innerHTML'
+        id="clear-btn" 
+        class="dropdown-item bg-(--primary-color) px-4 py-2.5 text-sm font-semibold text-white rounded-lg cursor-pointer block w-full whitespace-nowrap"
+        >Clear All
+    </button>

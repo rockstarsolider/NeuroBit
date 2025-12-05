@@ -11,6 +11,7 @@ urlpatterns = [
     path('', include('pages.urls')),
     path('', include('courses.urls')),
     path('', include('core.urls')),
+    path('', include('notifications.urls')),
 ]
 
 # serve media in development
