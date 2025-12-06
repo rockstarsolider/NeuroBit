@@ -6,8 +6,8 @@ from .models import Notification
 
 
 @receiver(post_save, sender=Notification)
-def create_profile(sender, instance, created, **kwargs):
-    if created:
+def notification_created(sender, instance, created, **kwargs):
+    if created and instance.send_internal:
         channel_layer = get_channel_layer()
         group_name = f'notifications_user_{instance.user.id}'
         event = {

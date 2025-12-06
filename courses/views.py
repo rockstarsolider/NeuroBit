@@ -152,11 +152,17 @@ class TaskListView(LoginRequiredMixin, ListView):
     context_object_name = "tasks"
     template_name = "courses/task_list.html"
 
+    # ---------------------------------------------------------
+    # Access Control
+    # ---------------------------------------------------------
     def dispatch(self, request, *args, **kwargs):
         if not hasattr(request.user, "learner_profile"):
             raise Http404("You do not have access to this page.")
         return super().dispatch(request, *args, **kwargs)
 
+    # ---------------------------------------------------------
+    # Helpers
+    # ---------------------------------------------------------
     def get_step_progress(self, step_id, learner):
         return (
             StepProgress.objects.filter(
@@ -174,68 +180,113 @@ class TaskListView(LoginRequiredMixin, ListView):
             .first()
         )
 
+    # ---------------------------------------------------------
+    # Main Query Source (annotation + filtering)
+    # ---------------------------------------------------------
     def get_base_queryset(self, step_id, step_progress):
-        tasks = Task.objects.filter(step_id=step_id).select_related("step").order_by("order_in_step")
+        tasks = (
+            Task.objects.filter(step_id=step_id)
+            .select_related("step")
+            .order_by("order_in_step")
+        )
+
+        # No progress yet → no annotations needed
         if not step_progress:
             return tasks
 
         submissions_qs = (
             TaskSubmission.objects.filter(step_progress=step_progress)
-            .prefetch_related(Prefetch("evaluations", queryset=TaskEvaluation.objects.select_related("mentor")))
+            .prefetch_related(
+                Prefetch(
+                    "evaluations",
+                    queryset=TaskEvaluation.objects.select_related("mentor"),
+                )
+            )
         )
+
         evaluated_subq = TaskEvaluation.objects.filter(
             submission__task=OuterRef("pk"),
             submission__step_progress=step_progress,
             evaluated_at__isnull=False,
         )
 
-        return tasks.prefetch_related(Prefetch("submissions", queryset=submissions_qs)).annotate(
-            latest_submission=Max(
-                "submissions__submitted_at", filter=Q(submissions__step_progress=step_progress)
-            ),
-            is_completed=Count(
-                "submissions__evaluations",
-                filter=Q(
-                    submissions__step_progress=step_progress,
-                    submissions__evaluations__evaluated_at__isnull=False,
+        # --------------------------
+        # Annotate here
+        # --------------------------
+        qs = (
+            tasks.prefetch_related(
+                Prefetch("submissions", queryset=submissions_qs)
+            )
+            .annotate(
+                latest_submission=Max(
+                    "submissions__submitted_at",
+                    filter=Q(submissions__step_progress=step_progress),
                 ),
-                distinct=True,
-            ),
-            is_evaluated=Exists(evaluated_subq),
+                is_completed=Count(
+                    "submissions__evaluations",
+                    filter=Q(
+                        submissions__step_progress=step_progress,
+                        submissions__evaluations__evaluated_at__isnull=False,
+                    ),
+                    distinct=True,
+                ),
+                is_evaluated=Exists(evaluated_subq),
+            )
         )
 
+        # --------------------------
+        # Apply Filters *here*
+        # --------------------------
+        search = self.request.GET.get("search", "")
+        status = self.request.GET.get("status", "all")
+
+        if search:
+            qs = qs.filter(title__icontains=search)
+
+        if status == "evaluated":
+            qs = qs.filter(is_completed__gt=0)
+
+        elif status == "todo":
+            qs = qs.filter(
+                Q(is_completed=0) | Q(is_completed__isnull=True)
+            )
+
+        return qs
+
+    # ---------------------------------------------------------
+    # Final Query
+    # ---------------------------------------------------------
     def get_queryset(self):
         step_id = self.kwargs["step_id"]
         learner = getattr(self.request.user, "learner_profile", None)
+
         if not learner:
             return Task.objects.none()
 
         self.step_progress = self.get_step_progress(step_id, learner)
-        tasks = self.get_base_queryset(step_id, self.step_progress)
 
-        # Filters
-        search, status = self.request.GET.get("search", ""), self.request.GET.get("status", "all")
-        if search:
-            tasks = tasks.filter(title__icontains=search)
-        if status == "evaluated":
-            tasks = tasks.filter(is_completed=True)
-        elif status == "todo":
-            tasks = tasks.filter(Q(is_completed=False) | Q(is_completed__isnull=True))
+        return self.get_base_queryset(step_id, self.step_progress)
 
-        return tasks
-
+    # ---------------------------------------------------------
+    # Context
+    # ---------------------------------------------------------
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
+
         step = get_object_or_404(
-            EducationalStep.objects.select_related("learning_path").prefetch_related("resources"),
+            EducationalStep.objects
+            .select_related("learning_path")
+            .prefetch_related("resources"),
             pk=self.kwargs["step_id"],
         )
+
         tasks = ctx["tasks"]
         total = len(tasks)
         completed = sum(1 for t in tasks if getattr(t, "is_completed", 0))
 
         due_date = None
         step_progress_id = None
+
         if getattr(self, "step_progress", None):
             sp = self.step_progress
             step_progress_id = sp.id
@@ -243,22 +294,29 @@ class TaskListView(LoginRequiredMixin, ListView):
                 days=sp.initial_promise_days + (sp.total_extension_days or 0)
             )
 
-        ctx.update({
-            "step": step,
-            "learning_path": step.learning_path,
-            "resources": step.resources.all(),
-            "due_date": due_date,
-            "progress_percent": round((completed / total) * 100) if total else 0,
-            "completed_count": completed,
-            "remaining_count": total - completed,
-            "total": total,
-            "step_progress_id": step_progress_id,
-        })
+        ctx.update(
+            {
+                "step": step,
+                "learning_path": step.learning_path,
+                "resources": step.resources.all(),
+                "due_date": due_date,
+                "progress_percent": round((completed / total) * 100) if total else 0,
+                "completed_count": completed,
+                "remaining_count": total - completed,
+                "total": total,
+                "step_progress_id": step_progress_id,
+            }
+        )
+
         return ctx
 
+    # ---------------------------------------------------------
+    # HTMX Partial
+    # ---------------------------------------------------------
     def get_template_names(self):
-        return ["courses/partials/task_list_partial.html"] if self.request.headers.get("HX-Request") \
-               else ["courses/task_list.html"]
+        if self.request.headers.get("HX-Request"):
+            return ["courses/partials/task_list_partial.html"]
+        return ["courses/task_list.html"]
     
 
 class TaskSubmissionView(View):

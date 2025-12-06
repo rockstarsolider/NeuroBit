@@ -54,10 +54,14 @@
         </div>
 
         <!-- Profile Image -->
-        {% if user.image %}
-            <a href='{% url "profile" user.id %}'><img src="{{ user.image.url }}" class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-slate-200" alt="Profile"></a>
+        {% if user.is_authenticated %}
+            {% if user.image %}
+                <a href='{% url "profile" user.id %}'><img src="{{ user.image.url }}" class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-slate-200" alt="Profile"></a>
+            {% else %}
+                <a href='{% url "profile" user.id %}'><img src="{% static 'images/default_user_image.jpg' %}" class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-slate-200" alt="Default Profile"></a>
+            {% endif %}
         {% else %}
-            <img src="{% static 'images/default_user_image.jpg' %}" class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-slate-200" alt="Default Profile">
+            <a href='{% url "login" %}'><img src="{% static 'images/default_user_image.jpg' %}" class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-slate-200" alt="Default Profile"></a>
         {% endif %}
 
         <!-- Language Selection -->
