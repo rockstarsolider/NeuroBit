@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block content %}
 <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
@@ -6,8 +7,8 @@
         <main class="flex-1 bg-slate-50 py-12 px-6 lg:px-8">
             <div class="mx-auto max-w-7xl">
                 <div class="mb-10 text-center">
-                    <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl">Main Hub</h1>
-                    <p class="mt-4 text-xl text-gray-600">Your central point for managing learners.</p>
+                    <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl">{% trans "Main Hub"%}</h1>
+                    <p class="mt-4 text-xl text-gray-600">{% trans "Your central point for managing learners."%}</p>
                 </div>
                 <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
                     <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:col-span-2 lg:grid-cols-2">
@@ -18,13 +19,13 @@
                                     class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary-100 text-primary-600">
                                     <span class="material-symbols-outlined">task_alt</span>
                                 </div>
-                                <h3 class="text-xl font-bold text-gray-900">Feedback List</h3>
-                                <p class="mt-2 text-base text-gray-600">A list of submitted tasks that you should evaluate and write feedback for. it also includes your past feedbacks</p>
+                                <h3 class="text-xl font-bold text-gray-900">{% trans "Feedback List"%}</h3>
+                                <p class="mt-2 text-base text-gray-600">{% trans "A list of submitted tasks that you should evaluate and write feedback for. it also includes your past feedbacks"%}</p>
                             </div>
                             <div class="mt-auto p-6 pt-0">
                                 <a class="inline-flex items-center gap-2 text-sm font-semibold text-primary-600 hover:text-primary-800"
                                     href="{% url "mentor-feedback-list" %}">
-                                    Go to Feedback list
+                                    {% trans "Go to Feedback list"%}
                                     <span class="material-symbols-outlined">arrow_forward</span>
                                 </a>
                             </div>
@@ -36,13 +37,13 @@
                                     class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary-100 text-primary-600">
                                     <span class="material-symbols-outlined text-3xl">person</span>
                                 </div>
-                                <h3 class="text-xl font-bold text-gray-900">Edit Profile</h3>
-                                <p class="mt-2 text-base text-gray-600">View and edit your profile here.</p>
+                                <h3 class="text-xl font-bold text-gray-900">{% trans "Edit Profile"%}</h3>
+                                <p class="mt-2 text-base text-gray-600">{% trans "View and edit your profile here."%}</p>
                             </div>
                             <div class="mt-auto p-6 pt-0">
                                 <a class="inline-flex items-center gap-2 text-sm font-semibold text-primary-600 hover:text-primary-800"
                                     href="{% url "edit-profile" %}">
-                                    Go to Profile Edit page
+                                    {% trans "Go to Profile Edit page"%}
                                     <span class="material-symbols-outlined">arrow_forward</span>
                                 </a>
                             </div>
@@ -54,13 +55,13 @@
                                     class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary-100 text-primary-600">
                                     <span class="material-symbols-outlined">person_book</span>
                                 </div>
-                                <h3 class="text-xl font-bold text-gray-900">Learners</h3>
-                                <p class="mt-2 text-base text-gray-600">View a list of your current learners</p>
+                                <h3 class="text-xl font-bold text-gray-900">{% trans "Learners"%}</h3>
+                                <p class="mt-2 text-base text-gray-600">{% trans "View a list of your current learners"%}</p>
                             </div>
                             <div class="mt-auto p-6 pt-0">
                                 <a class="inline-flex items-center gap-2 text-sm font-semibold text-primary-600 hover:text-primary-800"
                                     href="{% url "learners-list" %}">
-                                    View Learners
+                                    {% trans "View Learners"%}
                                     <span class="material-symbols-outlined">arrow_forward</span>
                                 </a>
                             </div>
@@ -72,13 +73,13 @@
                                 class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary-100 text-primary-600">
                                 <span class="material-symbols-outlined text-3xl">calendar_month</span>
                             </div>
-                            <h3 class="text-xl font-bold text-gray-900">Session List</h3>
-                            <p class="mt-2 text-base text-gray-600">A quick look at your weekly and past sessions.</p>
+                            <h3 class="text-xl font-bold text-gray-900">{% trans "Session List"%}</h3>
+                            <p class="mt-2 text-base text-gray-600">{% trans "A quick look at your weekly and past sessions."%}</p>
                         </div>
                         <div class="mt-6">
                             <a class="flex w-full items-center justify-center gap-2 rounded-lg bg-(--primary-color) px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-600"
                                 href="{% url "session-list" %}">
-                                <span>View All Sessions</span>
+                                <span>{% trans "View All Sessions"%}</span>
                                 <span class="material-symbols-outlined text-base">arrow_forward</span>
                             </a>
                         </div>

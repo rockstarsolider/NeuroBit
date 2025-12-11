@@ -95,7 +95,7 @@
                                                 <div
                                                     class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                                                     <div>
-                                                        <span class="text-xs font-semibold bg-amber-100 text-amber-600 px-3 py-1 rounded-full mb-2 inline-block">UPCOMING</span>
+                                                        <span class="text-xs font-semibold bg-amber-100 text-amber-600 px-3 py-1 rounded-full mb-2 inline-block">{% trans "UPCOMING"%}</span>
                                                         <p class="font-bold text-slate-800 text-xl">{{session.mentor_group_session.session_type}}</p>
                                                         <p class="text-sm text-slate-500">{{session.mentor_group_session.session_type.description |safe}}</p>
                                                     </div>
@@ -123,7 +123,7 @@
                                                     class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                                                     <div>
                                                         <span
-                                                            class="text-xs font-semibold bg-slate-100 text-slate-600 px-3 py-1 rounded-full mb-2 inline-block">COMPLETED</span>
+                                                            class="text-xs font-semibold bg-slate-100 text-slate-600 px-3 py-1 rounded-full mb-2 inline-block">{% trans "COMPLETED"%}</span>
                                                         <p class="font-bold text-slate-800 text-xl">{{session.mentor_group_session.session_type}}</p>
                                                         <p class="text-sm text-slate-500">{{session.mentor_group_session.session_type.description |safe}}</p>
                                                     </div>

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block content %}
 <div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden bg-slate-50">
@@ -9,7 +10,7 @@
                 <div class="flex flex-col gap-6">
                     <div>
                         <h1 class="text-2xl font-bold tracking-tight text-slate-900">
-                            Task Submission: {{ task.title }}
+                            {% trans "Task Submission"%}: {{ task.title }}
                         </h1>
                         <p class="text-sm text-slate-500">Step: {{ step_progress.educational_step.title }}</p>
                     </div>
@@ -17,16 +18,16 @@
                         <div class="flex items-center gap-3 rounded-md bg-slate-100 p-3">
                             <span class="material-symbols-outlined text-slate-600">numbers</span>
                             <div>
-                                <p class="text-sm font-medium text-slate-700">Task Number</p>
+                                <p class="text-sm font-medium text-slate-700">{% trans "Task Number"%}</p>
                                 <p class="text-sm font-semibold text-slate-900">
-                                    Task #{{ task.order_in_step }}
+                                    {% trans "Task"%} #{{ task.order_in_step }}
                                 </p>
                             </div>
                         </div>
                         <div class="flex items-center gap-3 rounded-md bg-slate-100 p-3">
                             <span class="material-symbols-outlined text-slate-600">calendar_today</span>
                             <div>
-                                <p class="text-sm font-medium text-slate-700">Due Date</p>
+                                <p class="text-sm font-medium text-slate-700">{% trans "Due Date"%}</p>
                                 <p class="text-sm font-semibold text-slate-900">
                                     {{ step_progress.educational_step.created_at|date:"F d, Y" }}
                                 </p>
@@ -40,35 +41,35 @@
                 {% csrf_token %}
                 <div class="grid grid-cols-1 gap-10 md:grid-cols-2">
                     <div class="space-y-6">
-                        <h3 class="text-lg font-semibold leading-tight text-slate-900">Links</h3>
+                        <h3 class="text-lg font-semibold leading-tight text-slate-900">{% trans "Links"%}</h3>
                         <div class="space-y-6">
                             <div>
-                                <label class="block text-sm font-medium text-slate-700" for="link1">Artifact Link</label>
+                                <label class="block text-sm font-medium text-slate-700" for="link1">{% trans "Artifact Link"%}</label>
                                 <input value="{{ request.POST.link1 }}" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" id="link1" name="link1" placeholder="https://example.com" type="url" />
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-slate-700" for="link2">Report Video Link</label>
+                                <label class="block text-sm font-medium text-slate-700" for="link2">{% trans "Report Video Link"%}</label>
                                 <input value="{{ request.POST.link2 }}" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" id="link2" name="link2" placeholder="https://another-example.com" type="url" />
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-slate-700" for="link3">Repository Link</label>
+                                <label class="block text-sm font-medium text-slate-700" for="link3">{% trans "Repository Link"%}</label>
                                 <input value="{{ request.POST.link3 }}" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" id="link3" name="link3" placeholder="https://repo.com" type="url" />
                             </div>
                         </div>
                     </div>
 
                     <div class="space-y-6">
-                        <h3 class="text-lg font-semibold leading-tight text-slate-900">Attachments</h3>
+                        <h3 class="text-lg font-semibold leading-tight text-slate-900">{% trans "Attachments"%}</h3>
                         <div class="space-y-6">
                             <div>
-                                <label class="block text-sm font-medium text-slate-700" for="file-upload1">File</label>
+                                <label class="block text-sm font-medium text-slate-700" for="file-upload1">{% trans "File"%}</label>
                                 <input class="block w-full text-sm text-slate-900 border border-slate-300 rounded-md shadow-sm mt-1
                                     file:mr-4 file:py-2 file:px-4 file:rounded-md
                                     file:text-sm file:font-semibold file:cursor-pointer
                                     file:bg-slate-100 file:text-slate-900" id="file-upload1" name="file-upload1" type="file" />
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-slate-700" for="file-upload2">Video</label>
+                                <label class="block text-sm font-medium text-slate-700" for="file-upload2">{% trans "Video"%}</label>
                                 <input class="block w-full text-sm text-slate-900 border border-slate-300 rounded-md shadow-sm mt-1
                                     file:mr-4 file:py-2 file:px-4 file:rounded-md
                                     file:text-sm file:font-semibold file:cursor-pointer
@@ -80,17 +81,17 @@
 
                 <div>
                     <div class="space-y-2">
-                        <label class="block text-sm font-medium text-slate-700" for="comments">Description</label>
+                        <label class="block text-sm font-medium text-slate-700" for="comments">{% trans "Description"%}</label>
                         <textarea class="mt-2 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" id="comments" name="comments" rows="5">{{ request.POST.comments }}</textarea>
                     </div>
                 </div>
 
                 <div class="border-t border-slate-200 pt-8">
-                    <h3 class="text-lg font-semibold leading-tight text-slate-900">Social Media Posts</h3>
+                    <h3 class="text-lg font-semibold leading-tight text-slate-900">{% trans "Social Media Posts"%}</h3>
                     <div class="space-y-6 rounded-md pt-4">
                         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                             <div>
-                                <label class="block text-sm font-medium text-slate-700" for="platform1">Platform Name</label>
+                                <label class="block text-sm font-medium text-slate-700" for="platform1">{% trans "Platform Name"%}</label>
                                 <select class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" id="platform1" name="platform1">
                                     {% for platform in social_medias %}
                                         <option value="{{ platform.pk }}">{{ platform.platform }}</option>
@@ -98,16 +99,16 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-slate-700" for="post_date1">Post Date</label>
+                                <label class="block text-sm font-medium text-slate-700" for="post_date1">{% trans "Post Date"%}</label>
                                 <input class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" id="post-date1" name="post-date1" type="date" value="{{ request.POST.post_date1 }}">
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-700" for="post-link1">Post Link</label>
+                            <label class="block text-sm font-medium text-slate-700" for="post-link1">{% trans "Post Link"%}</label>
                             <input class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" id="post-link1" name="post_link1" type="url" value="{{ request.POST.post_link1 }}">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-700" for="description1">Short Description</label>
+                            <label class="block text-sm font-medium text-slate-700" for="description1">{% trans "Short Description"%}</label>
                             <textarea class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" id="description1" name="description1" rows="3">{{ request.POST.description1 }}</textarea>
                         </div>
                     </div>
@@ -115,14 +116,14 @@
 
                 <div class="flex justify-end pt-4">
                     <button class="inline-flex cursor-pointer justify-center rounded-md border border-transparent bg-blue-600 py-3 px-6 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" type="submit">
-                        Submit Assignment
+                        {% trans "Submit Assignment"%}
                     </button>
                 </div>
             </form>
 
             {% if social_posts %}
                 <div class="space-y-10 rounded-lg border border-slate-200 bg-white p-8 shadow-sm mt-10">
-                    <h3 class="text-lg font-semibold text-slate-900 mb-3">Your Previous Social Posts</h3>
+                    <h3 class="text-lg font-semibold text-slate-900 mb-3">{% trans "Your Previous Social Posts"%}</h3>
                     <ul class="space-y-3">
                         {% for post in social_posts %}
                             <li class="flex gap-3 rounded-md bg-slate-100 p-3 justify-between items-start">

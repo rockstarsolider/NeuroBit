@@ -32,16 +32,6 @@
               <p class="text-4xl font-bold mt-2">{{completed_steps}}</p>
               <p class="mt-1 font-semibold">{% trans "Steps Completed"%}</p>
             </div>
-            
-            {% comment %} <div class="md:col-span-2 lg:col-span-1 flex flex-col items-center justify-center text-center p-6 bg-slate-50 rounded-lg">
-              <h4 class="font-semibold mb-3">{% trans "Achievements"%}</h4>
-              <div class="flex gap-4">
-                <span class="material-symbols-outlined text-5xl text-yellow-500" title="Fast Learner">emoji_events</span>
-                <span class="material-symbols-outlined text-5xl text-slate-400" title="Consistent Performer">emoji_events</span>
-                <span class="material-symbols-outlined text-5xl text-orange-400" title="Project Milestone">emoji_events</span>
-              </div>
-              <p class="text-sm text-slate-500 mt-3">3 {% trans "Badges Earned"%}</p>
-            </div> {% endcomment %}
 
             <div class="col-span-1 md:col-span-2 lg:col-span-4 bg-slate-50 p-6 rounded-lg">
               <h4 class="font-semibold mb-4 text-center lg:text-left">{% trans "Weekly Activity"%}</h4>
@@ -122,15 +112,15 @@
                         <p class="font-medium">{{ item.step_title }}</p>
                         <p class="text-sm text-slate-500">
                           {% if item.days_left > 0 %}
-                            Due in {{ item.days_left }} days
+                            {% trans "Due in"%} {{ item.days_left }} {% trans "days"%}
                           {% else %}
-                            Due today
+                            {% trans "Due today"%}
                           {% endif %}
                         </p>
                       </div>
                     </li>
                   {% empty %}
-                    <p class="text-sm text-slate-400">No upcoming deadlines 🎉</p>
+                    <p class="text-sm text-slate-400">{% trans "No upcoming deadlines 🎉"%}</p>
                   {% endfor %}
                 </ul>
               </div>
@@ -144,7 +134,7 @@
                       </div>
                       <div>
                         <p class="font-medium">{{ sub.task.title }}</p>
-                        <p class="text-sm text-slate-500">Submitted {{ sub.submitted_at|timesince }} ago</p>
+                        <p class="text-sm text-slate-500">{% trans "Submitted"%} {{ sub.submitted_at|timesince }} {% trans "ago"%}</p>
                       </div>
                     </li>
                   {% endfor %}
@@ -155,8 +145,8 @@
                         <span class="material-symbols-outlined text-base">chat_bubble</span>
                       </div>
                       <div>
-                        <p class="font-medium">Feedback on {{ eval.submission.task.title }}</p>
-                        <p class="text-sm text-slate-500">By {{ eval.mentor.user.first_name }} {{ eval.mentor.user.last_name }}</p>
+                        <p class="font-medium">{% trans "Feedback on"%} {{ eval.submission.task.title }}</p>
+                        <p class="text-sm text-slate-500">{% trans "By"%} {{ eval.mentor.user.first_name }} {{ eval.mentor.user.last_name }}</p>
                       </div>
                     </li>
                   {% endfor %}

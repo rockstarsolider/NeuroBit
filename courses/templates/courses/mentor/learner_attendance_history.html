@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
 
 {% block content %}
 <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden bg-slate-50">
@@ -12,17 +13,17 @@
                     <a class="flex items-center gap-2 text-sm font-medium text-secondary-600 transition-colors hover:text-primary-500"
                         href="/learners_list">
                         <span class="material-symbols-outlined">arrow_back</span>
-                        <span>Back to Learner List</span>
+                        <span>{% trans "Back to Learner List"%}</span>
                     </a>
                 </div>
 
                 <!-- Page Header -->
                 <div class="mb-8">
                     <h1 class="text-3xl font-bold tracking-tight text-secondary-900">
-                        Learner Attendance History
+                        {% trans "Learner Attendance History"%}
                     </h1>
                     <p class="mt-1 text-secondary-500">
-                        Review all group & private session attendance for this learner.
+                        {% trans "Review all group & private session attendance for this learner."%}
                     </p>
                 </div>
 
@@ -49,7 +50,7 @@
                 <div class="rounded-lg border border-[#e2e8f0] bg-white">
 
                     <div class="border-b border-[#e2e8f0] p-4 sm:p-6">
-                        <h3 class="text-xl font-bold text-secondary-900">Attendance Records</h3>
+                        <h3 class="text-xl font-bold text-secondary-900">{% trans "Attendance Records"%}</h3>
 
                         <!-- Filters -->
                         <form 
@@ -60,23 +61,23 @@
                         >
                             <!-- Session Type -->
                             <div class="relative flex-1">
-                                <label class="block pb-2 text-sm font-medium text-secondary-700">Session Type</label>
+                                <label class="block pb-2 text-sm font-medium text-secondary-700">{% trans "Session Type"%}</label>
                                 <select name="type"
                                     class="form-input h-12 w-full rounded-md border-[#e2e8f0]">
-                                    <option value="">All</option>
-                                    <option value="group" {% if session_type_filter == 'group' %}selected{% endif %}>Group</option>
-                                    <option value="private" {% if session_type_filter == 'private' %}selected{% endif %}>Private</option>
+                                    <option value="">{% trans "All"%}</option>
+                                    <option value="group" {% if session_type_filter == 'group' %}selected{% endif %}>{% trans "Group"%}</option>
+                                    <option value="private" {% if session_type_filter == 'private' %}selected{% endif %}>{% trans "Private"%}</option>
                                 </select>
                             </div>
 
                             <!-- Presence -->
                             <div class="relative flex-1">
-                                <label class="block pb-2 text-sm font-medium text-secondary-700">Presence</label>
+                                <label class="block pb-2 text-sm font-medium text-secondary-700">{% trans "Presence"%}</label>
                                 <select name="presence"
                                     class="form-input h-12 w-full rounded-md border-[#e2e8f0]">
-                                    <option value="">All</option>
-                                    <option value="present" {% if presence_filter == 'present' %}selected{% endif %}>Present</option>
-                                    <option value="absent" {% if presence_filter == 'absent' %}selected{% endif %}>Absent</option>
+                                    <option value="">{% trans "All"%}</option>
+                                    <option value="present" {% if presence_filter == 'present' %}selected{% endif %}>{% trans "Present"%}</option>
+                                    <option value="absent" {% if presence_filter == 'absent' %}selected{% endif %}>{% trans "Absent"%}</option>
                                 </select>
                             </div>
                         </form>

@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
 
 {% block content %}
 <div hx-target="body" hx-swap="outerHTML" class="flex h-screen flex-col">
@@ -7,7 +8,7 @@
         <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
             <div class="flex flex-col gap-8">
                 <div class="flex items-center justify-between">
-                    <h2 class="text-3xl font-bold text-gray-900">My Learners</h2>
+                    <h2 class="text-3xl font-bold text-gray-900">{% trans "My Learners"%}</h2>
                 </div>
                 
                 <!-- Search & Filters -->
@@ -22,7 +23,7 @@
                             hx-get="{% url 'learners-list' %}"
                             hx-trigger="keyup changed delay:300ms"
                             hx-include="closest div"
-                            placeholder="Search learners..."
+                            placeholder="{% trans "Search learners..."%}"
                             class="w-full rounded-md border-gray-300 bg-white py-2 pl-10 pr-4"
                             type="text" />
                     </div>
@@ -37,7 +38,7 @@
                             {% else %}
                                 text-gray-500 border-transparent
                             {% endif %}">
-                                All
+                                {% trans "All"%}
                             </a>
 
                             <a hx-get="{% url 'learners-list' %}"
@@ -49,7 +50,7 @@
                             {% else %}
                                 text-gray-500 border-transparent
                             {% endif %}">
-                                Active
+                                {% trans "Active"%}
                             </a>
 
                             <a hx-get="{% url 'learners-list' %}"
@@ -61,7 +62,7 @@
                             {% else %}
                                 text-gray-500 border-transparent
                             {% endif %}">
-                                Inactive
+                                {% trans "Inactive"%}
                             </a>
                         </nav>
                     </div>
@@ -75,29 +76,29 @@
                                 <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500"
                                     scope="col">
                                     <div class="flex items-center gap-1">
-                                        Name
+                                        {% trans "Name"%}
                                     </div>
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500"
                                     scope="col">
                                     <div class="flex items-center gap-1">
-                                        Learning Path
+                                        {% trans "Learning Path"%}
                                     </div>
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500"
                                     scope="col">
                                     <div class="flex items-center gap-1">
-                                        Start Date
+                                        {% trans "Start Date"%}
                                     </div>
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500"
                                     scope="col">
                                     <div class="flex items-center gap-1">
-                                        Plan
+                                        {% trans "Plan"%}
                                     </div>
                                 </th>
                                 <th class="relative px-6 py-3" scope="col">
-                                    <span class="sr-only">Actions</span>
+                                    <span class="sr-only">{% trans "Actions"%}</span>
                                 </th>
                             </tr>
                         </thead>
@@ -121,10 +122,10 @@
                                     <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium flex justify-end gap-4">
                                         <a class="inline-flex items-center gap-2 rounded-md bg-(--primary-color) px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-600"
                                             href="{% url "learner-attendance-history" row.learner.id %}">
-                                            <span>Attendance history</span>
+                                            <span>{% trans "Attendance history"%}</span>
                                         </a>
                                         <a class="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                                            href="{% url "profile" row.learner.user.id %}">View Profile</a>
+                                            href="{% url "profile" row.learner.user.id %}">{% trans "View Profile"%}</a>
                                     </td>
                                 </tr>
                             {% endfor %}

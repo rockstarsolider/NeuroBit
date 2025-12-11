@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
 
 {% block content %}
 <div class="flex min-h-screen w-full flex-col">
@@ -13,7 +14,7 @@
                 <div class="space-y-6">
                     <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700" for="session-date">Session Date</label>
+                            <label class="block text-sm font-medium text-gray-700" for="session-date">{% trans "Session Date"%}</label>
                             <div class="relative mt-1">
                                 <input
                                     class="block w-full disabled:bg-gray-100 rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
@@ -21,7 +22,7 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700" for="session-time">Session Time</label>
+                            <label class="block text-sm font-medium text-gray-700" for="session-time">{% trans "Session Time"%}</label>
                             <div class="relative mt-1">
                                 <input
                                     class="block w-full disabled:bg-gray-100 rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
@@ -29,7 +30,7 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700" for="session-duration">Session
+                            <label class="block text-sm font-medium text-gray-700" for="session-duration">{% trans "Session"%}
                                 Duration</label>
                             <div class="relative mt-1">
                                 <input
@@ -41,8 +42,8 @@
                     </div>
                     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700" for="session-recording-link">Session
-                                Recording Link</label>
+                            <label class="block text-sm font-medium text-gray-700" for="session-recording-link">{% trans "Session"%}
+                                {% trans "Recording Link"%}</label>
                             <input
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                                 id="session-recording-link" name="session-recording-link" placeholder="https://..."
@@ -52,7 +53,7 @@
                             <input class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                                 id="session-time-changed" name="session-time-changed" type="checkbox" />
                             <label class="ml-2 block text-sm font-medium text-gray-700"
-                                for="session-time-changed">Session Time Changed</label>
+                                for="session-time-changed">{% trans "Session Time Changed"%}</label>
                         </div>
                     </div>
                 </div>
@@ -62,7 +63,7 @@
             <div class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
                 <div class="border-b border-gray-200 bg-gray-50 px-6 py-4">
                     <h3 class="text-lg font-semibold text-gray-800">
-                        Presence of Learners
+                        {% trans "Presence of Learners"%}
                     </h3>
                 </div>
                 <ul class="divide-y divide-gray-200">
@@ -83,7 +84,7 @@
                             <a href="{% url 'learner-attendance-history' a.enrollment.learner.id %}"
                                class="inline-flex items-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-700">
                                 <span class="material-symbols-outlined text-base">history</span>
-                                View History
+                                {% trans "View History"%}
                             </a>
                 
                             <!-- Presence checkbox -->
@@ -98,7 +99,7 @@
                 <button 
                     type='submit'
                     class="inline-flex cursor-pointer items-center justify-center rounded-md bg-(--primary-color) px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
-                    Save
+                    {% trans "Save"%}
                 </button>
             </div>
         </form>

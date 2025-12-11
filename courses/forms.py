@@ -43,7 +43,7 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         model = CustomUser
         fields = ["username", "first_name", "last_name", "email", "birthdate", "image"]
-        labels = {f: _(f.replace("_", " ").title()) for f in fields}
+        labels = {"username":_("username"), "first_name":_("first_name"), "last_name":_("last_name"), "email":_("email"), "birthdate":_("birthdate"), "image":_("image")}
         widgets = {
             "username": forms.TextInput(attrs={"class": "mt-1 block w-full rounded-md border-gray-300 shadow-sm "
                                                 "focus:border-[var(--primary-color)] focus:ring-[var(--primary-color)] "

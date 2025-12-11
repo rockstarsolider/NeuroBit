@@ -4,11 +4,11 @@
 {% for submission in submissions %}
     <tr class="hover:bg-slate-50">
         <td
-            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-[var(--text-primary)]">
+            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-[var(--text-primary)]  text-start">
             {{ submission.task.title }}</td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-[var(--text-secondary)]">
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-[var(--text-secondary)]  text-start">
             <div class="flex items-center gap-3">
-                {% if submission.step_progress.mentor_assignment.enrollment.learner.user.image.url %}
+                {% if submission.step_progress.mentor_assignment.enrollment.learner.user.image %}
                     <img src="{{ submission.step_progress.mentor_assignment.enrollment.learner.user.image.url }}" class="h-8 w-8 rounded-full object-cover" alt="Profile">
                 {% else %}
                     <img src="{% static 'images/default_user_image.jpg' %}" class="h-8 w-8 rounded-full object-cover" alt="Default Profile">
@@ -16,9 +16,9 @@
                 <span>{{ submission.step_progress.mentor_assignment.enrollment.learner.user.get_full_name }}</span>
             </div>
         </td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-[var(--text-secondary)]">
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-[var(--text-secondary)]  text-start">
             {{ submission.submitted_at }}</td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-right">
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-start">
             {% if submission.has_evaluation %}
                 <a
                     href='{% url "mentor-feedback" submission.id %}'

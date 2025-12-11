@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
 
 {% block content %}
 <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden bg-slate-50">
@@ -9,16 +10,16 @@
                 <a class="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-[var(--brand-primary)] transition-colors"
                     href="/session_list">
                     <span class="material-symbols-outlined">arrow_back</span>
-                    Back to Session History
+                    {% trans "Back to Session History"%}
                 </a>
             </div>
 
             <div class="my-8">
                 <h1 class="text-3xl font-bold tracking-tight text-slate-900">
-                    Private Session Details
+                    {% trans "Private Session Details"%}
                 </h1>
                 <p class="mt-1 text-slate-600">
-                    Full details of this private mentoring session.
+                    {% trans "Full details of this private mentoring session."%}
                 </p>
             </div>
 
@@ -33,28 +34,28 @@
                     {% endif %}
                     <div>
                         <p class="font-semibold text-lg">{{ learner.user.get_full_name }}</p>
-                        <p class="text-sm text-slate-600">Learner</p>
+                        <p class="text-sm text-slate-600">{% trans "Learner"%}</p>
                     </div>
                 </div>
 
                 <!-- Session info -->
                 <div class="border-t border-slate-200 pt-4 space-y-3 mt-4">
-                    <p><span class="font-medium">Session Type:</span> {{ session_obj.session_type.name_fa }}</p>
-                    <p><span class="font-medium">Date:</span> {{ session_obj.datetime|date}}</p>
-                    <p><span class="font-medium">Time:</span> {{ session_obj.datetime|time:"H:i" }}</p>
-                    <p><span class="font-medium">Attendance:</span> 
+                    <p><span class="font-medium">{% trans "Session Type:"%}</span> {{ session_obj.session_type.name_fa }}</p>
+                    <p><span class="font-medium">{% trans "Date:"%}</span> {{ session_obj.datetime|date}}</p>
+                    <p><span class="font-medium">{% trans "Time:"%}</span> {{ session_obj.datetime|time:"H:i" }}</p>
+                    <p class='flex items-end'><span class="font-medium">{% trans "Attendance:"%} </span> 
                         {% if session_obj.present %}
-                            <span class="text-green-600 font-medium">Present</span>
+                            <span class="text-green-600 font-medium"> {% trans "Present"%} </span>
                         {% else %}
-                            <span class="text-red-600 font-medium">Absent</span>
+                            <span class="text-red-600 font-medium"> {% trans "Absent"%} </span>
                         {% endif %}
                     </p>
                     {% if session_obj.recorded_meet_link %}
                     <p>
-                        <span class="font-medium">Recorded Video:</span>
+                        <span class="font-medium">{% trans "Recorded Video:"%}</span>
                         <a href="{{ session_obj.recorded_meet_link }}"
                            class="text-blue-600 underline" target="_blank">
-                           View Recording
+                           {% trans "View Recording"%}
                         </a>
                     </p>
                     {% endif %}

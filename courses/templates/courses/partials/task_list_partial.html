@@ -19,7 +19,7 @@
                     {% else %}
                     bg-transparent text-slate-600 hover:bg-slate-200
                     {% endif %}">
-            All
+            {% trans "All"%}
         </button>
     
         <button type="button" name="status" value="evaluated"
@@ -32,7 +32,7 @@
                     {% else %}
                     bg-transparent text-slate-600 hover:bg-slate-200
                     {% endif %}">
-            Completed
+            {% trans "Completed"%}
         </button>
     
         <button type="button" name="status" value="todo"
@@ -45,7 +45,7 @@
                     {% else %}
                     bg-transparent text-slate-600 hover:bg-slate-200
                     {% endif %}">
-            To Do
+            {% trans "To Do"%}
         </button>
         </div>
     
@@ -58,7 +58,7 @@
             class="h-11 w-full rounded-lg border border-slate-200 py-2 pl-10 pr-4
                     focus:border-transparent focus:outline-none focus:ring-2
                     focus:ring-[var(--primary-color)] sm:w-64"
-            placeholder="Search tasks..."
+            placeholder="{% trans "Search tasks..."%}"
             type="text"
             hx-get="{% url 'task-list' step.id %}"
             hx-target="#task-container"
@@ -86,7 +86,7 @@
                             <div class="flex items-center gap-2 text-sm">
                                 <span class="material-symbols-outlined text-base text-slate-500"> check
                                 </span>
-                                <p class="font-normal text-slate-500">Submitted: <span
+                                <p class="font-normal text-slate-500">{% trans "Submitted"%}: <span
                                         class="font-medium text-slate-600">{{task.latest_submission}}</span></p>
                             </div>
                         </div>
@@ -96,14 +96,14 @@
                     <a href='{% url "task-feedback" step_progress_id=step_progress_id task_id=task.id %}' class="flex shrink-0 items-center gap-3 self-end sm:self-center">
                         <div class="flex items-center gap-2 rounded-full bg-blue-100 px-3 py-1 text-blue-700">
                             <span class="material-symbols-outlined text-base"> task_alt </span>
-                            <span class="text-sm font-medium">Evaluated</span>
+                            <span class="text-sm font-medium">{% trans "Evaluated"%}</span>
                         </div>
                     </a>
                 {% elif task.latest_submission%}
                     <div
                         class="flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-emerald-700">
                         <span class="material-symbols-outlined text-base"> check_circle </span>
-                        <span class="text-sm font-medium">Submitted</span>
+                        <span class="text-sm font-medium">{% trans "Submitted"%}</span>
                     </div>
                 {% else %}
                     {% if step_progress_id %}
@@ -111,7 +111,7 @@
                             href='{% url "task-submission" step_progress_id=step_progress_id task_id=task.id %}'
                             class="flex h-10 min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-md bg-[var(--primary-color)] px-4 text-sm font-semibold leading-normal text-white transition-colors duration-300 hover:bg-blue-700">
                             <span class="material-symbols-outlined text-base"> upload </span>
-                            <span>Submit</span>
+                            <span>{% trans "Submit"%}</span>
                         </a>
                     {% endif %}
                 {% endif %}

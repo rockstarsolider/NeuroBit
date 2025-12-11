@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-04 01:13+0330\n"
-"PO-Revision-Date: 2025-11-04 01:17+0330\n"
-"Last-Translator: پوریا غیاثی <pouriaghiasi3@gmail.com>\n"
+"POT-Creation-Date: 2025-12-11 21:56+0330\n"
+"PO-Revision-Date: 2025-12-11 21:56+0330\n"
+"Last-Translator: لورم ایپسوم نژاد <>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -19,89 +19,92 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Translated-Using: django-rosetta 0.10.2\n"
 
-#: .\config\settings.py:183 .\templates\partials\head\header.html:13
+#: .\config\settings.py:188
 msgid "Home"
 msgstr "خانه"
 
-#: .\config\settings.py:188
+#: .\config\settings.py:193
 msgid "about us"
-msgstr ""
+msgstr "درباره ما"
 
-#: .\config\settings.py:205
+#: .\config\settings.py:210
 msgid "Navigation"
 msgstr ""
 
-#: .\config\settings.py:210
+#: .\config\settings.py:215 .\templates\partials\head\header.html:17
+#: .\templates\partials\head\header.html:22
 msgid "Dashboard"
-msgstr ""
-
-#: .\config\settings.py:215
-msgid "Users"
-msgstr ""
+msgstr "داشبورد"
 
 #: .\config\settings.py:220
-msgid "Mentors"
-msgstr ""
+msgid "Users"
+msgstr "کاربران"
 
 #: .\config\settings.py:225
+msgid "Mentors"
+msgstr "مربیان"
+
+#: .\config\settings.py:230
+#: .\courses\templates\courses\mentor\attendance_hub.html:58
+#: .\templates\partials\head\header.html:24
 msgid "Learners"
-msgstr ""
+msgstr "فراگیران"
 
-#: .\config\settings.py:230 .\courses\admin.py:1008
+#: .\config\settings.py:235 .\courses\admin.py:1008
 msgid "Subscriptions Analytics"
-msgstr ""
+msgstr "آنالیز اشتراک ها"
 
-#: .\config\settings.py:240
+#: .\config\settings.py:245
 msgid "SMS Notifications"
 msgstr ""
 
-#: .\config\settings.py:248 .\config\settings.py:253
+#: .\config\settings.py:253 .\config\settings.py:258
 msgid "Courses"
-msgstr ""
+msgstr "دوره ها"
 
-#: .\config\settings.py:258
+#: .\config\settings.py:263
 msgid "LearnerSubscribePlan"
 msgstr ""
 
-#: .\config\settings.py:263
+#: .\config\settings.py:268
 msgid "Mentor Assignment"
 msgstr ""
 
-#: .\config\settings.py:268
-msgid "Educational Steps"
-msgstr ""
-
 #: .\config\settings.py:273
-msgid "Task Evaluation"
-msgstr ""
+msgid "Educational Steps"
+msgstr "قدم ها"
 
 #: .\config\settings.py:278
-msgid "Social Post"
-msgstr ""
+msgid "Task Evaluation"
+msgstr "بررسی تسک"
 
 #: .\config\settings.py:283
+msgid "Social Post"
+msgstr "پست شبکه اجتماعی"
+
+#: .\config\settings.py:288
 msgid "MentorGroupSessionParticipant"
 msgstr ""
 
-#: .\config\settings.py:290 .\config\settings.py:295
+#: .\config\settings.py:295 .\config\settings.py:300
 msgid "Applications"
 msgstr ""
 
 #: .\core\admin.py:127
 msgid "Avatar"
-msgstr ""
+msgstr "آواتار"
 
 #: .\core\admin.py:139
 msgid "Gender"
-msgstr ""
+msgstr "جنسیت"
 
 #: .\core\admin.py:156
 msgid "Permissions"
-msgstr ""
+msgstr "دسترسی ها"
 
 #: .\core\admin.py:157
 msgid "Important dates"
-msgstr ""
+msgstr "تاریخ های مهم"
 
 #: .\core\admin.py:173
 msgid "Activate selected users"
@@ -111,15 +114,11 @@ msgstr ""
 msgid "Deactivate selected users"
 msgstr ""
 
-#: .\core\templates\core\phone.html:6
+#: .\core\templates\core\login.html:6
 msgid "Enter your phone number"
 msgstr "شماره تلفن خود را وارد کنید"
 
-#: .\core\templates\core\phone.html:13
-msgid "Phone number"
-msgstr "شماره تلفن"
-
-#: .\core\templates\core\phone.html:21
+#: .\core\templates\core\login.html:15
 msgid "Send OTP"
 msgstr "ارسال کد تایید"
 
@@ -143,33 +142,34 @@ msgstr "کد را دریافت نکردید؟"
 msgid "Resend"
 msgstr "ارسال مجدد"
 
-#: .\core\views.py:33
-msgid "OTP has expired. Please request a new one."
+#: .\core\views.py:59
+msgid "OTP code is expired!, please try again."
 msgstr "کد تایید منقضی شده است. "
 
-#: .\core\views.py:42
-msgid "Signed up!"
-msgstr "ثبت نام انجام شد!"
+#: .\core\views.py:63
+msgid "OTP code is incorrect!, please try again."
+msgstr "کد تایید نادرست است!"
 
-#: .\core\views.py:42
+#: .\core\views.py:72 .\core\views.py:76
 msgid "Signed in!"
 msgstr "ورود با موفقیت انجام شد!"
 
-#: .\core\views.py:45
-msgid "Invalid OTP"
-msgstr "کد تایید معتبر نیست"
+#: .\core\views.py:81
+msgid "Error accorded!, please try again."
+msgstr "مشکلی پیش آمد!"
 
 #: .\courses\admin.py:201 .\courses\admin.py:236
 msgid "Progress Analytics"
 msgstr ""
 
-#: .\courses\admin.py:498
+#: .\courses\admin.py:498 .\courses\templates\courses\learning_path.html:54
+#: .\courses\templates\courses\task_feedback.html:28
 msgid "Mentor"
-msgstr ""
+msgstr "مربی"
 
 #: .\courses\admin.py:517
 msgid "Fullname"
-msgstr ""
+msgstr "نام کامل"
 
 #: .\courses\admin.py:831
 msgid "Amount (T)"
@@ -188,12 +188,17 @@ msgid "Analytics & Export"
 msgstr ""
 
 #: .\courses\admin.py:951
+#: .\courses\templates\courses\mentor\mentor_feedback.html:22
+#: .\courses\templates\courses\mentor\mentor_feedback_list.html:84
+#: .\courses\templates\courses\mentor\private_session_attendance.html:37
+#: .\courses\templates\courses\mentor\private_session_manage.html:28
 msgid "Learner"
-msgstr ""
+msgstr "فراگیر"
 
 #: .\courses\admin.py:956
+#: .\courses\templates\courses\mentor\learners_list.html:97
 msgid "Plan"
-msgstr ""
+msgstr "اشتراک"
 
 #: .\courses\admin.py:960
 msgid "Start (Shamsi)"
@@ -209,73 +214,80 @@ msgstr ""
 
 #: .\courses\admin.py:975
 msgid "Final Cost"
-msgstr ""
+msgstr "قیمت نهایی"
 
 #: .\courses\admin.py:979
 msgid "Status"
-msgstr ""
+msgstr "وضعیت"
 
 #: .\courses\admin.py:982
+#: .\courses\templates\courses\mentor\learners_list.html:53
 msgid "Active"
-msgstr ""
+msgstr "فعال"
 
 #: .\courses\admin.py:984
 msgid "Expired"
 msgstr "منقضی شده"
 
-#: .\courses\forms.py:9
+#: .\courses\forms.py:7
 msgid "Hire Date"
 msgstr "تاریخ استخدام"
 
-#: .\courses\forms.py:19
+#: .\courses\forms.py:14
 msgid "Address"
 msgstr "آدرس"
 
-#: .\courses\forms.py:27
+#: .\courses\forms.py:20
 msgid "Bio"
 msgstr "درباره من"
 
-#: .\courses\forms.py:36
+#: .\courses\forms.py:27
 msgid "Specialties"
 msgstr "تخصص ها "
 
-#: .\courses\forms.py:45
-#| msgid "Enter your phone number"
+#: .\courses\forms.py:34
 msgid "Mother phone number"
 msgstr "شماره مادر"
 
-#: .\courses\forms.py:54
-#| msgid "Enter your phone number"
+#: .\courses\forms.py:37
+msgid "Mother's phone number"
+msgstr "شماره مادر"
+
+#: .\courses\forms.py:38
 msgid "Father phone number"
 msgstr "شماره پدر"
 
-#: .\courses\forms.py:66
-msgid "Username"
+#: .\courses\forms.py:41
+msgid "Father's phone number"
+msgstr "شماره پدر"
+
+#: .\courses\forms.py:46
+msgid "username"
 msgstr "نام کاربری"
 
-#: .\courses\forms.py:67
-msgid "First Name"
+#: .\courses\forms.py:46
+msgid "first_name"
 msgstr "نام"
 
-#: .\courses\forms.py:68
-msgid "Last Name"
+#: .\courses\forms.py:46
+msgid "last_name"
 msgstr "نام خانوادگی"
 
-#: .\courses\forms.py:69
-msgid "Email"
+#: .\courses\forms.py:46
+msgid "email"
 msgstr "ایمیل"
 
-#: .\courses\forms.py:70
-msgid "Birthdate"
+#: .\courses\forms.py:46
+msgid "birthdate"
 msgstr "تاریخ تولد"
 
-#: .\courses\forms.py:71
-#| msgid "Profile"
-msgid "Profile Image"
-msgstr "تصویر پروفایل"
+#: .\courses\forms.py:46
+msgid "image"
+msgstr "تصویر"
 
 #: .\courses\templates\courses\edit_profile.html:10
-#: .\courses\templates\courses\profile_overview.html:27
+#: .\courses\templates\courses\mentor\attendance_hub.html:40
+#: .\courses\templates\courses\profile_overview.html:36
 msgid "Edit Profile"
 msgstr "ویرایش پروفایل"
 
@@ -284,11 +296,11 @@ msgid "Update your personal information and profile picture."
 msgstr "اطلاعات و تصویر پروفایل خود را ویرایش کنید"
 
 #: .\courses\templates\courses\edit_profile.html:18
-#| msgid "Profile"
 msgid "Profile Picture"
 msgstr "تصویر پروفایل"
 
 #: .\courses\templates\courses\edit_profile.html:58
+#: .\courses\templates\courses\mentor\mentor_feedback.html:94
 msgid "Cancel"
 msgstr "بازگشت به داشبورد"
 
@@ -312,99 +324,890 @@ msgstr "نمای کلی پیشرفت شما"
 msgid "Overall Progress"
 msgstr "پیشرفت کلی"
 
-#: .\courses\templates\courses\learner_dash.html:31
-msgid "Tasks Completed"
-msgstr "تسک های کامل شده"
+#: .\courses\templates\courses\learner_dash.html:33
+msgid "Steps Completed"
+msgstr "قدم های کامل شده"
 
-#: .\courses\templates\courses\learner_dash.html:46
+#: .\courses\templates\courses\learner_dash.html:37
 msgid "Weekly Activity"
 msgstr "فعالیت هفتگی"
 
-#: .\courses\templates\courses\learner_dash.html:52
+#: .\courses\templates\courses\learner_dash.html:43
 msgid "Mon"
 msgstr "دوشنبه"
 
-#: .\courses\templates\courses\learner_dash.html:58
+#: .\courses\templates\courses\learner_dash.html:49
 msgid "Tue"
 msgstr "سه شنبه"
 
-#: .\courses\templates\courses\learner_dash.html:64
+#: .\courses\templates\courses\learner_dash.html:55
 msgid "Wed"
 msgstr "چهارشنبه"
 
-#: .\courses\templates\courses\learner_dash.html:70
+#: .\courses\templates\courses\learner_dash.html:61
 msgid "Thu"
 msgstr "پنج شنبه"
 
-#: .\courses\templates\courses\learner_dash.html:76
+#: .\courses\templates\courses\learner_dash.html:67
 msgid "Fri"
 msgstr "جمعه"
 
-#: .\courses\templates\courses\learner_dash.html:82
+#: .\courses\templates\courses\learner_dash.html:73
 msgid "Sat"
 msgstr "شنبه"
 
-#: .\courses\templates\courses\learner_dash.html:88
+#: .\courses\templates\courses\learner_dash.html:79
 msgid "Sun"
 msgstr "یکشنبه"
 
-#: .\courses\templates\courses\learner_dash.html:97
+#: .\courses\templates\courses\learner_dash.html:89
 msgid "Continue Learning Path"
 msgstr "ادامه مسیر یادگیری"
 
-#: .\courses\templates\courses\learner_dash.html:106
+#: .\courses\templates\courses\learner_dash.html:98
+#: .\courses\templates\courses\learning_path.html:36
 msgid "Continue Learning"
 msgstr "ادامه یادگیری"
 
-#: .\courses\templates\courses\learner_dash.html:111
+#: .\courses\templates\courses\learner_dash.html:104
 msgid "Upcoming Deadlines"
 msgstr "مهلت‌های پیش رو"
 
-#: .\courses\templates\courses\learner_dash.html:134
+#: .\courses\templates\courses\learner_dash.html:115
+msgid "Due in"
+msgstr "سررسید در"
+
+#: .\courses\templates\courses\learner_dash.html:115
+msgid "days"
+msgstr "روز"
+
+#: .\courses\templates\courses\learner_dash.html:117
+msgid "Due today"
+msgstr "سررسید امروز است!"
+
+#: .\courses\templates\courses\learner_dash.html:123
+msgid "No upcoming deadlines 🎉"
+msgstr "سررسیدی برای آینده وجود ندارد 🎉"
+
+#: .\courses\templates\courses\learner_dash.html:128
 msgid "Recent Activities"
 msgstr "فعالیت های اخیر"
 
-#: .\courses\templates\courses\learner_dash.html:159
+#: .\courses\templates\courses\learner_dash.html:137
+#: .\courses\templates\courses\partials\task_list_partial.html:89
+#: .\courses\templates\courses\partials\task_list_partial.html:106
+msgid "Submitted"
+msgstr "ثبت شده در"
+
+#: .\courses\templates\courses\learner_dash.html:137
+msgid "ago"
+msgstr "پیش"
+
+#: .\courses\templates\courses\learner_dash.html:148
+msgid "Feedback on"
+msgstr "بازخورد درباره"
+
+#: .\courses\templates\courses\learner_dash.html:149
+msgid "By"
+msgstr "توسط"
+
+#: .\courses\templates\courses\learner_dash.html:158
 msgid "Quick Access"
 msgstr "دسترسی سریع"
 
-#: .\courses\templates\courses\learner_dash.html:163
-#: .\templates\partials\head\header.html:15
-msgid "Weekly Tasks"
-msgstr "تسک های هفتگی"
+#: .\courses\templates\courses\learner_dash.html:162
+msgid "Subscription Plans"
+msgstr "اشتراک ها"
 
 #: .\courses\templates\courses\learner_dash.html:167
-#: .\templates\partials\head\header.html:14
-msgid "Learning Paths"
-msgstr "مسیر های یادگیری"
+#: .\courses\templates\courses\mentor\learners_list.html:85
+msgid "Learning Path"
+msgstr "مسیر یادگیری"
 
-#: .\courses\templates\courses\learner_dash.html:171
+#: .\courses\templates\courses\learner_dash.html:172
+#: .\templates\partials\head\header.html:18
 msgid "Profile"
 msgstr "پروفایل"
 
-#: .\courses\templates\courses\learner_dash.html:175
-#: .\templates\partials\head\header.html:16
+#: .\courses\templates\courses\learner_dash.html:176
+#: .\templates\partials\head\header.html:20
 msgid "Support"
 msgstr "پشتیبانی"
 
-#: .\courses\templates\courses\profile_overview.html:34
-#, fuzzy
-#| msgid "Continue Learning Path"
-msgid "Completed Learning Paths"
-msgstr "ادامه مسیر یادگیری"
+#: .\courses\templates\courses\learning_path.html:25
+msgid "Progress"
+msgstr "پیشرفت"
 
-#: .\courses\templates\courses\profile_overview.html:55
-#, fuzzy
-#| msgid "Learning Paths"
+#: .\courses\templates\courses\learning_path.html:48
+msgid "Path Details"
+msgstr "جزییات مسیر یادگیری"
+
+#: .\courses\templates\courses\learning_path.html:67
+msgid "Plan Type"
+msgstr "نوع اشتراک"
+
+#: .\courses\templates\courses\learning_path.html:75
+msgid "Duration"
+msgstr "مدت زمان"
+
+#: .\courses\templates\courses\learning_path.html:78
+msgid "Days"
+msgstr "روز ها"
+
+#: .\courses\templates\courses\learning_path.html:91
+msgid "Online Sessions"
+msgstr "جلسات آنلاین"
+
+#: .\courses\templates\courses\learning_path.html:98
+msgid "UPCOMING"
+msgstr "پیش رو"
+
+#: .\courses\templates\courses\learning_path.html:105
+msgid "Join Session"
+msgstr "ورود به جلسه"
+
+#: .\courses\templates\courses\learning_path.html:126
+msgid "COMPLETED"
+msgstr "کامل شده"
+
+#: .\courses\templates\courses\learning_path.html:133
+#: .\courses\templates\courses\mentor\private_session_attendance.html:58
+msgid "View Recording"
+msgstr "مشاهده ضبط"
+
+#: .\courses\templates\courses\mentor\attendance_hub.html:10
+msgid "Main Hub"
+msgstr "پنل اصلی"
+
+#: .\courses\templates\courses\mentor\attendance_hub.html:11
+msgid "Your central point for managing learners."
+msgstr "نقطه مرکزی شما برای مدیریت زبان‌آموزان."
+
+#: .\courses\templates\courses\mentor\attendance_hub.html:22
+msgid "Feedback List"
+msgstr "لیست بازخورد ها"
+
+#: .\courses\templates\courses\mentor\attendance_hub.html:23
+msgid ""
+"A list of submitted tasks that you should evaluate and write feedback for. "
+"it also includes your past feedbacks"
+msgstr ""
+"فهرستی از تسک های ارسالی که باید ارزیابی کنید و برای آنها بازخورد بنویسید. "
+"همچنین شامل بازخوردهای قبلی شما نیز می‌شود."
+
+#: .\courses\templates\courses\mentor\attendance_hub.html:28
+msgid "Go to Feedback list"
+msgstr "لیست بازخورد ها"
+
+#: .\courses\templates\courses\mentor\attendance_hub.html:41
+msgid "View and edit your profile here."
+msgstr "پروفایل خود را اینجا ببینید و ویرایش کنید."
+
+#: .\courses\templates\courses\mentor\attendance_hub.html:46
+msgid "Go to Profile Edit page"
+msgstr "ویرایش پروفایل"
+
+#: .\courses\templates\courses\mentor\attendance_hub.html:59
+msgid "View a list of your current learners"
+msgstr "مشاهده لیست زبان آموزان فعلی شما."
+
+#: .\courses\templates\courses\mentor\attendance_hub.html:64
+msgid "View Learners"
+msgstr "لیست فراگیران"
+
+#: .\courses\templates\courses\mentor\attendance_hub.html:76
+msgid "Session List"
+msgstr "لیست جلسه ها"
+
+#: .\courses\templates\courses\mentor\attendance_hub.html:77
+msgid "A quick look at your weekly and past sessions."
+msgstr "نگاهی گذرا به جلسات هفتگی و جلسات گذشته شما."
+
+#: .\courses\templates\courses\mentor\attendance_hub.html:82
+msgid "View All Sessions"
+msgstr "لیست جلسات آنلاین"
+
+#: .\courses\templates\courses\mentor\group_session_attendance.html:17
+#: .\courses\templates\courses\partials\learner_attend_history_table.html:6
+msgid "Session Date"
+msgstr "تاریخ جلسه"
+
+#: .\courses\templates\courses\mentor\group_session_attendance.html:25
+msgid "Session Time"
+msgstr "زمان جلسه"
+
+#: .\courses\templates\courses\mentor\group_session_attendance.html:33
+#: .\courses\templates\courses\mentor\group_session_attendance.html:45
+msgid "Session"
+msgstr "جلسه"
+
+#: .\courses\templates\courses\mentor\group_session_attendance.html:46
+msgid "Recording Link"
+msgstr "لینک جلسه ضبط شده"
+
+#: .\courses\templates\courses\mentor\group_session_attendance.html:56
+msgid "Session Time Changed"
+msgstr "زمان جلسه تغییر کرده است"
+
+#: .\courses\templates\courses\mentor\group_session_attendance.html:66
+msgid "Presence of Learners"
+msgstr "حضور فراگیران"
+
+#: .\courses\templates\courses\mentor\group_session_attendance.html:87
+#: .\courses\templates\courses\mentor\session_list.html:206
+#: .\courses\templates\courses\mentor\session_list.html:212
+msgid "View History"
+msgstr "مشاهده تاریخچه"
+
+#: .\courses\templates\courses\mentor\group_session_attendance.html:102
+msgid "Save"
+msgstr "ثبت"
+
+#: .\courses\templates\courses\mentor\group_session_history.html:14
+#: .\courses\templates\courses\mentor\private_session_attendance.html:13
+msgid "Back to Session History"
+msgstr "برگشتن به لیست جلسات"
+
+#: .\courses\templates\courses\mentor\group_session_history.html:52
+msgid "Participant Name"
+msgstr "نام فراگیر"
+
+#: .\courses\templates\courses\mentor\group_session_history.html:56
+#: .\courses\templates\courses\partials\learner_attend_history_table.html:9
+msgid "Attendance Status"
+msgstr "وضعیت حضور و غیاب"
+
+#: .\courses\templates\courses\mentor\group_session_history.html:85
+#: .\courses\templates\courses\mentor\learner_attendance_history.html:79
+#: .\courses\templates\courses\mentor\private_session_attendance.html:48
+#: .\courses\templates\courses\partials\learner_attend_history_table.html:37
+msgid "Present"
+msgstr "حاضر"
+
+#: .\courses\templates\courses\mentor\group_session_history.html:91
+#: .\courses\templates\courses\mentor\learner_attendance_history.html:80
+#: .\courses\templates\courses\mentor\private_session_attendance.html:50
+#: .\courses\templates\courses\partials\learner_attend_history_table.html:41
+msgid "Absent"
+msgstr "غایب"
+
+#: .\courses\templates\courses\mentor\learner_attendance_history.html:16
+msgid "Back to Learner List"
+msgstr "برگشتن به لیست فراگیران"
+
+#: .\courses\templates\courses\mentor\learner_attendance_history.html:23
+msgid "Learner Attendance History"
+msgstr "سابقه حضور و غیاب فراگیر"
+
+#: .\courses\templates\courses\mentor\learner_attendance_history.html:26
+msgid "Review all group & private session attendance for this learner."
+msgstr "حضور و غیاب تمام جلسات گروهی و خصوصی این زبان‌آموز را بررسی کنید."
+
+#: .\courses\templates\courses\mentor\learner_attendance_history.html:53
+msgid "Attendance Records"
+msgstr "سابقه حضور و غیاب"
+
+#: .\courses\templates\courses\mentor\learner_attendance_history.html:64
+#: .\courses\templates\courses\mentor\private_session_manage.html:50
+msgid "Session Type"
+msgstr "نوع جلسه"
+
+#: .\courses\templates\courses\mentor\learner_attendance_history.html:67
+#: .\courses\templates\courses\mentor\learner_attendance_history.html:78
+#: .\courses\templates\courses\mentor\learners_list.html:41
+#: .\courses\templates\courses\partials\task_list_partial.html:22
+msgid "All"
+msgstr "همه"
+
+#: .\courses\templates\courses\mentor\learner_attendance_history.html:68
+msgid "Group"
+msgstr "گروهی"
+
+#: .\courses\templates\courses\mentor\learner_attendance_history.html:69
+msgid "Private"
+msgstr "خصوصی"
+
+#: .\courses\templates\courses\mentor\learner_attendance_history.html:75
+msgid "Presence"
+msgstr "حاضر بودن"
+
+#: .\courses\templates\courses\mentor\learners_list.html:11
+msgid "My Learners"
+msgstr "فراگیران من"
+
+#: .\courses\templates\courses\mentor\learners_list.html:26
+msgid "Search learners..."
+msgstr "جستجوی فراگیران..."
+
+#: .\courses\templates\courses\mentor\learners_list.html:65
+msgid "Inactive"
+msgstr "غیر فعال"
+
+#: .\courses\templates\courses\mentor\learners_list.html:79
+msgid "Name"
+msgstr "نام"
+
+#: .\courses\templates\courses\mentor\learners_list.html:91
+msgid "Start Date"
+msgstr "تاریخ شروع"
+
+#: .\courses\templates\courses\mentor\learners_list.html:101
+#: .\courses\templates\courses\mentor\session_list.html:113
+msgid "Actions"
+msgstr "عمل"
+
+#: .\courses\templates\courses\mentor\learners_list.html:125
+msgid "Attendance history"
+msgstr "سابقه حضور و غیاب"
+
+#: .\courses\templates\courses\mentor\learners_list.html:128
+msgid "View Profile"
+msgstr "بازدید از پروفایل"
+
+#: .\courses\templates\courses\mentor\mentor_feedback.html:10
+msgid "Provide Feedback"
+msgstr "ارائه بازخورد"
+
+#: .\courses\templates\courses\mentor\mentor_feedback.html:11
+msgid "Evaluate the learner's submission and provide constructive feedback."
+msgstr "ارائه زبان‌آموز را ارزیابی کنید و بازخورد سازنده ارائه دهید."
+
+#: .\courses\templates\courses\mentor\mentor_feedback.html:15
+msgid "Task Sumbission Details"
+msgstr "جزئیات جمع‌بندی وظایف"
+
+#: .\courses\templates\courses\mentor\mentor_feedback.html:18
+#: .\courses\templates\courses\mentor\mentor_feedback_list.html:46
+#: .\courses\templates\courses\mentor\mentor_feedback_list.html:81
+msgid "Task Title"
+msgstr "عنوان تسک"
+
+#: .\courses\templates\courses\mentor\mentor_feedback.html:26
+#: .\courses\templates\courses\task_submission.html:44
+msgid "Links"
+msgstr "لینک ها"
+
+#: .\courses\templates\courses\mentor\mentor_feedback.html:28
+msgid "Artifact"
+msgstr "لینک پروژه"
+
+#: .\courses\templates\courses\mentor\mentor_feedback.html:29
+msgid "Report Video"
+msgstr "لینک ویدیو"
+
+#: .\courses\templates\courses\mentor\mentor_feedback.html:30
+msgid "Repository"
+msgstr "لینک ریپازیتوری"
+
+#: .\courses\templates\courses\mentor\mentor_feedback.html:36
+msgid "Promised Date"
+msgstr "تاریخ قول داده شده"
+
+#: .\courses\templates\courses\mentor\mentor_feedback.html:40
+msgid "Submitted at"
+msgstr "ثبت شده در"
+
+#: .\courses\templates\courses\mentor\mentor_feedback.html:44
+msgid "Evaluated at"
+msgstr "ارزیابی شده در"
+
+#: .\courses\templates\courses\mentor\mentor_feedback.html:50
+msgid "Files"
+msgstr "فایل"
+
+#: .\courses\templates\courses\mentor\mentor_feedback.html:52
+#: .\courses\templates\courses\task_submission.html:65
+msgid "File"
+msgstr "فایل"
+
+#: .\courses\templates\courses\mentor\mentor_feedback.html:59
+msgid "Comment"
+msgstr "یادداشت"
+
+#: .\courses\templates\courses\mentor\mentor_feedback.html:63
+msgid "Task Description"
+msgstr "توضیحات تسک"
+
+#: .\courses\templates\courses\mentor\mentor_feedback.html:74
+msgid "Detailed Feedback"
+msgstr "بازخورد با جزییات"
+
+#: .\courses\templates\courses\mentor\mentor_feedback.html:78
+msgid "Provide clear, constructive, and actionable feedback..."
+msgstr "ارائه بازخوردهای شفاف، سازنده و کاربردی..."
+
+#: .\courses\templates\courses\mentor\mentor_feedback.html:83
+#: .\courses\templates\courses\mentor\mentor_feedback.html:84
+#: .\courses\templates\courses\mentor\mentor_feedback.html:85
+#: .\courses\templates\courses\mentor\mentor_feedback.html:86
+#: .\courses\templates\courses\mentor\mentor_feedback.html:87
+msgid "star"
+msgstr "ستاره "
+
+#: .\courses\templates\courses\mentor\mentor_feedback.html:97
+msgid "Submit Feedback"
+msgstr "ثبت بازخورد"
+
+#: .\courses\templates\courses\mentor\mentor_feedback_list.html:13
+msgid "Feedback Queue"
+msgstr "صف بازخورد"
+
+#: .\courses\templates\courses\mentor\mentor_feedback_list.html:15
+msgid "Tasks in Queue:"
+msgstr "تسک های پیش رو:"
+
+#: .\courses\templates\courses\mentor\mentor_feedback_list.html:19
+msgid "Manage and provide feedback on pending tasks."
+msgstr "مدیریت و ارائه بازخورد در مورد وظایف در حال انجام."
+
+#: .\courses\templates\courses\mentor\mentor_feedback_list.html:32
+msgid "Search tasks by title, learner..."
+msgstr "جستجو بر اساس عنوان، فراگیر و ..."
+
+#: .\courses\templates\courses\mentor\mentor_feedback_list.html:43
+msgid "Sort by (Default)"
+msgstr "پیش فرض"
+
+#: .\courses\templates\courses\mentor\mentor_feedback_list.html:44
+msgid "Date (Newest First)"
+msgstr "تاریخ (جدیدترین)"
+
+#: .\courses\templates\courses\mentor\mentor_feedback_list.html:45
+msgid "Date (Oldest First)"
+msgstr "تاریخ (قدیمی ترین)"
+
+#: .\courses\templates\courses\mentor\mentor_feedback_list.html:47
+msgid "Learner Name"
+msgstr "نام فراگیر"
+
+#: .\courses\templates\courses\mentor\mentor_feedback_list.html:57
+msgid "Filter by Evaluation"
+msgstr "فیلتر بر اساس ارزیابی"
+
+#: .\courses\templates\courses\mentor\mentor_feedback_list.html:62
+#: .\courses\templates\courses\partials\mentor_feedback_table.html:27
+#: .\courses\templates\courses\partials\task_list_partial.html:99
+msgid "Evaluated"
+msgstr "ارزیابی شد"
+
+#: .\courses\templates\courses\mentor\mentor_feedback_list.html:68
+msgid "Pending"
+msgstr "در انتظار"
+
+#: .\courses\templates\courses\mentor\mentor_feedback_list.html:87
+msgid "Submission Date"
+msgstr "تاریخ ثبت"
+
+#: .\courses\templates\courses\mentor\mentor_feedback_list.html:90
+msgid "Action"
+msgstr "عمل"
+
+#: .\courses\templates\courses\mentor\private_session_attendance.html:19
+msgid "Private Session Details"
+msgstr "جزئیات جلسه خصوصی"
+
+#: .\courses\templates\courses\mentor\private_session_attendance.html:22
+msgid "Full details of this private mentoring session."
+msgstr "جزئیات کامل جلسه بررسی کد خصوصی."
+
+#: .\courses\templates\courses\mentor\private_session_attendance.html:43
+msgid "Session Type:"
+msgstr "نوع جلسه"
+
+#: .\courses\templates\courses\mentor\private_session_attendance.html:44
+msgid "Date:"
+msgstr "تاریخ:"
+
+#: .\courses\templates\courses\mentor\private_session_attendance.html:45
+msgid "Time:"
+msgstr "زمان:"
+
+#: .\courses\templates\courses\mentor\private_session_attendance.html:46
+msgid "Attendance:"
+msgstr "وضعیت حضور و غیاب:"
+
+#: .\courses\templates\courses\mentor\private_session_attendance.html:55
+msgid "Recorded Video:"
+msgstr "لینک ویدیو جلسه:"
+
+#: .\courses\templates\courses\mentor\private_session_manage.html:11
+msgid "Attendance for Private Code Review"
+msgstr "حضور در جلسه بررسی خصوصی کد"
+
+#: .\courses\templates\courses\mentor\private_session_manage.html:12
+msgid "Session:"
+msgstr "جلسه"
+
+#: .\courses\templates\courses\mentor\private_session_manage.html:13
+msgid "Learner:"
+msgstr "فراگیر"
+
+#: .\courses\templates\courses\mentor\private_session_manage.html:14
+msgid "Date/Time:"
+msgstr "تاریخ/زمان:"
+
+#: .\courses\templates\courses\mentor\private_session_manage.html:18
+msgid "Authorized Participant"
+msgstr "شرکت‌کننده مجاز"
+
+#: .\courses\templates\courses\mentor\private_session_manage.html:32
+msgid "Attendance"
+msgstr "وضعیت حضور و غیاب"
+
+#: .\courses\templates\courses\mentor\private_session_manage.html:40
+msgid "Recorded Video Link "
+msgstr "لینک ویدیو جلسه"
+
+#: .\courses\templates\courses\mentor\private_session_manage.html:66
+msgid "Save Attendance"
+msgstr "ثبت وقوع جلسه"
+
+#: .\courses\templates\courses\mentor\session_list.html:12
+msgid "My Sessions"
+msgstr "جلسات من"
+
+#: .\courses\templates\courses\mentor\session_list.html:28
+msgid "Search sessions..."
+msgstr "جستجوی جلسه ها..."
+
+#: .\courses\templates\courses\mentor\session_list.html:41
+msgid "Sort by Date (Newest)"
+msgstr "مرتب سازی بر اساس تاریخ (جدیدترین)"
+
+#: .\courses\templates\courses\mentor\session_list.html:45
+msgid "Sort by Date (Oldest)"
+msgstr "مرتب سازی بر اساس تاریخ (قدیمی ترین)"
+
+#: .\courses\templates\courses\mentor\session_list.html:49
+msgid "Sort by Title (A-Z)"
+msgstr "مرتب سازی بر اساس عنوان (الف تا ی)"
+
+#: .\courses\templates\courses\mentor\session_list.html:53
+msgid "Sort by Title (Z-A)"
+msgstr "مرتب سازی بر اساس عنوان (ی تا الف)"
+
+#: .\courses\templates\courses\mentor\session_list.html:66
+msgid "Weekly Sessions"
+msgstr "جلسات هفتگی"
+
+#: .\courses\templates\courses\mentor\session_list.html:75
+msgid "History"
+msgstr "تاریخچه"
+
+#: .\courses\templates\courses\mentor\session_list.html:89
+msgid "Session Title"
+msgstr "عنوان جلسه"
+
+#: .\courses\templates\courses\mentor\session_list.html:92
+msgid "Type"
+msgstr "نوع"
+
+#: .\courses\templates\courses\mentor\session_list.html:96
+msgid "Day"
+msgstr "روز"
+
+#: .\courses\templates\courses\mentor\session_list.html:99
+#: .\courses\templates\courses\partials\learner_attend_history_table.html:7
+msgid "Time"
+msgstr "زمان"
+
+#: .\courses\templates\courses\mentor\session_list.html:103
+msgid "Held at"
+msgstr "برگزار شده در "
+
+#: .\courses\templates\courses\mentor\session_list.html:108
+msgid "Session Link"
+msgstr "لینک جلسه"
+
+#: .\courses\templates\courses\mentor\session_list.html:110
+msgid "Recorded Session Link"
+msgstr "لینک جلسه ضبط شده"
+
+#: .\courses\templates\courses\mentor\session_list.html:126
+#: .\courses\templates\courses\mentor\session_list.html:130
+msgid "code review"
+msgstr "بررسی کد"
+
+#: .\courses\templates\courses\mentor\session_list.html:168
+#: .\courses\templates\courses\mentor\session_list.html:173
+msgid "Join"
+msgstr "ورود به جلسه"
+
+#: .\courses\templates\courses\mentor\session_list.html:178
+#: .\courses\templates\courses\mentor\session_list.html:183
+#: .\courses\templates\courses\step_list.html:30
+msgid "View"
+msgstr "مشاهده"
+
+#: .\courses\templates\courses\mentor\session_list.html:194
+#: .\courses\templates\courses\mentor\session_list.html:200
+msgid "Add session occurrence"
+msgstr "افزودن وقوع جلسه"
+
+#: .\courses\templates\courses\mentor\session_list.html:220
+msgid "No sessions found."
+msgstr "هیچ جلسه ای پیدا نشد"
+
+#: .\courses\templates\courses\partials\learner_attend_history_table.html:8
+msgid "Session Topic"
+msgstr "موضوع جلسه"
+
+#: .\courses\templates\courses\partials\learner_attend_history_table.html:28
+msgid "(Group)"
+msgstr "(گروهی)"
+
+#: .\courses\templates\courses\partials\learner_attend_history_table.html:30
+msgid "(Private)"
+msgstr "(خصوصی)"
+
+#: .\courses\templates\courses\partials\learner_attend_history_table.html:49
+msgid "No attendance records found."
+msgstr "هیچ سابقه حضور و غیابی یافت نشد."
+
+#: .\courses\templates\courses\partials\mentor_feedback_table.html:34
+msgid "Review Task"
+msgstr "بررسی تسک"
+
+#: .\courses\templates\courses\partials\task_list_partial.html:35
+#: .\courses\templates\courses\task_list.html:34
+msgid "Completed"
+msgstr "کامل شده"
+
+#: .\courses\templates\courses\partials\task_list_partial.html:48
+msgid "To Do"
+msgstr "برای انجام"
+
+#: .\courses\templates\courses\partials\task_list_partial.html:61
+msgid "Search tasks..."
+msgstr "جستجوی تسک ها..."
+
+#: .\courses\templates\courses\partials\task_list_partial.html:114
+msgid "Submit"
+msgstr "ثبت"
+
+#: .\courses\templates\courses\partials\task_list_partial.html:127
+msgid "Study Items &amp; Guidelines"
+msgstr "موارد و دستورالعمل‌های مطالعه"
+
+#: .\courses\templates\courses\partials\task_list_partial.html:128
+msgid "Resources to help you with this week's tasks."
+msgstr "منابعی که در انجام تسک ها به شما کمک می‌کنند."
+
+#: .\courses\templates\courses\partials\task_list_partial.html:132
+msgid "Study Items"
+msgstr "موارد مطالعه"
+
+#: .\courses\templates\courses\partials\task_list_partial.html:155
+msgid "Guidelines"
+msgstr "رهنمودها"
+
+#: .\courses\templates\courses\partials\task_list_partial.html:160
+msgid "Make sure to submit your tasks before your deadline."
+msgstr "حتماً وظایف خود را قبل از مهلت مقرر ارسال کنید."
+
+#: .\courses\templates\courses\partials\task_list_partial.html:165
+msgid "Use the resources above before starting your tasks."
+msgstr "قبل از شروع وظایف خود از منابع بالا استفاده کنید."
+
+#: .\courses\templates\courses\profile_overview.html:45
+msgid "Completed Learning Paths"
+msgstr "مسیر های یادگیری کامل شده"
+
+#: .\courses\templates\courses\profile_overview.html:66
 msgid "In Progress Learning Paths"
-msgstr "مسیر های یادگیری"
+msgstr "مسیر های یادگیری در حال پیشرفت"
+
+#: .\courses\templates\courses\step_list.html:10
+msgid "Your Learning Path"
+msgstr "مسیر یادگیری شما"
+
+#: .\courses\templates\courses\step_list.html:11
+msgid "Follow these steps to master new skills and complete your course."
+msgstr ""
+"برای تسلط بر مهارت‌های جدید و تکمیل دوره خود، این مراحل را دنبال کنید."
+
+#: .\courses\templates\courses\step_list.html:22
+#: .\courses\templates\courses\step_list.html:43
+#: .\courses\templates\courses\step_list.html:62
+msgid "Step"
+msgstr "قدم ها"
+
+#: .\courses\templates\courses\step_list.html:51
+#: .\courses\templates\courses\step_list.html:75
+msgid "Continue"
+msgstr "ادامه یادگیری"
+
+#: .\courses\templates\courses\task_feedback.html:11
+msgid "Task list"
+msgstr "لیست تسک ها"
+
+#: .\courses\templates\courses\task_feedback.html:13
+#: .\courses\templates\courses\task_feedback.html:17
+#: .\courses\templates\courses\task_submission.html:23
+msgid "Task"
+msgstr "تسک"
+
+#: .\courses\templates\courses\task_feedback.html:18
+msgid "Mentor Feedback"
+msgstr "بازخورد مربی"
+
+#: .\courses\templates\courses\task_feedback.html:50
+msgid "Back to Task List"
+msgstr "برگشتن به لیست تسک ها"
+
+#: .\courses\templates\courses\task_list.html:10
+msgid "Weekly Tasks"
+msgstr "تسک های هفتگی"
+
+#: .\courses\templates\courses\task_list.html:11
+msgid "Manage your tasks for the week ahead and stay on track."
+msgstr "وظایف خود را برای هفته پیش رو مدیریت کنید و طبق برنامه پیش بروید."
+
+#: .\courses\templates\courses\task_list.html:16
+msgid "Weekly Progress"
+msgstr "پیشرفت کلی"
+
+#: .\courses\templates\courses\task_list.html:19
+msgid "Due date:"
+msgstr "تاریخ سررسید:"
+
+#: .\courses\templates\courses\task_list.html:20
+msgid "Edit Promise"
+msgstr "ویرایش قول"
+
+#: .\courses\templates\courses\task_list.html:22
+msgid "Set Promise"
+msgstr "قول دادن"
+
+#: .\courses\templates\courses\task_list.html:38
+msgid "To-Do"
+msgstr "پیش رو"
+
+#: .\courses\templates\courses\task_submission.html:13
+msgid "Task Submission"
+msgstr "ثبت تسک"
+
+#: .\courses\templates\courses\task_submission.html:21
+msgid "Task Number"
+msgstr "شماره تسک"
+
+#: .\courses\templates\courses\task_submission.html:30
+msgid "Due Date"
+msgstr "تاریخ سررسید:"
+
+#: .\courses\templates\courses\task_submission.html:47
+msgid "Artifact Link"
+msgstr "لینک پروژه"
+
+#: .\courses\templates\courses\task_submission.html:51
+msgid "Report Video Link"
+msgstr "لینک ویدیو"
+
+#: .\courses\templates\courses\task_submission.html:55
+msgid "Repository Link"
+msgstr "لینک ریپازیتوری"
+
+#: .\courses\templates\courses\task_submission.html:62
+msgid "Attachments"
+msgstr "فایل های پیوست"
+
+#: .\courses\templates\courses\task_submission.html:72
+msgid "Video"
+msgstr "ویدیو"
+
+#: .\courses\templates\courses\task_submission.html:84
+msgid "Description"
+msgstr "توضیحات"
+
+#: .\courses\templates\courses\task_submission.html:90
+msgid "Social Media Posts"
+msgstr "پست های شبکه اجتماعی"
+
+#: .\courses\templates\courses\task_submission.html:94
+msgid "Platform Name"
+msgstr "نام پلتفرم"
+
+#: .\courses\templates\courses\task_submission.html:102
+msgid "Post Date"
+msgstr "تاریخ پست"
+
+#: .\courses\templates\courses\task_submission.html:107
+msgid "Post Link"
+msgstr "لینک پست"
+
+#: .\courses\templates\courses\task_submission.html:111
+msgid "Short Description"
+msgstr "توضیحات کوتاه"
+
+#: .\courses\templates\courses\task_submission.html:119
+msgid "Submit Assignment"
+msgstr "ارسال تسک"
+
+#: .\courses\templates\courses\task_submission.html:126
+msgid "Your Previous Social Posts"
+msgstr "پست‌های اجتماعی قبلی شما"
+
+#: .\courses\views.py:500
+msgid "Your profile has been updated successfully."
+msgstr "پروفایل شما با موفقیت به‌روزرسانی شد."
+
+#: .\courses\views.py:504
+msgid "There was an error updating your profile. Please check the form."
+msgstr ""
+"خطایی در به‌روزرسانی پروفایل شما رخ داده است. لطفاً فرم را بررسی کنید."
+
+#: .\courses\views.py:657
+msgid "you do not have access to this page"
+msgstr "شما به این صفحه دسترسی ندارید"
+
+#: .\courses\views.py:783
+msgid "You do not have access to this page."
+msgstr "شما به این صفحه دسترسی ندارید"
+
+#: .\courses\views.py:840
+msgid "Please choose a score."
+msgstr "لطفا یک امتیاز را انتخاب کنید"
+
+#: .\courses\views.py:853
+msgid "Evaluation submitted successfully!"
+msgstr "ارزیابی با موفقیت ارسال شد!"
+
+#: .\courses\views.py:855
+msgid "Evaluation updated successfully!"
+msgstr "ارزیابی با موفقیت به روزرسانی شد!"
 
 #: .\pages\admin.py:16
 msgid "created_at"
 msgstr "ساخته شده در"
 
-#~ msgid "Achievements"
-#~ msgstr "دستاورد ها"
+#: .\templates\base.html:49
+msgid "© 2025 – All rights neurobit-reserved."
+msgstr "© ۲۰۲۵ – تمامی حقوق برای نوروبیت محفوظ است."
+
+#: .\templates\base.html:50
+msgid "Crafted with ❤️ for Iranian youth"
+msgstr "ساخته شده با ❤️ برای جوانان ایرانی"
+
+#: .\templates\partials\head\header.html:19
+msgid "Subscriptions"
+msgstr "اشتراک ها"
+
+#: .\templates\partials\head\header.html:23
+msgid "Feedback list"
+msgstr "لیست بازخورد"
+
+#: .\templates\partials\head\header.html:25
+msgid "Sessions"
+msgstr "جلسه ها"
+
+#~ msgid "Phone number"
+#~ msgstr "شماره تلفن"
+
+#~ msgid "Signed up!"
+#~ msgstr "ثبت نام انجام شد!"
+
+#~ msgid "Invalid OTP"
+#~ msgstr "کد تایید معتبر نیست"
 
 #~ msgid "schedule"
 #~ msgstr "برنامه"

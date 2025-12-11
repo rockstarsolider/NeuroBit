@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block content %}
 <div class="relative flex bg-slate-50 min-h-screen w-full flex-col overflow-x-hidden">
@@ -7,14 +8,14 @@
             <form method='post' class="space-y-8">
                 {% csrf_token %}
                 <div class="text-center">
-                    <h2 class="text-3xl font-bold tracking-tight">Attendance for Private Code Review</h2>
-                    <p class="mt-2 text-base text-gray-500">Session: <span class="font-medium text-gray-700">Private Session</span></p>
-                    <p class="text-base text-gray-500">Learner: <span class="font-medium text-gray-700">{{learner.user.get_full_name}}</span></p>
-                    <p class="text-base text-gray-500">Date/Time: <span class="font-medium text-gray-700">{{session_datetime}}</span></p>
+                    <h2 class="text-3xl font-bold tracking-tight">{% trans "Attendance for Private Code Review"%}</h2>
+                    <p class="mt-2 text-base text-gray-500">{% trans "Session:"%} <span class="font-medium text-gray-700">Private Session</span></p>
+                    <p class="text-base text-gray-500">{% trans "Learner:"%} <span class="font-medium text-gray-700">{{learner.user.get_full_name}}</span></p>
+                    <p class="text-base text-gray-500">{% trans "Date/Time:"%} <span class="font-medium text-gray-700">{{session_datetime}}</span></p>
                 </div>
                 <div class="rounded-lg border border-gray-200 bg-white shadow-sm">
                     <div class="px-6 py-4">
-                        <h3 class="text-lg font-semibold leading-tight">Authorized Participant</h3>
+                        <h3 class="text-lg font-semibold leading-tight">{% trans "Authorized Participant"%}</h3>
                     </div>
                     <div class="border-t border-gray-200 px-6 py-5">
                         <div class="flex items-center justify-between">
@@ -24,11 +25,11 @@
                                 </div>
                                 <div>
                                     <p class="text-base font-medium">{{learner.user.get_full_name}}</p>
-                                    <p class="text-sm text-gray-500">Learner</p>
+                                    <p class="text-sm text-gray-500">{% trans "Learner"%}</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-4">
-                                <span class="text-sm font-medium text-gray-500">Attendance</span>
+                                <span class="text-sm font-medium text-gray-500">{% trans "Attendance"%}</span>
                                 <!-- Presence checkbox -->
                                 <input type="checkbox" name="present" class="toggle">
                             </div>
@@ -36,7 +37,7 @@
 
                         <!-- Recorded video URL -->
                         <label class="block text-sm font-semibold text-gray-700 mb-1 mt-4">
-                            Recorded Video Link 
+                            {% trans "Recorded Video Link "%}
                         </label>
                         <input name="recorded_meet_link"
                             type="url"
@@ -46,7 +47,7 @@
                         <!-- Session Type -->
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1 mt-4">
-                                Session Type
+                                {% trans "Session Type"%}
                             </label>
                             <select name="session_type_id"
                                     class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500">
@@ -62,7 +63,7 @@
                         type='submit'
                         class="inline-flex items-center justify-center gap-2 rounded-md bg-(--primary-color) cursor-pointer px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
                         <span class="material-symbols-outlined">save</span>
-                        Save Attendance
+                        {% trans "Save Attendance"%}
                     </button>
                 </div>
             </form>

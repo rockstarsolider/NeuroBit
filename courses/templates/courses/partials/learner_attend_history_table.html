@@ -1,10 +1,12 @@
-<table class="w-full text-left">
+{% load i18n %}
+
+<table class="w-full text-start">
     <thead class="bg-secondary-50">
         <tr>
-            <th class="px-6 py-3 text-sm font-semibold text-secondary-600">Session Date</th>
-            <th class="px-6 py-3 text-sm font-semibold text-secondary-600">Time</th>
-            <th class="px-6 py-3 text-sm font-semibold text-secondary-600">Session Topic</th>
-            <th class="px-6 py-3 text-sm font-semibold text-secondary-600">Attendance Status</th>
+            <th class="px-6 py-3 text-sm font-semibold text-secondary-600 text-start">{% trans "Session Date"%}</th>
+            <th class="px-6 py-3 text-sm font-semibold text-secondary-600 text-start">{% trans "Time"%}</th>
+            <th class="px-6 py-3 text-sm font-semibold text-secondary-600 text-start">{% trans "Session Topic"%}</th>
+            <th class="px-6 py-3 text-sm font-semibold text-secondary-600 text-start">{% trans "Attendance Status"%}</th>
         </tr>
     </thead>
 
@@ -23,20 +25,20 @@
             <td class="whitespace-nowrap px-6 py-4 text-sm text-secondary-700">
                 {{ r.session_name }} 
                 {% if r.type == "group" %}
-                    <span class="text-xs text-blue-500">(Group)</span>
+                    <span class="text-xs text-blue-500">{% trans "(Group)"%}</span>
                 {% else %}
-                    <span class="text-xs text-yellow-600">(Private)</span>
+                    <span class="text-xs text-yellow-600">{% trans "(Private)"%}</span>
                 {% endif %}
             </td>
 
             <td class="whitespace-nowrap px-6 py-4 text-sm">
                 {% if r.present %}
                     <span class="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-800">
-                        Present
+                        {% trans "Present"%}
                     </span>
                 {% else %}
                     <span class="inline-flex items-center rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-800">
-                        Absent
+                        {% trans "Absent"%}
                     </span>
                 {% endif %}
             </td>
@@ -44,7 +46,7 @@
         {% empty %}
         <tr>
             <td colspan="4" class="px-6 py-6 text-center text-secondary-500">
-                No attendance records found.
+                {% trans "No attendance records found."%}
             </td>
         </tr>
         {% endfor %}

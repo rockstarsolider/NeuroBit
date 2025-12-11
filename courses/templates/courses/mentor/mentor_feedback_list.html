@@ -3,8 +3,7 @@
 {% load static %}
 
 {% block content %}
-<div class="relative flex h-auto min-h-screen w-full flex-col bg-slate-50 group/design-root overflow-x-hidden"
-    style='font-family: Lexend, "Noto Sans", sans-serif;'>
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-slate-50 group/design-root overflow-x-hidden">
     <div class="layout-container flex h-full grow flex-col">
 
         <main class="flex flex-1 justify-center py-10 px-4 sm:px-6 lg:px-8">
@@ -30,7 +29,7 @@
                             <input
                                 name="q" hx-get="." hx-target="#submission-list" hx-trigger="keyup changed delay:300ms"
                                 class="form-input w-full rounded-md border-slate-300 bg-white py-2.5 pl-10 pr-4 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:border-[var(--primary-color)] focus:ring-[var(--primary-color)]"
-                                placeholder="Search tasks by title, learner..." type="search" />
+                                placeholder="{% trans "Search tasks by title, learner..."%}" type="search" />
                         </div>
 
                         <div class="flex flex-wrap gap-3">
@@ -41,11 +40,11 @@
                                 hx-trigger="change"
                                 class="h-10 rounded-md border border-slate-300 bg-white px-3 text-sm text-[var(--text-secondary)]"
                             >
-                                <option value="">Sort by (Default)</option>
-                                <option value="date">Date (Newest First)</option>
-                                <option value="date_old">Date (Oldest First)</option>
-                                <option value="task">Task Title</option>
-                                <option value="learner">Learner Name</option>
+                                <option value="">{% trans "Sort by (Default)"%}</option>
+                                <option value="date">{% trans "Date (Newest First)"%}</option>
+                                <option value="date_old">{% trans "Date (Oldest First)"%}</option>
+                                <option value="task">{% trans "Task Title"%}</option>
+                                <option value="learner">{% trans "Learner Name"%}</option>
                             </select>
 
                             <select
@@ -55,18 +54,18 @@
                                 hx-trigger="change"
                                 class="h-10 rounded-md border border-slate-300 bg-white px-3 text-sm text-[var(--text-secondary)]"
                             >
-                                <option value="">Filter by Evaluation</option>
+                                <option value="">{% trans "Filter by Evaluation"%}</option>
                                 <option 
                                     value="evaluated"
                                     {% if request.GET.status == evaluated %}selected{% endif %}
                                 >
-                                    Evaluated
+                                    {% trans "Evaluated"%}
                                 </option>
                                 <option 
                                     value="pending"
                                     {% if request.GET.status == pending %}selected{% endif %}
                                 >
-                                    Pending
+                                    {% trans "Pending"%}
                                 </option>
                             </select>
                         </div>
@@ -78,17 +77,17 @@
                             <thead class="bg-slate-50 border-b border-slate-200">
                                 <tr>
                                     <th
-                                        class="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
-                                        Task Title</th>
+                                        class="px-6 py-3 text-start text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+                                        {% trans "Task Title"%}</th>
                                     <th
-                                        class="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
-                                        Learner</th>
+                                        class="px-6 py-3 text-start text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+                                        {% trans "Learner"%}</th>
                                     <th
-                                        class="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
-                                        Submission Date</th>
+                                        class="px-6 py-3 text-start text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+                                        {% trans "Submission Date"%}</th>
                                     <th
-                                        class="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] text-right">
-                                        Action</th>
+                                        class="px-6 py-3 text-start text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+                                        {% trans "Action"%}</th>
                                 </tr>
                             </thead>
                             <tbody id="submission-list" hx-get="{% url 'mentor-feedback-list' %}" hx-trigger="change from:#filters" class="divide-y divide-slate-200">
